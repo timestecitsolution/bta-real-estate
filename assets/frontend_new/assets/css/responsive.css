@@ -1,0 +1,117 @@
+/* Extra Small Devices (phones, <576px) */
+@media (max-width: 575.98px) {
+    .hero-banner-content {
+        min-height: auto;
+        text-align: center;
+        padding: 20px !important;
+        margin-top: 30px;
+    }
+
+    .hero-banner-content h1 {
+        font-size: 30px;
+    }
+
+    .navbar {
+        padding-block: 0px;
+        background: #00b345de;
+    }
+
+    .home-about-content {
+        background: transparent;
+    }
+
+    .title-one h1 {
+        font-size: 25px;
+    }
+
+    .title-two h1 {
+        font-size: 25px;
+    }
+
+    .project-single {
+        margin-bottom: 30px;
+    }
+
+    .why-choose .home-about-content {
+        padding-left: 0px !important;
+    }
+
+    .why-choose .row .p-5 {
+        padding: 10px !important;
+    }
+
+    .home-about-content h1 {
+        font-size: 26px;
+    }
+
+    .statistics-single {
+        border-radius: 20px;
+        text-align: center;
+    }
+
+    .upload-box {
+        width: 100%;
+    }
+
+    .upload-gallery {
+        flex-wrap: wrap;
+
+    }
+    .footer-container{
+        padding: 30px 0px;
+    }
+    .preview-gallery {
+        margin-bottom: 20px;
+    }
+
+    .footer-column {
+        flex: 1 1 100%;
+        margin-top: 20px;
+    }
+    .innerheader{
+        padding: 30px 0px;
+        margin-top: 50px;
+    }
+    .innerheader h1{
+        font-size: 20px;
+    }
+    .why-choose-single{
+        margin-bottom: 20px;
+    }
+    .speacialize-single img{
+        margin: 30px 0px;
+    }
+}
+
+ @media (max-width: 1024px) {
+      .keyfeature-single {
+        flex: 0 0 33.333%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .keyfeature-single {
+        flex: 0 0 50%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .keyfeature-single {
+        flex: 0 0 100%;
+      }
+    }
+
+/* Small Devices (phones, ≥576px and <768px) */
+@media (min-width: 576px) and (max-width: 767.98px) {}
+
+/* Medium Devices (tablets, ≥768px and <992px) */
+@media (min-width: 768px) and (max-width: 991.98px) {}
+
+/* Large Devices (desktops, ≥992px and <1200px) */
+@media (min-width: 992px) and (max-width: 1199.98px) {}
+
+/* Extra Large Devices (≥1200px and <1400px) */
+@media (min-width: 1200px) and (max-width: 1399.98px) {}
+
+/* Extra Extra Large Devices (≥1400px) */
+@media (min-width: 1400px) {}

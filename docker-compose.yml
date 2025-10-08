@@ -1,0 +1,33 @@
+services:
+  app:
+    container_name: bta_website
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_HOST=db
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: bta_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bta_real_state
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+
