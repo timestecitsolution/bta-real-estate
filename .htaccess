@@ -1,0 +1,30 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # যদি HTTPS বাধ্যতামূলক করতে চান, নিচের দুই লাইন আনকমেন্ট করুন
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # www বাদ দিতে চাইলে নিচের তিন লাইন চালু করুন
+    # RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    # RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+    # Authorization header ঠিক রাখতে
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # যদি ফোল্ডার না হয় এবং শেষে / থাকে তাহলে রিডাইরেক্ট করবে
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # যদি রিকোয়েস্ট ফাইল বা ফোল্ডার না হয়, তাহলে index.php তে পাঠাবে
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+
+
+# ফোল্ডার ব্রাউজিং চালু রাখতে
+Options +Indexes

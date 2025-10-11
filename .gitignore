@@ -46,7 +46,6 @@ Thumbs.db
 *.tmp
 
 # Apache / Server files
-.htaccess
 .htpasswd
 web.config
 
