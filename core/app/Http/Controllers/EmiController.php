@@ -27,8 +27,8 @@ class EmiController extends Controller
 
         if (in_array($request->payment_method, ['check', 'bank_transfer'])) {
         $request->validate([
-            'transaction_no' => 'required|string|max:255',
-            'check_ds_image' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'transaction_no' => 'nullable|string|max:255',
+            'check_ds_image' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
         } else {
             $request->validate([

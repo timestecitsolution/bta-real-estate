@@ -173,8 +173,8 @@
         if(paymentMethod === 'check' || paymentMethod === 'bank_transfer') {
             $('#transaction_no_amount_group').show();
             $('#check_ds_image_amount_group').show();
-            $('#transaction_no').prop('required', true);
-            $('#check_ds_image').prop('required', true);
+            // $('#transaction_no').prop('required', true);
+            // $('#check_ds_image').prop('required', true);
         } else {
             $('#transaction_no_amount_group').hide();
             $('#check_ds_image_amount_group').hide();

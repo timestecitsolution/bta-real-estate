@@ -8,6 +8,11 @@
 /.vscode/
 /storage/*.key
 /public/storage
+/core/public/emi_payment_document/
+/core/public/flat_document/
+/core/public/uploads/
+/core/uploads/land_query/
+
 Homestead.yaml
 Homestead.json
 .phpunit.result.cache
@@ -50,5 +55,3 @@ Thumbs.db
 .htpasswd
 web.config
 
-# Images or media you don't want to track (optional)
-/public/uploads/

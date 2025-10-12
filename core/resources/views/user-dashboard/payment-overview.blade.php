@@ -63,7 +63,7 @@
                         @endif
                         <td data-label="Document">
                             @if($emi->document_path)
-                                <div class="d-flex gap-2">
+                                <div>
                                     {{-- Preview Button --}}
                                     <a href="{{ route('emi.document.show', $emi->id) }}" target="_blank" class="btn btn-sm btn-info">
                                         Preview
