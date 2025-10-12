@@ -4,10 +4,11 @@
         <thead class="d-md-table-header-group">
             <tr>
                 <th>Customer Name</th>
-                <th>Project</th>
-                <th>Flat</th>
+                <th>Project (Flat)</th>
                 <th>EMI Amount</th>
                 <th>Extras Amount</th>
+                <th>Total / Remaining EMI</th>
+                <th>Paid Date</th>
                 <th>Status</th>
                 @if($user->status == '1')
                     <th>Action</th>
@@ -26,10 +27,18 @@
                 @foreach($emis as $emi)
                     <tr>
                         <td data-label="Customer Name">{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</td>
-                        <td data-label="Project">{{ $price->project->title_en ?? 'N/A' }}</td>
-                        <td data-label="Flat">{{ $price->flat->title ?? 'N/A' }}</td>
+                        <td data-label="Project (Flat)">
+                            {{ $price->project->title_en ?? 'N/A' }}
+                            ({{ $price->flat->title ?? 'N/A' }})
+                        </td>
                         <td data-label="EMI Amount">{{ $emi->emi_amount ? number_format($emi->emi_amount, 2) : 'N/A' }}</td>
                         <td data-label="Extras Amount">{{ $emi->extras_amount ? number_format($emi->extras_amount, 2) : 'N/A' }}</td>
+                        <td data-label="Total / Remaining EMI">
+                            {{ $price->emi_count ?? '0' }} / {{ $emi->remaining_emi_count ?? '0' }}
+                        </td>
+                        <td data-label="Paid Date">
+                            {{ $emi->emi_paid_date ? \Carbon\Carbon::parse($emi->emi_paid_date)->format('d M Y') : 'N/A' }}
+                        </td>
                         <td data-label="Status">
                             <span class="badge {{ $emi->status == 'approved' ? 'bg-success' : 'bg-danger' }}">
                                 {{ $emi->status ? ucfirst($emi->status) : 'N/A' }}

@@ -213,113 +213,150 @@
     });
 
     $('select[name="flat_id"]').on('change', function() {
-    var flatId = $(this).val();
+        var flatId = $(this).val();
 
-    if(flatId) {
-        $.ajax({
-            url: "{{ route('emi.flat.details') }}",
-            type: "GET",
-            data: { flat_id: flatId },
-            success: function(response) {
-                if(response.latest_status === 'pending') {
-                    alert('The latest EMI for this flat is still pending approval. Please wait until it is approved before making another payment.');
-                    $('select[name="flat_id"]').val('');
-                    return;
-                }
-
-                if(response.error) {
-                    alert(response.error);
-                    return;
-                }
-
-                // Base data
-                $('input[name="price_id"]').val(response.price_id);
-                $('input[name="customer_id"]').val(response.customer_id);
-                $('input[name="total_amount"]').val(response.total_price).prop('readonly', true);
-                $('input[name="total_emi_count"]').val(response.emi_count).prop('readonly', true);
-                $('input[name="remaining_emi_count"]').val(response.remaining_emi_count).prop('readonly', true);
-                $('input[name="due_amount"]').val(response.due_amount).prop('readonly', true);
-                $('input[name="remaining_due_amount"]').val(response.remaining_due_amount).prop('readonly', true);
-                $('input[name="emi_due_date"]').val(response.emi_due_date).prop('readonly', true);
-
-                // Set current installment
-                var $currentInstallmentInput = $('#current_installment_amount');
-                $currentInstallmentInput.val(response.emi);
-
-                // Base totals
-                var totalPaidPrevious = parseFloat(response.total_paid_amount) || 0;
-                var totalPaidWithExtrasPrevious = parseFloat(response.total_paid_amount_with_extras) || 0;
-
-                // Function to update totals based on current installment and extras
-                function updateTotals() {
-                    var currentInstallment = parseFloat($currentInstallmentInput.val()) || 0;
-                    var totalPaid = totalPaidPrevious + currentInstallment;
-
-                    var extrasAmountInput = 0;
-                    if($('#extras_amount_check').is(':checked')) {
-                        extrasAmountInput = parseFloat($('#extras_amount').val()) || 0;
+        if(flatId) {
+            $.ajax({
+                url: "{{ route('emi.flat.details') }}",
+                type: "GET",
+                data: { flat_id: flatId },
+                success: function(response) {
+                  if(response.latest_status === 'pending') {
+                        alert('The latest EMI for this flat is still pending approval. Please wait until it is approved before making another payment.');
+                        $('select[name="flat_id"]').val('');
+                        return;
                     }
-
-                    var totalPaidWithExtras = totalPaidWithExtrasPrevious + currentInstallment + extrasAmountInput;
-                    var dueWithExtras = parseFloat(response.due_amount_with_extras) - extrasAmountInput;
-                    var remainingDueWithExtras = parseFloat(response.remaining_due_amount_with_extras) - extrasAmountInput;
-
-                    $('input[name="total_paid_amount"]').val(totalPaid).prop('readonly', true);
-                    $('input[name="total_paid_amount_with_extras"]').val(totalPaidWithExtras).prop('readonly', true);
-                    $('input[name="due_amount_with_extras"]').val(dueWithExtras).prop('readonly', true);
-                    $('input[name="remaining_due_amount_with_extras"]').val(remainingDueWithExtras).prop('readonly', true);
-                }
-
-                // Initial update
-                updateTotals();
-
-                // Live update when current_installment_amount changes
-                $currentInstallmentInput.on('input keyup change', function() {
-                    updateTotals();
-                });
-
-                // Extras handling
-                if(response.extras_amount > 0){
-                    $('#extras_amount_check_group').show();
-                    $('#extras_amount_check_group label').text('Paying Extras Amount? (' + response.extras_amount + ') Tk');
-                    $('#total_paid_amount_with_extras_group label').text('Total Paid Amount (Booking + Downpayment + All Installments + Extras: ' + response.total_extras_paid + ') Tk');
-                    $('#total_due_amount_with_extras_group label').text('Total Due Amount (With Extras: ' + response.extras_amount + ') Tk');
-                    $('#remaining_due_amount_with_extras_group label').text('Remaining Due Amount (With Extras: ' + response.extras_amount + ') Tk');
-                } else {
-                    $('#extras_amount_check_group').hide();
-                    $('#extras_amount_group').hide();
-                    $('#extras_amount_check').prop('checked', false);
-                    $('#extras_amount').prop('required', false).val('');
-                }
-
-                // Extras input validation
-                $('#extras_amount').on('input keyup', function() {
-                    var val = parseFloat($(this).val()) || 0;
-                    if(val > response.extras_amount) {
-                        alert('Extras amount cannot exceed remaining amount: ' + response.extras_amount + ' Tk');
-                        $(this).val(response.extras_amount);
+                    if(response.error) {
+                        alert(response.error);
+                        return;
                     }
-                    updateTotals();
-                });
+                    $('input[name="current_installment_amount"]').val(response.emi);
 
-                $('#extras_amount_check').on('change', function() {
-                    if ($(this).is(':checked')) {
-                        $('#extras_amount_group').show();
-                        $('#extras_amount').prop('required', true).val(response.extras_amount);
+                    $total_paid_amount_previous = parseFloat(response.total_paid_amount);
+                    $current_installment_amount = parseFloat($('#current_installment_amount').val()) || 0;
+                    $total_paid_amount = $total_paid_amount_previous + $current_installment_amount;
+
+                    $total_paid_amount_with_extras_previous = parseFloat(response.total_paid_amount_with_extras);
+                    $total_paid_amount_with_extras = $total_paid_amount_with_extras_previous + $current_installment_amount;
+
+                    $('input[name="price_id"]').val(response.price_id);
+                    $('input[name="customer_id"]').val(response.customer_id);
+                    $('input[name="total_amount"]').val(response.total_price).prop('readonly', true);
+                    $('input[name="total_emi_count"]').val(response.emi_count).prop('readonly', true);
+                    $('input[name="remaining_emi_count"]').val(response.remaining_emi_count).prop('readonly', true);
+                    $('input[name="total_paid_amount"]').val($total_paid_amount).prop('readonly', true);
+                    $('input[name="total_paid_amount_with_extras"]').val($total_paid_amount_with_extras).prop('readonly', true);
+                    $('input[name="due_amount_with_extras"]').val(response.due_amount_with_extras).prop('readonly', true);
+                    $('input[name="remaining_due_amount_with_extras"]').val(response.remaining_due_amount_with_extras).prop('readonly', true);
+                    $('input[name="due_amount"]').val(response.due_amount).prop('readonly', true);
+                    $('input[name="remaining_due_amount"]').val(response.remaining_due_amount).prop('readonly', true);
+                    $('input[name="emi_due_date"]').val(response.emi_due_date).prop('readonly', true);
+
+                    if(response.extras_amount > 0){
+                        $('#extras_amount_check_group').show();
+                        $('#extras_amount_check_group label').text('Paying Extras Amount? (' + response.extras_amount + ') Tk');
+                        $('#total_paid_amount_with_extras_group label').text('Total Paid Amount (Booking + Downpayment + All Installments + Extras: ' + response.total_extras_paid + ') Tk');
+                        $('#total_due_amount_with_extras_group label').text('Total Due Amount (With Extras: ' + response.extras_amount + ') Tk');
+                        $('#remaining_due_amount_with_extras_group label').text('Remaining Due Amount (With Extras: ' + response.extras_amount + ') Tk');
                     } else {
+                        $('#extras_amount_check_group').hide();
                         $('#extras_amount_group').hide();
+                        $('#extras_amount_check').prop('checked', false);
                         $('#extras_amount').prop('required', false).val('');
                     }
-                    updateTotals();
-                });
+                    
+                    // Show or hide extras related fields based on whether any extras have been paid
+                    // if(response.total_extras_paid > 0){
+                    //     $('#total_paid_amount_with_extras_group').show();
+                    //     $('#total_due_amount_with_extras_group').show();
+                    //     $('#remaining_due_amount_with_extras_group').show();
+                    // } else {
+                    //     $('#total_paid_amount_with_extras_group').hide();
+                    //     $('#total_due_amount_with_extras_group').hide();
+                    //     $('#remaining_due_amount_with_extras_group').hide();
 
-            },
-            error: function() {
-                alert("Something went wrong!");
-            }
-        });
-    }
-});
+                    //     $('#total_paid_amount_with_extras').val('');
+                    //     $('#due_amount_with_extras').val('');
+                    //     $('#remaining_due_amount_with_extras').val('');
+                    // }
+                    
+                    // Extras amount cannot exceed remaining extras amount
+                    $('#extras_amount').on('input keyup', function() {
+                        if($(this).val() > response.extras_amount) {
+                            alert('Extras amount cannot exceed remaining amount:' + response.extras_amount + ' Tk');
+                            $(this).val(response.extras_amount);
+                        }
+                    });
 
+
+                    $('#extras_amount_check').on('change', function () {
+                      if ($(this).is(':checked')) {
+                          $('#extras_amount_group').show();
+                          $extrasAmount = response.extras_amount;
+                          $('#extras_amount').prop('required', true).val($extrasAmount);
+
+
+                          $extrasAmountInput = $('#extras_amount').val() ? parseFloat($('#extras_amount').val()) : 0;
+                            $totalPaidWithExtras = parseFloat(response.total_paid_amount_with_extras) + $extrasAmountInput;
+                            $totalDueWithExtras = parseFloat(response.due_amount_with_extras) - $extrasAmountInput;
+                            $remainingDueWithExtras = parseFloat(response.remaining_due_amount_with_extras) - $extrasAmountInput;
+
+                            $('input[name="total_paid_amount_with_extras"]').val($totalPaidWithExtras).prop('readonly', true);
+                            $('input[name="due_amount_with_extras"]').val($totalDueWithExtras).prop('readonly', true);
+                            $('input[name="remaining_due_amount_with_extras"]').val($remainingDueWithExtras).prop('readonly', true);
+
+
+                          $('#extras_amount').on('input keyup', function() {
+                                $extrasAmountInput = $(this).val() ? parseFloat($(this).val()) : 0;
+                                $totalPaidWithExtras = parseFloat(response.total_paid_amount_with_extras) + $extrasAmountInput;
+                                $totalDueWithExtras = parseFloat(response.due_amount_with_extras) - $extrasAmountInput;
+                                $remainingDueWithExtras = parseFloat(response.remaining_due_amount_with_extras) - $extrasAmountInput;
+
+                                $('input[name="total_paid_amount_with_extras"]').val($totalPaidWithExtras).prop('readonly', true);
+                                $('input[name="due_amount_with_extras"]').val($totalDueWithExtras).prop('readonly', true);
+                                $('input[name="remaining_due_amount_with_extras"]').val($remainingDueWithExtras).prop('readonly', true);
+                            });
+
+
+                          $('#total_amount, #current_installment_amount, #emi_due_date').val('');
+
+                          $('#total_amount_group, #total_emi_count_group, #remaining_emi_count_group, #total_paid_amount_group, #total_due_amount_group, #remaining_due_amount_group, #current_installment_amount_group, #emi_due_date_group')
+                              .hide()
+                              .find('input, select, textarea')
+                              .prop('required', false);
+
+                      } else {
+                          $('#extras_amount_group').hide();
+                          $('#extras_amount').prop('required', false).val('');
+
+                          $('#total_amount_group, #total_emi_count_group, #remaining_emi_count_group, #total_paid_amount_group, #total_due_amount_group, #remaining_due_amount_group, #current_installment_amount_group, #emi_due_date_group')
+                              .show()
+                              .find('input, select, textarea')
+                              .prop('required', true);
+
+                          $('input[name="price_id"]').val(response.price_id);
+                          $('input[name="customer_id"]').val(response.customer_id);
+                          $('input[name="total_amount"]').val(response.total_price).prop('readonly', true);
+                          $('input[name="total_emi_count"]').val(response.emi_count).prop('readonly', true);
+                          $('input[name="remaining_emi_count"]').val(response.remaining_emi_count).prop('readonly', true);
+                          $('input[name="total_paid_amount"]').val(response.total_paid_amount).prop('readonly', true);
+                          $('input[name="due_amount"]').val(response.due_amount).prop('readonly', true);
+                          $('input[name="remaining_due_amount"]').val(response.remaining_due_amount).prop('readonly', true);
+                          $('input[name="current_installment_amount"]').val(response.emi);
+                          $('input[name="emi_due_date"]').val(response.emi_due_date).prop('readonly', true);
+
+                          $('input[name="total_paid_amount_with_extras"]').val(response.total_paid_amount_with_extras).prop('readonly', true);
+                          $('input[name="due_amount_with_extras"]').val(response.due_amount_with_extras).prop('readonly', true);
+                          $('input[name="remaining_due_amount_with_extras"]').val(response.remaining_due_amount_with_extras).prop('readonly', true);
+                      }
+                  });
+
+                },
+                error: function() {
+                    alert("Something went wrong!");
+                }
+            });
+        }
+    });
 });
 </script>
