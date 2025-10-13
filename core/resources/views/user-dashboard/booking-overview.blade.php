@@ -1,5 +1,33 @@
 <div class="container">
     <h3>Booked Flats</h3>
+    <form method="POST" action="{{ route('dashboard-new-post') }}">
+        @csrf
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label>Customer <span>*</span></label>
+                <select name="filter_customer_id" class="form-select" required>
+                    <option value="">Select Customer</option>
+                    @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
+                        <option value="{{ $customer->id }}" 
+                            {{ (isset($filter_customer_id) && $filter_customer_id==$customer->id) ? 'selected' : '' }}>
+                            {{ $customer->first_name }} {{ $customer->last_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>From Date</label>
+                <input type="date" class="form-control" name="filter_from_date" value="{{ $filter_from_date ?? '' }}">
+            </div>
+            <div class="col-md-3">
+                <label>To Date</label>
+                <input type="date" class="form-control" name="filter_to_date" value="{{ $filter_to_date ?? '' }}">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">Filter</button>
+            </div>
+        </div>
+    </form>
     @if($prices_details->isNotEmpty())
     <div class="table-responsive">
         <table id="booked-table" class="table table-bordered">
@@ -34,12 +62,12 @@
                     <td data-label="Due Amount">{{ $price->due_amount ?? 'N/A' }}</td>
                     <td data-label="View Documents">
                         @if($existingDocuments->isNotEmpty())
-                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#documentsModal{{ $price->id }}">
-                            View Documents
-                        </button>
-                        @include('user-dashboard.view-documents-modal', ['existingDocuments' => $existingDocuments, 'price' => $price])
+                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#documentsModal{{ $price->id }}">
+                                View Documents
+                            </button>
+                            @include('user-dashboard.view-documents-modal', ['existingDocuments' => $existingDocuments, 'price' => $price])
                         @else
-                        <span>No documents</span>
+                            <span>No documents</span>
                         @endif
                     </td>
                     <td data-label="View Details">
