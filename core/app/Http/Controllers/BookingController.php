@@ -111,21 +111,60 @@ class BookingController extends Controller
             'email' => 'Credentials do not match.',
         ]);
     }
-
-    public function dashboard()
+    
+    public function dashboard(Request $request)
     {
         $user = Auth::guard('user')->user();
-        $prices_details = PriceModel::with(['project', 'flat', 'customer'])
+
+        $all_prices_details = PriceModel::with(['customer'])
         ->when($user->status == 0, function ($query) use ($user) {
             return $query->where('customer_id', $user->contact_id);
         })
         ->get();
-        $emi_details = EmiPayment::all();
+
+        // Step 1: Default empty collections
+        $prices_details = collect();
+        $emi_details = collect();
+
+        $filter_customer_id = $request->input('filter_customer_id');
+        $filter_from_date = $request->input('filter_from_date');
+        $filter_to_date = $request->input('filter_to_date');
+
+        // Step 2: If form is submitted (POST) and customer selected
+        if ($request->isMethod('post') && $request->filled('filter_customer_id')) {
+
+            // Step 3: Fetch prices based on customer
+            $prices_details = PriceModel::with(['project', 'flat', 'customer'])
+                ->where('customer_id', $filter_customer_id)
+                ->when($user->status == 0, function ($query) use ($user) {
+                    return $query->where('customer_id', $user->contact_id);
+                })
+                ->get();
+
+            // Step 4: Fetch EMI based on selected prices
+            $price_ids = $prices_details->pluck('id');
+
+            $emi_details = EmiPayment::whereIn('price_id', $price_ids)
+                ->when($filter_from_date && $filter_to_date, function ($query) use ($filter_from_date, $filter_to_date) {
+                    return $query->whereBetween('emi_paid_date', [$filter_from_date, $filter_to_date]);
+                })
+                ->when($filter_from_date && !$filter_to_date, function ($query) use ($filter_from_date) {
+                    return $query->whereDate('emi_paid_date', '>=', $filter_from_date);
+                })
+                ->when(!$filter_from_date && $filter_to_date, function ($query) use ($filter_to_date) {
+                    return $query->whereDate('emi_paid_date', '<=', $filter_to_date);
+                })
+                ->get();
+        }
+
+        // Step 5: Static data
         $Contact = Contact::find($user->contact_id);
         $customer_details = $prices_details->isNotEmpty() ? $prices_details->first()->customer : null;
         $allDocumentTypes = DocumentType::all();
-        return view('user-dashboard', compact('prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact'));
+
+        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_from_date', 'filter_to_date'));
     }
+
 
     public function UserLogin()
     {

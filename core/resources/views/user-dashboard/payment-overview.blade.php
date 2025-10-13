@@ -1,8 +1,37 @@
 <h3>Payment Overview</h3>
+<form method="POST" action="{{ route('dashboard-new-post') }}">
+@csrf
+    <div class="row">
+        <div class="col-md-3">
+            <label>Customer <span>*</span></label>
+            <select name="filter_customer_id" class="custom-select form-control" required>
+                <option value="">Select Customer</option>
+                @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
+                    <option value="{{ $customer->id }}" {{ $filter_customer_id == $customer->id ? 'selected' : '' }}>
+                        {{ $customer->first_name }} {{ $customer->last_name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>From Date</label>
+            <input type="date" class="form-control" name="filter_from_date" value="{{ $filter_from_date ?? '' }}" placeholder="From Date">
+        </div>
+        <div class="col-md-3">
+            <label>To Date</label>
+            <input type="date" class="form-control" name="filter_to_date" value="{{ $filter_to_date ?? '' }}" placeholder="To Date">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">Filter</button>
+        </div>
+    </div>
+</form>
+@if($prices_details->isNotEmpty())
 <div class="table-responsive">
     <table id="payment-table" class="table table-striped table-bordered">
         <thead class="d-md-table-header-group">
             <tr>
+                <th>SL No</th>
                 <th>Customer Name</th>
                 <th>Project (Flat)</th>
                 <th>EMI Amount</th>
@@ -18,6 +47,7 @@
             </tr>
         </thead>
         <tbody>
+            @php $sl = 1; @endphp
             @foreach($prices_details as $price)
                 @php
                     $customer = $price->customer;
@@ -26,6 +56,7 @@
 
                 @foreach($emis as $emi)
                     <tr>
+                        <td data-label="SL No">{{ $sl++ }}</td>
                         <td data-label="Customer Name">{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</td>
                         <td data-label="Project (Flat)">
                             {{ $price->project->title_en ?? 'N/A' }}
@@ -91,6 +122,11 @@
         </tbody>
     </table>
 </div>
+@else
+    <p class="text-center text-muted mt-3">
+        Please select a customer to view EMI data.
+    </p>
+@endif
 <script>
 function printInvoice(id) {
     const modalBody = document.querySelector(`#invoiceModal${id} .modal-body`);
