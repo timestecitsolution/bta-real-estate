@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- DataTables Buttons Extension CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.min.css">
   <link href="{{ URL::asset('assets/frontend_new/assets/css/style.css') }}" rel="stylesheet" />
   <link href="{{ URL::asset('assets/frontend_new/assets/css/responsive.css') }}" rel="stylesheet" />
 </head>
@@ -36,29 +38,42 @@
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
 
-    <!-- DataTables v2 core JS -->
+  <!-- DataTables v2 core JS -->
   <script src="https://cdn.datatables.net/2.3.3/js/dataTables.min.js"></script>
 
   <!-- DataTables Bootstrap 5 integration JS -->
   <script src="https://cdn.datatables.net/2.3.3/js/dataTables.bootstrap5.min.js"></script>
-
+  <!-- Buttons Extension JS -->
+  <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.bootstrap5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
 
   <script>
-    // new DataTable('#data-table');
-    // const navbar = document.getElementById('mainNavbar');
-
-    // window.addEventListener('scroll', () => {
-    //   if (window.scrollY > 100) {
-    //     navbar.classList.add('sticky-nav', 'show');
-    //   } else {
-    //     navbar.classList.remove('sticky-nav', 'show');
-    //   }
-    // });
-
     $('#payment-table').DataTable({
         pageLength: 10,
         ordering: true,
-        searching: true
+        searching: true,
+        dom: 'Blfrtip',
+        buttons: [
+          {
+              extend: 'excelHtml5',
+              text: '📊 Download Excel',
+              className: 'btn btn-success mb-3',
+              exportOptions: {
+                  columns: [0,1,2,3,4,5,6]
+              }
+          },
+          {
+              extend: 'print',
+              text: '🖨️ Print Table',
+              className: 'btn btn-info mb-3',
+              exportOptions: {
+                  columns: [0,1,2,3,4,5,6]
+              }
+          }
+      ]
     });
 
     $('#booked-table').DataTable({
