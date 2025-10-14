@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: bta_real_state
+      MYSQL_DATABASE: bta_real_estate
     ports:
       - "3307:3306"
 

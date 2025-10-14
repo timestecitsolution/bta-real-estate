@@ -25,6 +25,8 @@ class EmiPayment extends Model
         'payment_method',
         'trx_no',
         'document_path',
+        'voucher_no',
+        'note',
         'created_by',
         'updated_by',
     ];

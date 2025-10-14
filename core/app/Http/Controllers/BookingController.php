@@ -111,7 +111,7 @@ class BookingController extends Controller
             'email' => 'Credentials do not match.',
         ]);
     }
-    
+
     public function dashboard(Request $request)
     {
         $user = Auth::guard('user')->user();
@@ -121,7 +121,6 @@ class BookingController extends Controller
             return $query->where('customer_id', $user->contact_id);
         })
         ->get();
-
         // Step 1: Default empty collections
         $prices_details = collect();
         $emi_details = collect();

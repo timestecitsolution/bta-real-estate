@@ -98,6 +98,8 @@ class EmiController extends Controller
             'payment_method' => $request->payment_method,
             'trx_no' => $request->transaction_no,
             'document_path' => $documentPath,
+            'voucher_no' => $request->voucher_no,
+            'note' => $request->note,
             'created_by' => Auth::guard('user')->user()->id,
             'updated_by' => Auth::guard('user')->user()->id,
         ]);
@@ -171,7 +173,8 @@ class EmiController extends Controller
 
         if ($emis->count() > 0) {
             $paidEmi = $emis->where('status', 'approved');
-            $remainingEmiCount = ceil($latestRemainingDue / $monthlyEmi);
+            // $remainingEmiCount = ceil($latestRemainingDue / $monthlyEmi);
+            $remainingEmiCount = $emis->sortByDesc('id')->first()->remaining_emi_count ?? $totalEmiCount;
 
             $sumPaidEmi = $paidEmi->sum('emi_amount');
 

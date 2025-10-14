@@ -39,6 +39,8 @@
                 <th>Total / Remaining EMI</th>
                 <th>Paid Date</th>
                 <th>Status</th>
+                <th>Voucher No</th>
+                <th>Note</th>
                 @if($user->status == '1')
                     <th>Action</th>
                 @endif
@@ -74,6 +76,12 @@
                             <span class="badge {{ $emi->status == 'approved' ? 'bg-success' : 'bg-danger' }}">
                                 {{ $emi->status ? ucfirst($emi->status) : 'N/A' }}
                             </span>
+                        </td>
+                        <td data-label="Voucher No">
+                            {{ $emi->voucher_no ?? 'N/A' }}
+                        </td>
+                        <td data-label="Note">
+                            {{ $emi->note ?? 'N/A' }}
                         </td>
                         @if($emi->status == 'pending' && $user->status == '1')
                             <td data-label="Action">

@@ -8,7 +8,7 @@
     <label>Customer</label>
     <select name="customer_id_select" class="custom-select form-control" required>
         <option value="">Select Customer</option>
-        @foreach($prices_details->pluck('customer')->unique('id') as $customer)
+        @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
             <option value="{{ $customer->id }}">
                 {{ $customer->first_name }} {{ $customer->last_name }}
             </option>
@@ -146,10 +146,24 @@
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
   </div>
+  <div class="form-group">
+    <label >Voucher No</label>
+    <input type="text" class="form-control" name="voucher_no" placeholder="Voucher No">
+    @error('voucher_no')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+  </div>
   <div class="form-group" id="paying_date_group">
     <label >Paying Date</label>
     <input type="date" id="emi_paying_date" class="form-control" name="emi_paying_date" placeholder="Paying Date">
     @error('emi_paying_date')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+  </div>
+  <div class="form-group">
+    <label >Note</label>
+    <textarea class="form-control" name="note" placeholder="Note"></textarea>
+    @error('note')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
   </div>
