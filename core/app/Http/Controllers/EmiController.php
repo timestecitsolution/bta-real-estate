@@ -146,7 +146,6 @@ class EmiController extends Controller
         }else {
             return redirect()->back()->with('error', 'Failed to add price. Please try again.');
         }
-
     }
 
     public function getFlatDetails(Request $request)

@@ -4,9 +4,9 @@
         @csrf
         <div class="row g-2">
             <div class="col-md-3">
-                <label>Customer <span>*</span></label>
+                <label>Client <span>*</span></label>
                 <select name="filter_customer_id" class="form-select" required>
-                    <option value="">Select Customer</option>
+                    <option value="">Select Client</option>
                     @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
                         <option value="{{ $customer->id }}" 
                             {{ (isset($filter_customer_id) && $filter_customer_id==$customer->id) ? 'selected' : '' }}>

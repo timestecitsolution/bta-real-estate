@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\PriceModel;
 use App\Models\DocumentType;
 use App\Models\FlatDocuments;
+use App\Models\BulkSmsData;
 use App\Models\Contact;
 use App\Models\EmiPayment;
 use Helper;
@@ -161,7 +162,9 @@ class BookingController extends Controller
         $customer_details = $prices_details->isNotEmpty() ? $prices_details->first()->customer : null;
         $allDocumentTypes = DocumentType::all();
 
-        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_from_date', 'filter_to_date'));
+        $bulksmsdata = BulkSmsData::all();
+
+        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata'));
     }
 
 

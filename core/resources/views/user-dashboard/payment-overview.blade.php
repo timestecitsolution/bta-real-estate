@@ -3,9 +3,9 @@
 @csrf
     <div class="row">
         <div class="col-md-3">
-            <label>Customer <span>*</span></label>
+            <label>Client <span>*</span></label>
             <select name="filter_customer_id" class="custom-select form-control" required>
-                <option value="">Select Customer</option>
+                <option value="">Select Client</option>
                 @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
                     <option value="{{ $customer->id }}" {{ $filter_customer_id == $customer->id ? 'selected' : '' }}>
                         {{ $customer->first_name }} {{ $customer->last_name }}
@@ -132,7 +132,7 @@
 </div>
 @else
     <p class="text-center text-muted mt-3">
-        Please select a customer to view EMI data.
+        Please select a client to view EMI data.
     </p>
 @endif
 <script>

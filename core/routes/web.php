@@ -9,6 +9,7 @@ use App\Http\Controllers\LandQueryController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\EmiController;
+use App\Http\Controllers\BulkSmsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +88,7 @@ Route::middleware(['force.password.change'])->group(function() {
 
     Route::get('/emi/document/{id}', [EmiController::class, 'showDocument'])->name('emi.document.show');
     Route::get('/emi/document/{id}/download', [EmiController::class, 'downloadDocument'])->name('emi.document.download');
+    Route::post('/send-sms', [BulkSmsController::class, 'bulksms'])->name('bulk.sms');
 
 });
 

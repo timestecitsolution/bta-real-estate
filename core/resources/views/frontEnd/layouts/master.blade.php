@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <!-- DataTables Buttons Extension CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.min.css">
   <link href="{{ URL::asset('assets/frontend_new/assets/css/style.css') }}" rel="stylesheet" />
@@ -49,6 +50,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   <script>
     $('#payment-table').DataTable({
@@ -109,6 +111,57 @@
                 exportOptions: { columns: [0,1,2,3,4,5,6,7] }
             }
         ]
+    });
+
+    $('#sms-history-table').DataTable({
+        pageLength: 10,
+        ordering: true,
+        searching: true,
+        dom: `<"d-flex justify-content-between align-items-center mb-2"
+                <"d-flex align-items-center"l>
+                <"d-flex justify-content-center mt-4" B>
+                <"d-flex"f>
+            >
+            rt
+            <"d-flex justify-content-between align-items-center mt-2"ip>`,
+        buttons: [
+          {
+              extend: 'excelHtml5',
+              text: '📊 Download Excel',
+              className: 'btn btn-success mb-3',
+              exportOptions: {
+                  columns: [0,1,2,3,4]
+              }
+          },
+          {
+              extend: 'print',
+              text: '🖨️ Print SMS History',
+              className: 'btn btn-info mb-3',
+              exportOptions: {
+                  columns: [0,1,2,3,4]
+              }
+          }
+      ]
+    });
+
+    $(document).ready(function() {
+        // Initialize Select2
+        $('#customerSelect').select2({
+            placeholder: "Select Customer(s)",
+            allowClear: true,
+            width: '100%'
+        });
+
+        // Handle "Select All" option
+        $('#customerSelect').on('select2:select', function(e) {
+            if (e.params.data.id === 'all') {
+                // Select all customers except "all"
+                let allOptions = $('#customerSelect option[value!="all"]').map(function() {
+                    return $(this).val();
+                }).get();
+                $('#customerSelect').val(allOptions).trigger('change');
+            }
+        });
     });
   </script>
   <script>

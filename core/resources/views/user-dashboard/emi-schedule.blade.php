@@ -5,9 +5,9 @@
     <input type="hidden" name="price_id">
     <input type="hidden" name="customer_id">
     
-    <label>Customer</label>
+    <label>Client</label>
     <select name="customer_id_select" class="custom-select form-control" required>
-        <option value="">Select Customer</option>
+        <option value="">Select Client</option>
         @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
             <option value="{{ $customer->id }}">
                 {{ $customer->first_name }} {{ $customer->last_name }}

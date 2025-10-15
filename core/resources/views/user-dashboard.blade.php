@@ -24,11 +24,24 @@
                     User Profile
                 </button>
             </li>
+            @if($user->status == '1')
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" style="color: black !important;" id="bulk-sms-tab" data-bs-toggle="tab" data-bs-target="#bulk-sms" type="button" role="tab" aria-controls="bulk-sms" aria-selected="false">
+                    Bulk Sms
+                </button>
+            </li>
+            @endif
             <li class="nav-item" role="presentation">
                 <button class="nav-link" style="color: black !important;" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab" aria-controls="notifications" aria-selected="false">
                     Action
                 </button>
             </li>
+            <div class="ms-3">
+                <form method="POST" action="{{ route('user.logout') }}">
+                    @csrf
+                    <button class="nav-link btn btn-danger" style="color: white !important; background-color: red !important;" type="submit">Logout</button>
+                </form>
+            </div>
         </ul>
 
         <!-- ===== Tab Content ===== -->
@@ -45,13 +58,18 @@
             <div class="tab-pane fade" id="user-profile" role="tabpanel" aria-labelledby="user-profile-tab">
                 @include('user-dashboard.user-profile')
             </div>
+            @if($user->status == '1')
+            <div class="tab-pane fade" id="bulk-sms" role="tabpanel" aria-labelledby="bulk-sms-tab">
+                @include('user-dashboard.bulk-sms')
+            </div>
+            @endif
             <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
                 @include('user-dashboard.notification')
             </div>
         </div>
     </div>
+    
 </section>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     // Persist active tab
