@@ -37,10 +37,11 @@
                 <th>EMI Amount</th>
                 <th>Extras Amount</th>
                 <th>Total / Remaining EMI</th>
+                <th>DUE</th>
                 <th>Paid Date</th>
                 <th>Status</th>
                 <th>Voucher No</th>
-                <th>Note</th>
+                <!-- <th>Note</th> -->
                 @if($user->status == '1')
                     <th>Action</th>
                 @endif
@@ -69,6 +70,9 @@
                         <td data-label="Total / Remaining EMI">
                             {{ $price->emi_count ?? '0' }} / {{ $emi->remaining_emi_count ?? '0' }}
                         </td>
+                        <td data-label="Remaining Due (with Extras)">
+                            {{ isset($emi->remaining_due_amount_with_extras) ? number_format($emi->remaining_due_amount_with_extras, 2) : '0.00' }}
+                        </td>
                         <td data-label="Paid Date">
                             {{ $emi->emi_paid_date ? \Carbon\Carbon::parse($emi->emi_paid_date)->format('d M Y') : 'N/A' }}
                         </td>
@@ -80,13 +84,15 @@
                         <td data-label="Voucher No">
                             {{ $emi->voucher_no ?? 'N/A' }}
                         </td>
-                        <td data-label="Note">
+                        <!-- <td data-label="Note">
                             {{ $emi->note ?? 'N/A' }}
-                        </td>
-                        @if($emi->status == 'pending' && $user->status == '1')
+                        </td> -->
+                        @if($user->status == '1')
                             <td data-label="Action">
+                                @if($emi->status == 'pending' && $user->status == '1')
                                     <a href="{{ route('emi.approve', $emi->id) }}" class="btn btn-sm btn-success">Approve</a>
                                     <a href="{{ route('emi.reject', $emi->id) }}" class="btn btn-sm btn-warning">Reject</a>
+                                @endif
                                 <form action="{{ route('emi.destroy', $emi->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
@@ -95,11 +101,17 @@
                                         Delete
                                     </button>
                                 </form>
+
+                                <button type="button" 
+                                        class="btn btn-sm btn-warning editEmiBtn" 
+                                        data-id="{{ $emi->id }}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editEmiModal{{ $emi->id }}">
+                                    <i class="fa fa-edit"></i> Edit
+                                </button>
+                                @include('user-dashboard.emi-schedule-edit', ['emi' => $emi])
                             </td>
-                        @endif
-                        @if($emi->status == 'approved' && $user->status == '1')
-                            <td data-label="Action"></td>
-                        @endif
+                            @endif
                         <td data-label="Document">
                             @if($emi->document_path)
                                 <div>
@@ -135,6 +147,7 @@
         Please select a client to view EMI data.
     </p>
 @endif
+@push('scripts')
 <script>
 function printInvoice(id) {
     const modalBody = document.querySelector(`#invoiceModal${id} .modal-body`);
@@ -145,7 +158,35 @@ function printInvoice(id) {
     printWindow.document.close();
     printWindow.print();
 }
+
+$(document).ready(function() {
+
+    // শুধু modal submit টা handle করবি
+    $(document).on('submit', '.editEmiForm', function(e) {
+        e.preventDefault();
+
+        let form = $(this);
+        let emiId = form.find('input[name="emi_id"]').val();
+        let formData = form.serialize();
+
+        $.ajax({
+            url: '/emi/' + emiId,
+            type: 'POST', // or PUT depending on backend
+            data: formData,
+            success: function(res) {
+                alert('EMI updated successfully!');
+                location.reload();
+            },
+            error: function(err) {
+                console.error(err);
+                alert('Update failed!');
+            }
+        });
+    });
+
+});
 </script>
+@endpush
 <style>
 /*  Make table vertical on small screens */
 @media (max-width: 767px) {

@@ -47,7 +47,7 @@ class EmiController extends Controller
             $payment_category = 'extras';
             $extras_amount = $request->extras_amount;
             $emi_amount = null;
-            $remaining_emi_count = $request->remaining_emi_count;
+            // $remaining_emi_count = $request->remaining_emi_count;
         }else{
             $request->validate([
                 'current_installment_amount' => 'required|numeric|min:1',
@@ -55,13 +55,16 @@ class EmiController extends Controller
             $payment_category = 'emi';
             $extras_amount = null;
             $emi_amount = $request->current_installment_amount;
-            $remaining_emi_count = $lastEmi ? $lastEmi->remaining_emi_count - 1 : $request->remaining_emi_count - 1;
+            // $remaining_emi_count = $lastEmi ? $lastEmi->remaining_emi_count - 1 : $request->remaining_emi_count - 1;
         }
-        $remaining_due = $lastEmi ? $lastEmi->remaining_due - $request->current_installment_amount : $request->due_amount - $request->current_installment_amount;
-        $remaining_due_with_extras = $lastEmi ? $lastEmi->remaining_due_amount_with_extras - $request->current_installment_amount : $request->remaining_due_amount_with_extras - $request->current_installment_amount;
-        $number_format_remaining_due = number_format((float)$remaining_due, 2, '.', '');
+        // $remaining_due = $lastEmi ? $lastEmi->remaining_due - $request->current_installment_amount : $request->due_amount - $request->current_installment_amount;
+        // $remaining_due_with_extras = $lastEmi ? $lastEmi->remaining_due_amount_with_extras - $request->current_installment_amount : $request->remaining_due_amount_with_extras - $request->current_installment_amount;
+        // $number_format_remaining_due = number_format((float)$remaining_due, 2, '.', '');
         $number_format_current_installment_amount = number_format((float)$request->current_installment_amount, 2, '.', '');
         $next_emi_date = Carbon::parse($request->emi_due_date)->addMonth()->format('Y-m-d');
+        // $total_paid_amount = $request->total_paid_amount + $request->current_installment_amount;
+
+        // $total_paid_amount_with_extras = $request->total_paid_amount_with_extras + $request->current_installment_amount;
 
         // Handle file upload
         $documentPath = null;
@@ -90,11 +93,11 @@ class EmiController extends Controller
             'emi_due_date' => $request->emi_due_date,
             'emi_paid_date' => $request->emi_paying_date,
             'status' => $status,
-            'remaining_due' => $remaining_due,
-            'remaining_due_amount_with_extras' => $remaining_due_with_extras,
-            'total_paid_amount' => $request->total_paid_amount,
-            'total_paid_amount_with_extras' => $request->total_paid_amount_with_extras,
-            'remaining_emi_count' => $remaining_emi_count,
+            // 'remaining_due' => $remaining_due,
+            // 'remaining_due_amount_with_extras' => $remaining_due_with_extras,
+            // 'total_paid_amount' => $request->total_paid_amount,
+            // 'total_paid_amount_with_extras' => $request->total_paid_amount_with_extras,
+            // 'remaining_emi_count' => $remaining_emi_count,
             'payment_method' => $request->payment_method,
             'trx_no' => $request->transaction_no,
             'document_path' => $documentPath,
@@ -136,8 +139,8 @@ class EmiController extends Controller
                     . "Your flat EMI has been paid for the project: {$project->title_en}, Flat No: {$prices->flat->title}.\n"
                     . "EMI Amount: {$number_format_current_installment_amount} BDT,\n"
                     . "Paid Date: {$request->emi_paying_date},\n"
-                    . "Your Remaining Due Amount: {$number_format_remaining_due} BDT,\n"
-                    . "Remaining EMI Count: {$remaining_emi_count},\n"
+                    // . "Your Remaining Due Amount: {$number_format_remaining_due} BDT,\n"
+                    // . "Remaining EMI Count: {$remaining_emi_count},\n"
                     . "Next EMI Date: {$next_emi_date}.\n"
                     . "Thank you for choosing us.\n"
                     . "- Building Technology & Architecture.";
@@ -148,56 +151,151 @@ class EmiController extends Controller
         }
     }
 
+    // public function getFlatDetails(Request $request)
+    // {
+    //     $flatId = $request->flat_id;
+
+    //     $price = PriceModel::with(['project', 'flat', 'customer'])->where('flat_id', $flatId)->first();
+    //     if (!$price) {
+    //         return response()->json(['error' => 'No data found'], 404);
+    //     }
+
+    //     $monthlyEmi = $price->emi;
+    //     $totalEmiCount = $price->emi_count;
+    //     $dueAmount = $price->due_amount;
+
+    //     $emis = EmiPayment::where('price_id', $price->id)
+    //               ->where('status', 'approved')
+    //               ->get();
+
+    //     $totalExtrasPaid = $emis->sum('extras_amount');
+    //     $remainingExtras = $price->extras_amount - $totalExtrasPaid ?? 0;
+    //     $latestRemainingDue = $emis->sortByDesc('id')->first()->remaining_due ?? $dueAmount;
+    //     $latestStatus = $emis->sortByDesc('id')->first()->status ?? null;
+
+    //     if ($emis->count() > 0) {
+    //         $paidEmi = $emis->where('status', 'approved');
+    //         // $remainingEmiCount = ceil($latestRemainingDue / $monthlyEmi);
+    //         $remainingEmiCount = $emis->sortByDesc('id')->first()->remaining_emi_count ?? $totalEmiCount;
+
+    //         $sumPaidEmi = $paidEmi->sum('emi_amount');
+
+    //         $lastPaidEmi = $paidEmi->sortByDesc('emi_due_date')->first();
+    //         if ($lastPaidEmi) {
+    //             $nextEmiDueDate = Carbon::parse($lastPaidEmi->emi_due_date)->addMonth();
+    //         } else {
+    //             $nextEmiDueDate = Carbon::parse($price->emi_start_date);
+    //         }
+
+    //         $currentDueAmount = $monthlyEmi;
+
+    //     } else {
+    //         $remainingEmiCount = $totalEmiCount;
+    //         $nextEmiDueDate = Carbon::parse($price->emi_start_date);
+    //         $currentDueAmount = $monthlyEmi;
+    //         $sumPaidEmi = 0;
+    //     }
+
+    //     $totalPaidAmount = ($price->booking_amount ?? 0) + ($price->downpayment_amount ?? 0) + $sumPaidEmi;
+    //     $totalPaidAmountWithExtras = $totalPaidAmount + $totalExtrasPaid;
+    //     $dueAmountWithExtras = $dueAmount + $remainingExtras;
+    //     $remainingDueAmountWithExtras = $latestRemainingDue + $remainingExtras;
+
+    //     return response()->json([
+    //         'price_id' => $price->id,
+    //         'project_id' => $price->project_id,
+    //         'flat_id' => $price->flat_id,
+    //         'flat_size' => $price->flat_size,
+    //         'customer_id' => $price->customer_id,
+    //         'price_per_sqft' => $price->price_per_sqft,
+    //         'total_price' => $price->price,
+    //         'emi' => $monthlyEmi,
+    //         'booking_amount' => $price->booking_amount,
+    //         'downpayment_amount' => $price->downpayment_amount,
+    //         'due_amount' => $dueAmount,
+    //         'remaining_due_amount' => $latestRemainingDue,
+    //         'is_negotiable_total_price' => $price->is_negotiable_total_price,
+    //         'extras_amount' => $remainingExtras,
+    //         'emi_count' => $totalEmiCount,
+    //         'remaining_emi_count' => $remainingEmiCount,
+    //         'total_paid_amount' => $totalPaidAmount,
+    //         'total_extras_paid' => $totalExtrasPaid,
+    //         'latest_status' => $latestStatus,
+    //         'total_paid_amount_with_extras' => $totalPaidAmountWithExtras,
+    //         'due_amount_with_extras' => $dueAmountWithExtras,
+    //         'remaining_due_amount_with_extras' => $remainingDueAmountWithExtras,
+    //         'current_installment_amount' => $currentDueAmount,
+    //         'emi_start_date' => $price->emi_start_date,
+    //         'emi_due_date' => $nextEmiDueDate->format('Y-m-d'),
+    //     ]);
+    // }
+
     public function getFlatDetails(Request $request)
     {
         $flatId = $request->flat_id;
 
-        $price = PriceModel::with(['project', 'flat', 'customer'])->where('flat_id', $flatId)->first();
+        $price = PriceModel::with(['project', 'flat', 'customer'])
+            ->where('flat_id', $flatId)
+            ->first();
+
         if (!$price) {
             return response()->json(['error' => 'No data found'], 404);
         }
 
-        $monthlyEmi = $price->emi;
-        $totalEmiCount = $price->emi_count;
-        $dueAmount = $price->due_amount;
+        // Base variables
+        $total_price = floatval($price->price ?? 0);
+        $emi_count = intval($price->emi_count ?? 0);
+        $monthly_emi = floatval($price->emi ?? 0);
+        $due_amount = floatval($price->due_amount ?? 0);
+        $extras_amount_total = floatval($price->extras_amount ?? 0);
 
+        // Fetch EMI Payments
         $emis = EmiPayment::where('price_id', $price->id)
-                  ->where('status', 'approved')
-                  ->get();
+            ->where('status', 'approved')
+            ->orderBy('id', 'asc')
+            ->get();
 
-        $totalExtrasPaid = $emis->sum('extras_amount');
-        $remainingExtras = $price->extras_amount - $totalExtrasPaid ?? 0;
-        $latestRemainingDue = $emis->sortByDesc('id')->first()->remaining_due ?? $dueAmount;
-        $latestStatus = $emis->sortByDesc('id')->first()->status ?? null;
+        // Default initialization
+        $total_paid = 0;
+        $total_paid_with_extras = 0;
+        $actual_emi_paid_count = 0;
 
-        if ($emis->count() > 0) {
-            $paidEmi = $emis->where('status', 'approved');
-            // $remainingEmiCount = ceil($latestRemainingDue / $monthlyEmi);
-            $remainingEmiCount = $emis->sortByDesc('id')->first()->remaining_emi_count ?? $totalEmiCount;
+        // Dynamic calculation (same as dashboard)
+        foreach ($emis as $emi) {
+            $emi_amount = floatval($emi->emi_amount ?? 0);
+            $extras_amount = floatval($emi->extras_amount ?? 0);
 
-            $sumPaidEmi = $paidEmi->sum('emi_amount');
-
-            $lastPaidEmi = $paidEmi->sortByDesc('emi_due_date')->first();
-            if ($lastPaidEmi) {
-                $nextEmiDueDate = Carbon::parse($lastPaidEmi->emi_due_date)->addMonth();
-            } else {
-                $nextEmiDueDate = Carbon::parse($price->emi_start_date);
+            if ($emi_amount > 0) {
+                $total_paid += $emi_amount;
+                $actual_emi_paid_count++;
             }
 
-            $currentDueAmount = $monthlyEmi;
-
-        } else {
-            $remainingEmiCount = $totalEmiCount;
-            $nextEmiDueDate = Carbon::parse($price->emi_start_date);
-            $currentDueAmount = $monthlyEmi;
-            $sumPaidEmi = 0;
+            $total_paid_with_extras += ($emi_amount + $extras_amount);
         }
 
-        $totalPaidAmount = ($price->booking_amount ?? 0) + ($price->downpayment_amount ?? 0) + $sumPaidEmi;
-        $totalPaidAmount = ($price->booking_amount ?? 0) + ($price->downpayment_amount ?? 0) + $sumPaidEmi;
-        $totalPaidAmountWithExtras = $totalPaidAmount + $totalExtrasPaid;
-        $dueAmountWithExtras = $dueAmount + $remainingExtras;
-        $remainingDueAmountWithExtras = $latestRemainingDue + $remainingExtras;
+        // Derived values (dynamic)
+        $remaining_due = max($total_price - $total_paid, 0);
+        $remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
+        $remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
+
+        // Extras calculation
+        $total_extras_paid = $emis->sum('extras_amount');
+        $remaining_extras = max($extras_amount_total - $total_extras_paid, 0);
+
+        // Next EMI date calculation
+        $lastEmi = $emis->sortByDesc('emi_due_date')->first();
+        if ($lastEmi) {
+            $nextEmiDueDate = \Carbon\Carbon::parse($lastEmi->emi_due_date)->addMonth();
+        } else {
+            $nextEmiDueDate = \Carbon\Carbon::parse($price->emi_start_date);
+        }
+
+        $currentDueAmount = $monthly_emi;
+
+        // Grand totals
+        $totalPaidAmount = ($price->booking_amount ?? 0) + ($price->downpayment_amount ?? 0) + $total_paid;
+        $totalPaidAmountWithExtras = $totalPaidAmount + $total_extras_paid;
+        $dueAmountWithExtras = $due_amount + $remaining_extras;
 
         return response()->json([
             'price_id' => $price->id,
@@ -207,26 +305,27 @@ class EmiController extends Controller
             'customer_id' => $price->customer_id,
             'price_per_sqft' => $price->price_per_sqft,
             'total_price' => $price->price,
-            'emi' => $monthlyEmi,
+            'emi' => $monthly_emi,
             'booking_amount' => $price->booking_amount,
             'downpayment_amount' => $price->downpayment_amount,
-            'due_amount' => $dueAmount,
-            'remaining_due_amount' => $latestRemainingDue,
-            'is_negotiable_total_price' => $price->is_negotiable_total_price,
-            'extras_amount' => $remainingExtras,
-            'emi_count' => $totalEmiCount,
-            'remaining_emi_count' => $remainingEmiCount,
-            'total_paid_amount' => $totalPaidAmount,
-            'total_extras_paid' => $totalExtrasPaid,
-            'latest_status' => $latestStatus,
-            'total_paid_amount_with_extras' => $totalPaidAmountWithExtras,
+            'due_amount' => $due_amount,
+            'remaining_due_amount' => $remaining_due,
+            'extras_amount' => $remaining_extras,
+            'emi_count' => $emi_count,
+            'remaining_emi_count' => $remaining_emi_count,
+            'total_paid_amount' => $total_paid,
+            'total_extras_paid' => $total_extras_paid,
+            'total_paid_amount_with_extras' => $total_paid_with_extras,
+            'remaining_due_amount_with_extras' => $remaining_due_amount_with_extras,
+            'total_paid_amount_final' => $totalPaidAmount,
+            'total_paid_amount_with_extras_final' => $totalPaidAmountWithExtras,
             'due_amount_with_extras' => $dueAmountWithExtras,
-            'remaining_due_amount_with_extras' => $remainingDueAmountWithExtras,
             'current_installment_amount' => $currentDueAmount,
             'emi_start_date' => $price->emi_start_date,
             'emi_due_date' => $nextEmiDueDate->format('Y-m-d'),
         ]);
     }
+
 
     public function getCustomerFlats(Request $request)
     {
@@ -262,6 +361,68 @@ class EmiController extends Controller
         $emi->save();
 
         return redirect()->back()->with('success', 'EMI rejected successfully.');
+    }
+    public function editEmi(EmiPayment $emi)
+    {
+        return response()->json($emi);
+    }
+    public function updateEmi(Request $request, $emiId)
+    {
+        $emi = EmiPayment::findOrFail($emiId);
+
+        // dynamic validation rules
+        $rules = [
+            'payment_method_edit' => 'required|string',
+            'transaction_no_edit' => 'nullable|string|max:255',
+            'check_ds_image_edit' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'voucher_no' => 'nullable|string|max:255',
+            'paying_date' => 'nullable|date',
+            'note' => 'nullable|string',
+        ];
+
+        // dynamically require based on visible field
+        if ($request->has('emi_amount')) {
+            $rules['emi_amount'] = 'required|numeric|min:0';
+        } elseif ($request->has('extras_amount')) {
+            $rules['extras_amount'] = 'required|numeric|min:0';
+        }
+
+        $request->validate($rules);
+
+        // old file path
+        $oldFile = $emi->document_path;
+        $documentPath = $oldFile;
+
+        if ($request->hasFile('check_ds_image_edit')) {
+            $folder = public_path('emi_payment_document');
+            if (!file_exists($folder)) {
+                mkdir($folder, 0777, true);
+            }
+
+            // delete old file if exists
+            if ($oldFile && file_exists(public_path($oldFile))) {
+                unlink(public_path($oldFile));
+            }
+
+            // upload new one
+            $file = $request->file('check_ds_image_edit');
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($folder, $fileName);
+            $documentPath = 'emi_payment_document/' . $fileName;
+        }
+
+        $emi->update([
+            'emi_amount'       => $request->emi_amount ?? $emi->emi_amount,
+            'extras_amount'    => $request->extras_amount ?? $emi->extras_amount,
+            'payment_method'   => $request->payment_method_edit,
+            'trx_no'           => $request->transaction_no_edit,
+            'voucher_no'       => $request->voucher_no,
+            'emi_paid_date'    => $request->paying_date,
+            'note'             => $request->note,
+            'document_path'    => $documentPath,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'EMI updated successfully!']);
     }
 
     public function destroy($id)

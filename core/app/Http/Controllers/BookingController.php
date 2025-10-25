@@ -140,7 +140,6 @@ class BookingController extends Controller
                     return $query->where('customer_id', $user->contact_id);
                 })
                 ->get();
-
             // Step 4: Fetch EMI based on selected prices
             $price_ids = $prices_details->pluck('id');
 
@@ -155,8 +154,49 @@ class BookingController extends Controller
                     return $query->whereDate('emi_paid_date', '<=', $filter_to_date);
                 })
                 ->get();
-        }
 
+                //  Dynamic EMI Balance Calculation
+                $prices = $prices_details->keyBy('id');
+                $calculatedEmis = collect();
+
+                foreach ($emi_details->groupBy('price_id') as $price_id => $emis) {
+
+                    $price_info = $prices[$price_id];
+                    $total_price = floatval($price_info->price ?? 0); 
+                    $emi_count = intval($price_info->emi_count ?? 0);
+
+                    $total_paid = 0;
+                    $total_paid_with_extras = 0;
+                    $actual_emi_paid_count = 0;
+
+                    foreach ($emis as $index => $emi) {
+
+                        $emi_amount = floatval($emi->emi_amount ?? 0);
+                        $extras_amount = floatval($emi->extras_amount ?? 0);
+
+
+                        if ($emi_amount > 0) {
+                            $total_paid += $emi_amount;
+                            $actual_emi_paid_count++;
+                        }
+
+                        // $total_paid += $emi_amount;
+                        $total_paid_with_extras += ($emi_amount + $extras_amount);
+
+                        $emi->total_paid_amount = $total_paid;
+                        $emi->remaining_due = max($total_price - $total_paid, 0);
+
+                        $emi->total_paid_amount_with_extras = $total_paid_with_extras;
+                        $emi->remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
+
+                        $emi->remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
+
+                        $calculatedEmis->push($emi);
+                    }
+                }
+
+                $emi_details = $calculatedEmis;
+        }
         // Step 5: Static data
         $Contact = Contact::find($user->contact_id);
         $customer_details = $prices_details->isNotEmpty() ? $prices_details->first()->customer : null;

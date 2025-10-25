@@ -12,7 +12,7 @@
                         <img src="{{ asset('uploads/settings/logo-short.svg') }}" alt="Company Logo" class="mb-2 text-center" style="max-height: 60px;">
                         <h2 class="fw-bold">Building Technology Architecture</h2>
                         <p class="mb-1">Missionpara, Narayanganj</p>
-                        <p class="mb-1">Phone: +880 1234 567 890</p>
+                        <p class="mb-1">Phone: +880 1841883887</p>
                         <p>Email: info@bta.com</p>
                     </div>
                     <div class="col-4 text-end">

@@ -14,6 +14,8 @@
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <!-- DataTables Buttons Extension CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.min.css">
+  <!-- ✅ Toastr CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
   <link href="{{ URL::asset('assets/frontend_new/assets/css/style.css') }}" rel="stylesheet" />
   <link href="{{ URL::asset('assets/frontend_new/assets/css/responsive.css') }}" rel="stylesheet" />
 </head>
@@ -51,6 +53,8 @@
   <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <!-- ✅ Toastr JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
   <script>
     $('#payment-table').DataTable({
@@ -101,7 +105,7 @@
             {
                 extend: 'excelHtml5',
                 text: '📊 Download Excel',
-                className: 'btn btn-success btn-sm me-2',
+                className: 'btn btn-success btn-sm',
                 exportOptions: { columns: [0,1,2,3,4,5,6,7] } 
             },
             {
@@ -147,7 +151,7 @@
     $(document).ready(function() {
         // Initialize Select2
         $('#customerSelect').select2({
-            placeholder: "Select Customer(s)",
+            placeholder: "Select Client(s)",
             allowClear: true,
             width: '100%'
         });
@@ -197,7 +201,7 @@
     }
   </script>
 
-
+@stack('scripts')
 </body>
 
 </html>

@@ -19,7 +19,7 @@
             <div class="form-group mb-3">
                 <label>Select Client(s)</label>
                 <select name="customer_ids[]" id="customerSelect" class="form-control" multiple required>
-                    <option value="all">-- Select All Customers --</option>
+                    <option value="all">-- Select All Clients --</option>
                     @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
                         @if($customer && $customer->id)
                             <option value="{{ $customer->id }}">
@@ -28,7 +28,7 @@
                         @endif
                     @endforeach
                 </select>
-                <small class="text-muted">Select multiple customers or choose "Select All".</small>
+                <small class="text-muted">Select multiple Clients or choose "Select All".</small>
             </div>
             @error('customer_ids')
                 <div class="invalid-feedback">{{ $message }}</div>

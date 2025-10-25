@@ -43,7 +43,7 @@
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
   </div>
-  <div class="form-group" id="total_amount_group">
+  <!-- <div class="form-group" id="total_amount_group">
     <label >Total Amount</label>
     <input type="text" id="total_amount" class="form-control" name="total_amount" placeholder="Total Amount" readonly>
     @error('total_amount')
@@ -105,7 +105,7 @@
     @error('remaining_due_amount_with_extras')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
-  </div>
+  </div> -->
   <div class="form-group" id="current_installment_amount_group">
     <label >Current Installment Amount</label>
     <input type="text" id="current_installment_amount" class="form-control" name="current_installment_amount" placeholder="Current Installment Amount">
@@ -264,33 +264,38 @@
                 var totalPaidPrevious = parseFloat(response.total_paid_amount) || 0;
                 var totalPaidWithExtrasPrevious = parseFloat(response.total_paid_amount_with_extras) || 0;
 
+                $('input[name="total_paid_amount"]').val(response.total_paid_amount).prop('readonly', true);
+                $('input[name="total_paid_amount_with_extras"]').val(response.total_paid_amount_with_extras).prop('readonly', true);
+                $('input[name="due_amount_with_extras"]').val(response.due_amount_with_extras).prop('readonly', true);
+                $('input[name="remaining_due_amount_with_extras"]').val(response.remaining_due_amount_with_extras).prop('readonly', true);
+
                 // Function to update totals based on current installment and extras
-                function updateTotals() {
-                    var currentInstallment = parseFloat($currentInstallmentInput.val()) || 0;
-                    var totalPaid = totalPaidPrevious + currentInstallment;
+                // function updateTotals() {
+                //     var currentInstallment = parseFloat($currentInstallmentInput.val()) || 0;
+                //     var totalPaid = totalPaidPrevious + currentInstallment;
 
-                    var extrasAmountInput = 0;
-                    if($('#extras_amount_check').is(':checked')) {
-                        extrasAmountInput = parseFloat($('#extras_amount').val()) || 0;
-                    }
+                //     var extrasAmountInput = 0;
+                //     if($('#extras_amount_check').is(':checked')) {
+                //         extrasAmountInput = parseFloat($('#extras_amount').val()) || 0;
+                //     }
 
-                    var totalPaidWithExtras = totalPaidWithExtrasPrevious + currentInstallment + extrasAmountInput;
-                    var dueWithExtras = parseFloat(response.due_amount_with_extras) - extrasAmountInput;
-                    var remainingDueWithExtras = parseFloat(response.remaining_due_amount_with_extras) - extrasAmountInput;
+                //     var totalPaidWithExtras = totalPaidWithExtrasPrevious + currentInstallment + extrasAmountInput;
+                //     var dueWithExtras = parseFloat(response.due_amount_with_extras) - extrasAmountInput;
+                //     var remainingDueWithExtras = parseFloat(response.remaining_due_amount_with_extras) - extrasAmountInput;
 
-                    $('input[name="total_paid_amount"]').val(totalPaid).prop('readonly', true);
-                    $('input[name="total_paid_amount_with_extras"]').val(totalPaidWithExtras).prop('readonly', true);
-                    $('input[name="due_amount_with_extras"]').val(dueWithExtras).prop('readonly', true);
-                    $('input[name="remaining_due_amount_with_extras"]').val(remainingDueWithExtras).prop('readonly', true);
-                }
+                //     $('input[name="total_paid_amount"]').val(totalPaid).prop('readonly', true);
+                //     $('input[name="total_paid_amount_with_extras"]').val(totalPaidWithExtras).prop('readonly', true);
+                //     $('input[name="due_amount_with_extras"]').val(dueWithExtras).prop('readonly', true);
+                //     $('input[name="remaining_due_amount_with_extras"]').val(remainingDueWithExtras).prop('readonly', true);
+                // }
 
-                // Initial update
-                updateTotals();
+                //Initial update
+                // updateTotals();
 
                 // Live update when current_installment_amount changes
-                $currentInstallmentInput.on('input keyup change', function() {
-                    updateTotals();
-                });
+                // $currentInstallmentInput.on('input keyup change', function() {
+                //     updateTotals();
+                // });
 
                 // Extras handling
                 if(response.extras_amount > 0){
@@ -310,21 +315,50 @@
                 $('#extras_amount').on('input keyup', function() {
                     var val = parseFloat($(this).val()) || 0;
                     if(val > response.extras_amount) {
-                        alert('Extras amount cannot exceed remaining amount: ' + response.extras_amount + ' Tk');
+                        alert('Extras amount cannot exceed remaining extra amount: ' + response.extras_amount + ' Tk');
                         $(this).val(response.extras_amount);
                     }
-                    updateTotals();
+                    // updateTotals();
                 });
 
                 $('#extras_amount_check').on('change', function() {
                     if ($(this).is(':checked')) {
                         $('#extras_amount_group').show();
                         $('#extras_amount').prop('required', true).val(response.extras_amount);
+
+
+                        $('#total_amount, #current_installment_amount, #emi_due_date').val('');
+
+                        $('#total_amount_group, #total_emi_count_group, #remaining_emi_count_group, #total_paid_amount_group, #total_due_amount_group, #remaining_due_amount_group, #current_installment_amount_group, #emi_due_date_group')
+                            .hide()
+                            .find('input, select, textarea')
+                            .prop('required', false);
                     } else {
                         $('#extras_amount_group').hide();
                         $('#extras_amount').prop('required', false).val('');
+
+
+                        $('#total_amount_group, #total_emi_count_group, #remaining_emi_count_group, #total_paid_amount_group, #total_due_amount_group, #remaining_due_amount_group, #current_installment_amount_group, #emi_due_date_group')
+                              .show()
+                              .find('input, select, textarea')
+                              .prop('required', true);
+
+                        $('input[name="price_id"]').val(response.price_id);
+                        $('input[name="customer_id"]').val(response.customer_id);
+                        $('input[name="total_amount"]').val(response.total_price).prop('readonly', true);
+                        $('input[name="total_emi_count"]').val(response.emi_count).prop('readonly', true);
+                        $('input[name="remaining_emi_count"]').val(response.remaining_emi_count).prop('readonly', true);
+                        $('input[name="total_paid_amount"]').val(response.total_paid_amount).prop('readonly', true);
+                        $('input[name="due_amount"]').val(response.due_amount).prop('readonly', true);
+                        $('input[name="remaining_due_amount"]').val(response.remaining_due_amount).prop('readonly', true);
+                        $('input[name="current_installment_amount"]').val(response.emi);
+                        $('input[name="emi_due_date"]').val(response.emi_due_date).prop('readonly', true);
+
+                        $('input[name="total_paid_amount_with_extras"]').val(response.total_paid_amount_with_extras).prop('readonly', true);
+                        $('input[name="due_amount_with_extras"]').val(response.due_amount_with_extras).prop('readonly', true);
+                        $('input[name="remaining_due_amount_with_extras"]').val(response.remaining_due_amount_with_extras).prop('readonly', true);
                     }
-                    updateTotals();
+                    // updateTotals();
                 });
 
             },

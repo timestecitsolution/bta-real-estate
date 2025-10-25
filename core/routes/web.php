@@ -82,6 +82,7 @@ Route::middleware(['force.password.change'])->group(function() {
     Route::get('/emi/flat-details', [EmiController::class, 'getFlatDetails'])->name('emi.flat.details');
     Route::get('/emi/customer/flats', [EmiController::class, 'getCustomerFlats'])->name('emi.customer.flats');
     Route::post('/emi/store', [EmiController::class, 'storeEmi'])->name('emi.store');
+    Route::post('/emi/{emi}', [EmiController::class, 'updateEmi'])->name('emi.update');
     Route::get('/emiapprove/{id}', [EmiController::class, 'approve'])->name('emi.approve');
     Route::get('/emi/reject/{id}', [EmiController::class, 'reject'])->name('emi.reject');
     Route::delete('/emidelete/{id}', [EmiController::class, 'destroy'])->name('emi.destroy');
