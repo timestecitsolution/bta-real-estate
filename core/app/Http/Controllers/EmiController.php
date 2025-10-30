@@ -289,6 +289,10 @@ class EmiController extends Controller
         } else {
             $nextEmiDueDate = \Carbon\Carbon::parse($price->emi_start_date);
         }
+        $latestStatus = EmiPayment::where('price_id', $price->id)
+                        ->orderByDesc('id')
+                        ->first()
+                        ->status ?? null;
 
         $currentDueAmount = $monthly_emi;
 
@@ -315,6 +319,7 @@ class EmiController extends Controller
             'remaining_emi_count' => $remaining_emi_count,
             'total_paid_amount' => $total_paid,
             'total_extras_paid' => $total_extras_paid,
+            'latest_status' => $latestStatus,
             'total_paid_amount_with_extras' => $total_paid_with_extras,
             'remaining_due_amount_with_extras' => $remaining_due_amount_with_extras,
             'total_paid_amount_final' => $totalPaidAmount,

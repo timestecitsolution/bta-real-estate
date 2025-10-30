@@ -55,6 +55,11 @@ Route::post('/login-new', [BookingController::class, 'loginbookinguser'])->name(
 Route::get('/change-password', [ChangePassword::class, 'index'])->name('change-password')->middleware('user');
 Route::post('/change-password', [ChangePassword::class, 'update'])->name('change-password.update')->middleware('user');
 
+Route::post('/admin/reset-default-password', [ChangePassword::class, 'resetDefaultPassword'])
+    ->name('admin.reset.default.password')
+    ->middleware('user');
+
+
 // Start of Frontend Routes
 // - site map
 Route::get('/sitemap.xml', [SiteMapController::class, 'siteMap'])->name('siteMap');

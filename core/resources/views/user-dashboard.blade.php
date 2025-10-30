@@ -32,8 +32,8 @@
             </li>
             @endif
             <li class="nav-item" role="presentation">
-                <button class="nav-link" style="color: black !important;" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab" aria-controls="notifications" aria-selected="false">
-                    Action
+                <button class="nav-link" style="color: black !important;" id="reset-password-tab" data-bs-toggle="tab" data-bs-target="#reset-password" type="button" role="tab" aria-controls="reset-password" aria-selected="false">
+                    Reset Password
                 </button>
             </li>
             <div class="ms-3">
@@ -63,8 +63,8 @@
                 @include('user-dashboard.bulk-sms')
             </div>
             @endif
-            <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
-                @include('user-dashboard.notification')
+            <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
+                @include('user-dashboard.reset-password')
             </div>
         </div>
     </div>
