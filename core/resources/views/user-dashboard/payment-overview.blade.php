@@ -161,7 +161,6 @@ function printInvoice(id) {
 
 $(document).ready(function() {
 
-    // শুধু modal submit টা handle করবি
     $(document).on('submit', '.editEmiForm', function(e) {
         e.preventDefault();
 
@@ -171,7 +170,7 @@ $(document).ready(function() {
 
         $.ajax({
             url: '/emi/' + emiId,
-            type: 'POST', // or PUT depending on backend
+            type: 'POST', 
             data: formData,
             success: function(res) {
                 alert('EMI updated successfully!');

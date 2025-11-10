@@ -10,6 +10,7 @@ use App\Mail\BookingQueryMail;
 use App\Models\User;
 use App\Models\PriceModel;
 use App\Models\DocumentType;
+use App\Models\MaterialDetails;
 use App\Models\FlatDocuments;
 use App\Models\BulkSmsData;
 use App\Models\Contact;
@@ -99,6 +100,14 @@ class BookingController extends Controller
         ]);
     }
 
+    public function getFlatsByCustomer($customer_id)
+    {
+        $flats = PriceModel::where('customer_id', $customer_id)
+                    ->with('flat')
+                    ->get()
+                    ->pluck('flat');  
+        return response()->json($flats);
+    }
 
     public function loginbookinguser(Request $request)
     {
@@ -125,8 +134,10 @@ class BookingController extends Controller
         // Step 1: Default empty collections
         $prices_details = collect();
         $emi_details = collect();
+        $material_details = collect();
 
         $filter_customer_id = $request->input('filter_customer_id');
+        $filter_flat_id = $request->input('filter_flat_id');
         $filter_from_date = $request->input('filter_from_date');
         $filter_to_date = $request->input('filter_to_date');
 
@@ -164,9 +175,13 @@ class BookingController extends Controller
                     $price_info = $prices[$price_id];
                     $total_price = floatval($price_info->price ?? 0); 
                     $emi_count = intval($price_info->emi_count ?? 0);
+                    $booking_amount = floatval($price_info->booking_amount ?? 0);
+                    $downpayment_amount = floatval($price_info->downpayment_amount ?? 0);
 
-                    $total_paid = 0;
-                    $total_paid_with_extras = 0;
+                    $total_paid = $booking_amount + $downpayment_amount;
+                    $total_paid_with_extras = $booking_amount + $downpayment_amount;
+                    // $total_paid = 0;
+                    // $total_paid_with_extras = 0;
                     $actual_emi_paid_count = 0;
 
                     foreach ($emis as $index => $emi) {
@@ -196,6 +211,11 @@ class BookingController extends Controller
                 }
 
                 $emi_details = $calculatedEmis;
+
+                $material_details = MaterialDetails::whereIn('price_id', $price_ids)
+                    ->join('material_types', 'material_details.material_type_id', '=', 'material_types.id')
+                    ->select('material_details.*', 'material_types.material_type')
+                    ->get();
         }
         // Step 5: Static data
         $Contact = Contact::find($user->contact_id);
@@ -204,7 +224,7 @@ class BookingController extends Controller
 
         $bulksmsdata = BulkSmsData::all();
 
-        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata'));
+        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details'));
     }
 
 

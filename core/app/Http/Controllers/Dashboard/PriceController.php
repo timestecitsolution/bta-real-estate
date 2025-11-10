@@ -11,7 +11,9 @@ use App\Models\WebmasterSection;
 use App\Models\Contact;
 use App\Models\PriceModel;
 use App\Models\DocumentType;
+use App\Models\MaterialType;
 use App\Models\FlatDocuments;
+use App\Models\MaterialDetails;
 use App\Models\Invoices;
 use App\Models\EmiPayment;
 use App\Http\Controllers\SMSService;
@@ -47,10 +49,11 @@ class PriceController extends Controller
         // $contacts = Contact::all();
         $contacts = Contact::where('status', 1)->get();
         $documentTypes = DocumentType::all();
+        $materialTypes = MaterialType::all();
         // General for all pages
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
         // General END
-        return view("dashboard.price.create", compact("GeneralWebmasterSections", "contacts", "documentTypes"));
+        return view("dashboard.price.create", compact("GeneralWebmasterSections", "contacts", "documentTypes", "materialTypes"));
     }
 
     /**
@@ -96,6 +99,8 @@ class PriceController extends Controller
             'discount_amount' => 'nullable|numeric',
             'document_type_id.*' => 'nullable|exists:document_types,id',
             'document.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240|required_with:document_type_id.*',
+            'material_type_id.*' => 'nullable|exists:material_types,id',
+            'material_details.*' => 'nullable|required_with:material_type_id.*',
         ]);
         $price = PriceModel::create($validated);
 
@@ -116,6 +121,19 @@ class PriceController extends Controller
                         'price_id' => $price->id,
                         'document_type_id' => $docTypeId,
                         'file_path' => 'flat_document/' . $filename,
+                    ]);
+                }
+            }
+        }
+
+        /* ------------------ Material Details Save ------------------ */
+        if ($request->has('material_type_id') && $request->has('material_details')) {
+            foreach ($request->material_type_id as $index => $materialTypeId) {
+                if ($materialTypeId && isset($request->material_details[$index])) {
+                    MaterialDetails::create([
+                        'price_id' => $price->id,
+                        'material_type_id' => $materialTypeId,
+                        'details' => $request->material_details[$index],
                     ]);
                 }
             }
@@ -203,12 +221,30 @@ class PriceController extends Controller
             $docType->file_path = $doc ? $doc->file_path : null;
             return $docType;
         });
+
+
+        // ===== Material Types =====
+        $allMaterialTypes = MaterialType::all();
+        $existingMaterials = MaterialDetails::where('price_id', $id)->get();
+
+        $materialTypes = $allMaterialTypes->map(function ($matType) use ($existingMaterials) {
+            $mat = $existingMaterials->firstWhere('material_type_id', $matType->id);
+            $matType->details = $mat ? $mat->details : null;
+            return $matType;
+        });
+
+
         if ($prices) {
             $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')
                 ->orderby('row_no', 'asc')
                 ->get();
 
-            return view("dashboard.price.edit", compact("prices", "contacts", "projects", "documentTypes", "allDocumentTypes", "existingDocuments", "GeneralWebmasterSections"));
+            return view("dashboard.price.edit", compact(
+                "prices", "contacts", "projects",
+                "documentTypes", "allDocumentTypes", "existingDocuments",
+                "materialTypes", "allMaterialTypes", "existingMaterials",
+                "GeneralWebmasterSections"
+            ));
         } else {
             return redirect()->back()->with('error', 'Price not found.');
         }
@@ -259,9 +295,14 @@ class PriceController extends Controller
             'discount_amount' => 'nullable|numeric',
             'document_type_id.*' => 'nullable|exists:document_types,id',
             'document.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240|required_with:document_type_id.*',
+            'material_type_id.*' => 'nullable|exists:material_types,id',
+            'material_details.*' => 'nullable|required_with:material_type_id.*',
         ]);
         $price = PriceModel::findOrFail($id);
-        $price->update($request->except(['document','document_type_id','document_ids']));
+        $price->update($request->except([
+            'document','document_type_id','document_ids',
+            'material_type_id','material_details','material_ids'
+        ]));
 
         $existingDocs = FlatDocuments::where('price_id',$price->id)->get()->keyBy('id');
         $submittedIds = $request->input('document_ids', []);
@@ -305,6 +346,45 @@ class PriceController extends Controller
                             'file_path' => $filePath,
                         ]);
                     }
+                }
+            }
+        }
+
+        /*---------------------------------------------------
+        | MATERIAL UPDATE LOGIC  ✅✅✅
+        ----------------------------------------------------*/
+        $existingMaterials = MaterialDetails::where('price_id', $price->id)->get()->keyBy('id');
+        $submittedMaterialIds = $request->input('material_ids', []);
+
+        // Delete removed material rows
+        $materialsToDelete = $existingMaterials->keys()->diff(array_filter($submittedMaterialIds));
+        foreach($materialsToDelete as $matId){
+            $existingMaterials[$matId]->delete();
+        }
+
+        // Add or update materials
+        if($request->has('material_type_id')){
+            foreach($request->material_type_id as $i => $matTypeId){
+                $details = $request->material_details[$i] ?? null;
+                $matId = $submittedMaterialIds[$i] ?? null;
+
+                // skip empty rows
+                if(!$matTypeId && !$details) continue;
+
+                // update existing
+                if($matId && isset($existingMaterials[$matId])){
+                    $mat = $existingMaterials[$matId];
+                    $mat->material_type_id = $matTypeId;
+                    $mat->details = $details;
+                    $mat->save();
+                }
+                // create new
+                else {
+                    MaterialDetails::create([
+                        'price_id' => $price->id,
+                        'material_type_id' => $matTypeId,
+                        'details' => $details
+                    ]);
                 }
             }
         }

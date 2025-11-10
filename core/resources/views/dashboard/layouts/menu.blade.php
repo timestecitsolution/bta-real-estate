@@ -215,6 +215,18 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                         </a>
                     </li>
 
+                    <?php
+                        $currentFolder = "material-type"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('material-type') }}">
+                            <span class="nav-icon">
+                            <i class="material-icons">&#xe7ef;</i>
+                            </span>
+                            <span class="nav-text">Material Type</span>
+                        </a>
+                    </li>
 
                     <!-- @if(Helper::GeneralWebmasterSettings("price_status"))
                         @if(@Auth::user()->permissionsGroup->price_status)

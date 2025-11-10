@@ -59,7 +59,7 @@
                     <td data-label="Project">{{ $price->project->title_en ?? 'N/A' }}</td>
                     <td data-label="Price">{{ $price->price ?? 'N/A' }}</td>
                     <td data-label="Booking Amount">{{ $price->booking_amount ?? 'N/A' }}</td>
-                    <td data-label="Due Amount">{{ $price->due_amount ?? 'N/A' }}</td>
+                    <td data-label="Due Amount">{{ $price->due_amount + $price->extras_amount ?? 'N/A' }}</td>
                     <td data-label="View Documents">
                         @if($existingDocuments->isNotEmpty())
                             <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#documentsModal{{ $price->id }}">

@@ -385,7 +385,7 @@ $projects = Helper::Topics(8);
                             <label class="col-sm-2 form-control-label">Documents(Max 10MB- pdf,jpg,jpeg,png)</label>
                             <div class="col-sm-4">
                                 <select name="document_type_id[]" class="form-control c-select">
-                                    <option value="">- - Select Document Type - -</option>
+                                    <option value="">-- Select Document Type --</option>
                                     @foreach($documentTypes as $documentType)
                                         <option value="{{ $documentType->id }}">{{ $documentType->document_type }}</option>
                                     @endforeach
@@ -402,6 +402,79 @@ $projects = Helper::Topics(8);
                             </div>
                         </div>
                     @endif
+                    </div>
+
+
+                    <div id="material-wrapper">
+
+                        @if(old('material_type_id'))
+                            @foreach(old('material_type_id') as $i => $matId)
+                                <div class="form-group row material-item">
+
+                                    @if($i == 0)
+                                        <label class="col-sm-2 form-control-label">Materials</label>
+                                    @else
+                                        <label class="col-sm-2 form-control-label">&nbsp;</label>
+                                    @endif
+
+                                    <div class="col-sm-4">
+                                        <select name="material_type_id[]" class="form-control material-type">
+                                            <option value="">-- Select Material --</option>
+                                            @foreach($materials as $material)
+                                                <option value="{{ $material->id }}"
+                                                    {{ $material->id == $matId ? 'selected' : '' }}>
+                                                    {{ $material->material_type }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <input type="text" 
+                                            name="material_details[]" 
+                                            class="form-control"
+                                            placeholder="Material Details"
+                                            value="{{ old('material_details')[$i] ?? '' }}">
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        @if($i == 0)
+                                            <button type="button" class="btn btn-success add-material">+</button>
+                                        @else
+                                            <button type="button" class="btn btn-danger remove-material">-</button>
+                                        @endif
+                                    </div>
+
+                                </div>
+                            @endforeach
+
+                        @else
+                            <!-- Default first row -->
+                            <div class="form-group row material-item">
+                                <label class="col-sm-2 form-control-label">Materials</label>
+
+                                <div class="col-sm-4">
+                                    <select name="material_type_id[]" class="form-control material-type">
+                                        <option value="">-- Select Material --</option>
+                                        @foreach($materialTypes as $material)
+                                            <option value="{{ $material->id }}">{{ $material->material_type }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <input type="text" 
+                                        name="material_details[]" 
+                                        class="form-control"
+                                        placeholder="Material Details">
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-success add-material">+</button>
+                                </div>
+                            </div>
+                        @endif
+
                     </div>
                 </div>
                 <div class="form-group row m-t-md">
@@ -457,7 +530,6 @@ $projects = Helper::Topics(8);
 
             function togglePriceField() {
             if ($("#is_negotiate_total_price").is(":checked")) {
-                console.log("checked");
                 $("#price_per_sqft_group").hide();
                 $("#price_per_sqft").val("");
                 $("#booking_amount").val("");
@@ -467,12 +539,6 @@ $projects = Helper::Topics(8);
                 $("#emi_count").val("");
             } else {
                 $("#price_per_sqft_group").show();
-                // $("#price_per_sqft").val("");
-                // $("#booking_amount").val("");
-                // $("#downpayment_amount").val("");
-                // $("#due_amount").val("");
-                // $("#emi_amount").val("");
-                // $("#emi_count").val("");
             }
         }
 
@@ -697,10 +763,6 @@ $projects = Helper::Topics(8);
 
             calculateDueAmount();
 
-            // $("#total_price, #booking_amount, #downpayment_amount").on("input", function () {
-            //     calculateDueAmount();
-            // });
-
             $(document).on("keyup input change", "#gas_amount, #parking_amount, #utility_amount, #gas_pay_scheme input[type='radio'], #parking_pay_scheme input[type='radio'], #utility_pay_scheme input[type='radio']", function() {
                 updateExtras();
             });
@@ -719,7 +781,6 @@ $projects = Helper::Topics(8);
             function calculateEMICount() {
                 let dueAmount = parseFloat($("#due_amount").val()) || 0;
                 let emiAmount = parseFloat($("#emi_amount").val()) || 0;
-                console.log(dueAmount, emiAmount);
                 if (dueAmount > 0 && emiAmount > 0) {
                     let emiCount = Math.ceil(dueAmount / emiAmount);
                     $("#emi_count").val(emiCount);
@@ -790,13 +851,6 @@ $projects = Helper::Topics(8);
                     return false;
                 }
 
-                // if (emiTotal > totalPrice) {
-                //     alert("Total EMI (EMI Amount x EMI Count) cannot be greater than Total Price!");
-                //     $("#emi_amount").val("");       
-                //     $("#emi_count").val(""); 
-                //     return false;
-                // }
-
                 return true;
             }
 
@@ -828,23 +882,22 @@ $projects = Helper::Topics(8);
                 let currentVal = $(this).val();
                 $(this).find("option").each(function () {
                     if ($(this).val() === "") {
-                        $(this).show(); // keep empty option visible
+                        $(this).show(); 
                     } else if ($(this).val() === currentVal) {
-                        $(this).show(); // show currently selected value
+                        $(this).show(); 
                     } else if (selectedValues.includes($(this).val())) {
-                        $(this).hide(); // hide already selected options
+                        $(this).hide(); 
                     } else {
                         $(this).show();
                     }
                 });
 
-                // Make the file required only if type selected
                 let fileInput = $(this).closest(".document-item").find("input[type='file']");
                 if ($(this).val()) {
                     fileInput.prop("required", true);
                 } else {
                     fileInput.prop("required", false);
-                    fileInput.val(''); // Clear file if type deselected
+                    fileInput.val(''); 
                 }
             });
 
@@ -909,6 +962,113 @@ $projects = Helper::Topics(8);
 
         // Initial call
         updateDocumentTypeOptions();
+
+
+       function updateMaterialOptions() {
+            let selectedValues = [];
+
+            // Collect selected material types
+            $("select[name='material_type_id[]']").each(function () {
+                let val = $(this).val();
+                if (val) selectedValues.push(val);
+            });
+
+            // Prevent duplicates
+            $("select[name='material_type_id[]']").each(function () {
+                let currentVal = $(this).val();
+
+                $(this).find("option").each(function () {
+                    if ($(this).val() === "") {
+                        $(this).show();
+                    } else if ($(this).val() === currentVal) {
+                        $(this).show();
+                    } else if (selectedValues.includes($(this).val())) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+            });
+
+            // Make material details mandatory if material type selected
+            $("select[name='material_type_id[]']").each(function () {
+                let detailsInput = $(this).closest(".material-item").find("input[name='material_details[]']");
+                if ($(this).val() !== "") {
+                    detailsInput.prop("required", true);
+                } else {
+                    detailsInput.prop("required", false);
+                }
+            });
+        }
+
+        // Add New Material Row
+        $(document).on("click", ".add-material", function () {
+            let allSelected = true;
+
+            $("select[name='material_type_id[]']").each(function () {
+                if ($(this).val() === "") {
+                    allSelected = false;
+                    return false;
+                }
+            });
+
+            if (!allSelected) {
+                alert("Please select a material type in all rows before adding a new one.");
+                return;
+            }
+
+            let wrapper = $("#material-wrapper");
+            let item = $(this).closest(".material-item");
+            let clone = item.clone(false, false);
+
+            clone.find("select").val("");
+            clone.find("input").val("");
+            clone.find("label").html("&nbsp;");
+
+            clone.find(".add-material")
+                .removeClass("btn-success add-material")
+                .addClass("btn-danger remove-material")
+                .text("-");
+
+            wrapper.append(clone);
+
+            updateMaterialOptions();
+        });
+
+        // Remove Row
+        $(document).on("click", ".remove-material", function () {
+            $(this).closest(".material-item").remove();
+            updateMaterialOptions();
+        });
+
+        // On change of material dropdown
+        $(document).on("change", "select[name='material_type_id[]']", function () {
+            updateMaterialOptions();
+        });
+
+        // Form submit validation
+        $("form").on("submit", function (e) {
+            let valid = true;
+
+            $(".material-item").each(function () {
+                let type = $(this).find("select[name='material_type_id[]']").val();
+                let details = $(this).find("input[name='material_details[]']").val();
+
+                if ((type && !details) || (!type && details)) {
+                    valid = false;
+                    return false; // break loop
+                }
+            });
+
+            if (!valid) {
+                alert("Please fill out both Material Type and Material Details for all rows.");
+                e.preventDefault();
+            }
+        });
+
+        // Initial load
+        updateMaterialOptions();
+
 
     </script>
 @endpush

@@ -36,6 +36,11 @@
                     Reset Password
                 </button>
             </li>
+            <li class="nav-item" role="material_details">
+                <button class="nav-link" style="color: black !important;" id="material-details-tab" data-bs-toggle="tab" data-bs-target="#material-details" type="button" role="tab" aria-controls="material-details" aria-selected="false">
+                    Material Details
+                </button>
+            </li>
             <div class="ms-3">
                 <form method="POST" action="{{ route('user.logout') }}">
                     @csrf
@@ -65,6 +70,12 @@
             @endif
             <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
                 @include('user-dashboard.reset-password')
+            </div>
+            <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
+                @include('user-dashboard.reset-password')
+            </div>
+            <div class="tab-pane fade" id="material-details" role="tabpanel" aria-labelledby="material-details-tab">
+                @include('user-dashboard.material-details')
             </div>
         </div>
     </div>

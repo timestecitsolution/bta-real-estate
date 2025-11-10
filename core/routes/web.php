@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Dashboard\MaterialDetailsController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LanguageController;
@@ -10,7 +10,6 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\EmiController;
 use App\Http\Controllers\BulkSmsController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -80,6 +79,9 @@ Route::post('/order', [HomeController::class, 'order_submit'])->name('orderSubmi
 // - Contact page form submit
 Route::post('/contact-submit', [HomeController::class, 'contact_submit'])->name('contactPageSubmit');
 Route::post('/get-project-flats', [BookingController::class, 'getFlats'])->name('get.project.flats');
+Route::get('/get-flats-by-customer/{customer_id}', [BookingController::class, 'getFlatsByCustomer'])
+    ->name('get.flats.by.customer');
+
 
 Route::middleware(['force.password.change'])->group(function() {
     Route::get('/dashboard-new', [BookingController::class, 'dashboard'])->name('dashboard-new')->middleware('user');
@@ -94,6 +96,8 @@ Route::middleware(['force.password.change'])->group(function() {
 
     Route::get('/emi/document/{id}', [EmiController::class, 'showDocument'])->name('emi.document.show');
     Route::get('/emi/document/{id}/download', [EmiController::class, 'downloadDocument'])->name('emi.document.download');
+    Route::post('/material/change/{id}', [MaterialDetailsController::class, 'MaterialChangeApplication'])->name('material.change');
+    Route::post('/material/action/{id}', [MaterialDetailsController::class, 'MaterialChangeApproval'])->name('material.action');
     Route::post('/send-sms', [BulkSmsController::class, 'bulksms'])->name('bulk.sms');
 
 });

@@ -375,7 +375,69 @@
                     </div>
                 @endforelse
             </div>
+            <div id="material-wrapper">
+                @forelse($existingMaterials as $i => $material)
+                    <div class="form-group row material-item">
+                        <label class="col-sm-2 form-control-label">
+                            @if($i == 0)
+                                Materials
+                            @endif
+                        </label>
 
+                        <!-- Material Type Dropdown -->
+                        <div class="col-sm-4">
+                            <select name="material_type_id[]" class="form-control c-select">
+                                <option value="">- - Select Material Type - -</option>
+                                @foreach($allMaterialTypes as $materialType)
+                                    <option value="{{ $materialType->id }}"
+                                        {{ $material->material_type_id == $materialType->id ? 'selected' : '' }}>
+                                        {{ $materialType->material_type }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Material Details input -->
+                        <div class="col-sm-4">
+                            <input type="text" name="material_details[]" class="form-control"
+                                value="{{ $material->details }}" placeholder="Enter material details">
+                        </div>
+
+                        <div class="col-sm-2">
+                            @if($i == 0)
+                                <button type="button" class="btn btn-success add-material">+</button>
+                            @else
+                                <button type="button" class="btn btn-danger remove-material">-</button>
+                            @endif
+
+                            <input type="hidden" name="material_ids[]" value="{{ $material->id }}">
+                        </div>
+                    </div>
+                @empty
+                    <div class="form-group row material-item">
+                        <label class="col-sm-2 form-control-label">Materials</label>
+
+                        <div class="col-sm-4">
+                            <select name="material_type_id[]" class="form-control c-select">
+                                <option value="">- - Select Material Type - -</option>
+                                @foreach($allMaterialTypes as $materialType)
+                                    <option value="{{ $materialType->id }}">{{ $materialType->material_type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <input type="text" name="material_details[]" class="form-control"
+                                placeholder="Enter material details">
+                        </div>
+
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-success add-material">+</button>
+                            <input type="hidden" name="material_ids[]" value="">
+                        </div>
+                    </div>
+                @endforelse
+            </div>
 
             <div class="form-group row m-t-md">
                 <div class="offset-sm-2 col-sm-10">
@@ -788,12 +850,12 @@ $(function () {
                     return false;
                 }
 
-                if (emiTotal > totalPrice) {
-                    alert("Total EMI (EMI Amount x EMI Count) cannot be greater than Total Price!");
-                    $("#emi_amount").val("");       
-                    // $("#emi_count").val(""); 
-                    return false;
-                }
+                // if (emiTotal > totalPrice) {
+                //     console.log(emiTotal, totalPrice);
+                //     alert("Total EMI (EMI Amount x EMI Count) cannot be greater than Total Price!");
+                //     $("#emi_amount").val("");       
+                //     return false;
+                // }
 
                 return true;
             }
@@ -966,5 +1028,108 @@ $(function () {
     });
 
     updateDocumentTypeOptions();
+
+
+
+
+
+    function updateMaterialOptions() {
+        let selectedValues = [];
+
+        // Collect selected material types
+        $("select[name='material_type_id[]']").each(function () {
+            let val = $(this).val();
+            if (val) selectedValues.push(val);
+        });
+
+        // Prevent duplicates
+        $("select[name='material_type_id[]']").each(function () {
+            let currentVal = $(this).val();
+
+            $(this).find("option").each(function () {
+                if ($(this).val() === "") {
+                    $(this).show();
+                } else if ($(this).val() === currentVal) {
+                    $(this).show();
+                } else if (selectedValues.includes($(this).val())) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+    }
+
+    // Add New Material Row
+    $(document).on("click", ".add-material", function () {
+        // Validate existing rows before adding new
+        let valid = true;
+        $(".material-item").each(function () {
+            let type = $(this).find("select[name='material_type_id[]']").val();
+            let details = $(this).find("input[name='material_details[]']").val();
+            if ((type && !details) || (!type && details)) {
+                valid = false;
+                return false; // break loop
+            }
+        });
+
+        if (!valid) {
+            alert("Please fill both Material Type and Details in all filled rows before adding a new one.");
+            return;
+        }
+
+        let wrapper = $("#material-wrapper");
+        let item = $(this).closest(".material-item");
+        let clone = item.clone(false, false);
+
+        clone.find("select").val("");
+        clone.find("input").val("");
+        clone.find("label").html("&nbsp;");
+
+        clone.find(".add-material")
+            .removeClass("btn-success add-material")
+            .addClass("btn-danger remove-material")
+            .text("-");
+
+        wrapper.append(clone);
+
+        updateMaterialOptions();
+    });
+
+    // Remove Row
+    $(document).on("click", ".remove-material", function () {
+        $(this).closest(".material-item").remove();
+        updateMaterialOptions();
+    });
+
+    // On change of material dropdown or details input
+    $(document).on("change", "select[name='material_type_id[]'], input[name='material_details[]']", function () {
+        updateMaterialOptions();
+    });
+
+    // Form submit validation
+    $("#your-form-id").on("submit", function (e) {
+        let valid = true;
+
+        $(".material-item").each(function () {
+            let type = $(this).find("select[name='material_type_id[]']").val();
+            let details = $(this).find("input[name='material_details[]']").val();
+
+            // Check partial fill
+            if ((type && !details) || (!type && details)) {
+                valid = false;
+                return false; // break loop
+            }
+        });
+
+        if (!valid) {
+            alert("Please fill both Material Type and Details for all filled rows.");
+            e.preventDefault();
+        }
+    });
+
+    // Initial load
+    updateMaterialOptions();
+
 </script>
 @endpush

@@ -43,7 +43,7 @@
                         </tr>
                         <tr>
                             <th>Due Amount</th>
-                            <td>{{ number_format($price->due_amount, 2) ?? 'N/A' }} Tk</td>
+                            <td>{{ number_format(($price->due_amount + $price->extras_amount), 2) ?? 'N/A' }} Tk</td>
 
                             <th>EMI Amount (Per Month)</th>
                             <td>{{ number_format($price->emi, 2) ?? 'N/A' }} Tk</td>

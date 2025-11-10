@@ -13,6 +13,7 @@ use App\Http\Controllers\Dashboard\TopicsController;
 use App\Http\Controllers\Dashboard\ContactsController;
 use App\Http\Controllers\Dashboard\PriceController;
 use App\Http\Controllers\Dashboard\DocumentTypeController;
+use App\Http\Controllers\Dashboard\MaterialTypeController;
 use App\Http\Controllers\Dashboard\WebmailsController;
 use App\Http\Controllers\Dashboard\EventsController;
 use App\Http\Controllers\Dashboard\AnalyticsController;
@@ -219,6 +220,16 @@ Route::get('/document-type/{id}/edit', [DocumentTypeController::class, 'edit'])-
 Route::post('/document-type/{id}/update', [DocumentTypeController::class, 'update'])->name('document-type.update');
 Route::get('/document-type/{id}', [DocumentTypeController::class, 'show'])->name('document-type.show');
 Route::get('/document-type/destroy/{id}', [DocumentTypeController::class, 'destroy'])->name('document-type.destroy');
+
+
+// Material Type
+Route::get('/material-type', [MaterialTypeController::class, 'index'])->name('material-type');
+Route::get('/material-type/create', [MaterialTypeController::class, 'create'])->name('material-type.create');
+Route::post('/material-type/store', [MaterialTypeController::class, 'store'])->name('material-type.store');
+Route::get('/material-type/{id}/edit', [MaterialTypeController::class, 'edit'])->name('material-type.edit');
+Route::post('/material-type/{id}/update', [MaterialTypeController::class, 'update'])->name('material-type.update');
+Route::get('/material-type/{id}', [MaterialTypeController::class, 'show'])->name('material-type.show');
+Route::get('/material-type/destroy/{id}', [MaterialTypeController::class, 'destroy'])->name('material-type.destroy');
 
 // WebMails Groups
 Route::post('/webmails/storeGroup', [WebmailsController::class, 'storeGroup'])->name('webmailsStoreGroup');
