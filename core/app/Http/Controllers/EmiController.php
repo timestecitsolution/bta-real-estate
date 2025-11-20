@@ -9,6 +9,8 @@ use App\Models\Contact;
 use App\Models\Invoices;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Services\SMSService;
+
 class EmiController extends Controller
 {
     public function create()
@@ -144,7 +146,7 @@ class EmiController extends Controller
                     . "Next EMI Date: {$next_emi_date}.\n"
                     . "Thank you for choosing us.\n"
                     . "- Building Technology & Architecture.";
-            // SMSService::send($customerPhone, $message);
+            SMSService::send($customerPhone, $message);
             return redirect()->back()->with('success', 'EMI saved successfully!');
         }else {
             return redirect()->back()->with('error', 'Failed to add price. Please try again.');

@@ -10,6 +10,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\EmiController;
 use App\Http\Controllers\BulkSmsController;
+use App\Services\EmiNotificationService;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,7 +21,10 @@ use App\Http\Controllers\BulkSmsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Route::get('/test-emi-notification', function () {
+    app(EmiNotificationService::class)->run();
+    return "✅ EMI Notification service executed successfully.";
+});
 // Language Route
 Route::post('/lang', [LanguageController::class, 'index'])->middleware('LanguageSwitcher')->name('lang');
 // For Language direct URL link

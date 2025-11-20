@@ -1216,7 +1216,6 @@ class HomeController extends Controller
     public function details($id)
     {
         $details = Topic::with('categories','fields','photos','relatedTopics')->where('id', $id)->first();
-        // dd($details);
         return view("frontEnd.project_details", ["page_data" => $details]);
     }
 

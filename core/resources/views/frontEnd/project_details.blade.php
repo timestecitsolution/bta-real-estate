@@ -2,6 +2,10 @@
 @extends('frontEnd.layouts.master')
 
 @section('content')
+
+@php
+    $commercialBrochure = $page_data->fields->where('field_id', 55)->first();
+@endphp
   <section class="project-details-wrap py-5">
     <div class="container">
       <div class="project-info-top">
@@ -10,12 +14,18 @@
             <h3>{{$page_data->title_en}}</h3>
             <p><i class="fa-solid fa-location-dot"></i>{{$page_data->address}}</p>
           </div>
-          <div class="col-lg-6 text-end">
+          <div class="col-lg-3 text-end">
             <a href="{{ URL::to('uploads/topics/'.$page_data['attach_file']) }}" download class="btn btn-primary">
-                Download Full Brochure (PDF) <i class="fa-solid fa-file-pdf"></i>
+                Brochure (Residential)
             </a>
           </div>
-
+          @if($commercialBrochure)
+          <div class="col-lg-3 text-end">
+                <a href="{{ URL::to('uploads/topics/'.$commercialBrochure->field_value) }}" download class="btn btn-primary">
+                    Brochure (Commercial)
+                </a>
+          </div>
+          @endif
         </div>
         <div class="row mt-5">
           <div class="col-lg-6">

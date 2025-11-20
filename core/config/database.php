@@ -95,6 +95,11 @@ return [
 
     ],
 
+
+    'mysql' => [
+        'timezone' => 'Asia/Dhaka',   
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Migration Repository Table

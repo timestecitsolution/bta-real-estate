@@ -16,7 +16,7 @@ use App\Models\FlatDocuments;
 use App\Models\MaterialDetails;
 use App\Models\Invoices;
 use App\Models\EmiPayment;
-use App\Http\Controllers\SMSService;
+use App\Services\SMSService;
 use Auth;
 use File;
 use Helper;
@@ -178,7 +178,7 @@ class PriceController extends Controller
                     . "Thank you for choosing us.\n"
                     . "- Building Technology & Architecture.";
 
-            // SMSService::send($customerPhone, $message);
+            SMSService::send($customerPhone, $message);
 
             return redirect()->route('price')->with('success', 'Price added successfully!');
         }else {
@@ -351,7 +351,7 @@ class PriceController extends Controller
         }
 
         /*---------------------------------------------------
-        | MATERIAL UPDATE LOGIC  ✅✅✅
+        | MATERIAL UPDATE LOGIC  
         ----------------------------------------------------*/
         $existingMaterials = MaterialDetails::where('price_id', $price->id)->get()->keyBy('id');
         $submittedMaterialIds = $request->input('material_ids', []);
