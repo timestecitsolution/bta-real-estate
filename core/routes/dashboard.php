@@ -211,6 +211,8 @@ Route::post('/price/{id}/update', [PriceController::class, 'update'])->name('pri
 Route::get('/price/{id}', [PriceController::class, 'show'])->name('price.show');
 Route::get('/price/destroy/{id}', [PriceController::class, 'destroy'])->name('price.destroy');
 Route::get('/price/document/download/{id}', [PriceController::class, 'downloadDocument'])->name('price.downloadDocument');
+Route::post('/deal-cancel', [PriceController::class, 'cancelDeal'])->name('deal.cancel');
+Route::post('/deal-reopen', [PriceController::class, 'reopenDeal'])->name('deal.reopen');
 
 // Document Type
 Route::get('/document-type', [DocumentTypeController::class, 'index'])->name('document-type');

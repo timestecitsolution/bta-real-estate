@@ -51,7 +51,7 @@
                     $customer = $price->customer;
                     $existingDocuments = App\Models\FlatDocuments::where('price_id', $price->id)->get();
                 @endphp
-                <tr>
+                <tr class="{{ $price->is_cancelled ? 'table-danger' : '' }}">
                     <td data-label="SL">{{ $loop->iteration }}</td>
                     <td data-label="Client">{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</td>
                     <td data-label="Flat">{{ $price->flat->title ?? 'N/A' }}</td>
@@ -70,12 +70,14 @@
                             <span>No documents</span>
                         @endif
                     </td>
+                    @if($price->is_cancelled != 1)
                     <td data-label="View Details">
                         <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ $price->id }}">
                             View Details
                         </button>
                         @include('user-dashboard.view-details-modal', ['price' => $price])
                     </td>
+                    @endif
                 </tr>
                 @endforeach
             </tbody>

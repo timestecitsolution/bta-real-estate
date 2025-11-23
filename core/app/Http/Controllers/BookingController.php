@@ -103,6 +103,7 @@ class BookingController extends Controller
     public function getFlatsByCustomer($customer_id)
     {
         $flats = PriceModel::where('customer_id', $customer_id)
+                    ->where('is_cancelled', '!=', 1)
                     ->with('flat')
                     ->get()
                     ->pluck('flat');  

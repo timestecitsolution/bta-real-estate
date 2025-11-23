@@ -245,6 +245,42 @@
                     alert(response.error);
                     return;
                 }
+                if(response.is_cancelled == 1) {
+                    let cancelledModal = $(`
+                        <div class="modal fade" id="cancelledDealModal" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title">Deal Cancelled</h5>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <p class="h4">Your deal is cancelled!</p>
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-light" id="acknowledgeCancelled">OK</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+                    $('body').append(cancelledModal);
+
+                    $('#cancelledDealModal').modal({
+                        backdrop: 'static', 
+                        keyboard: false     
+                    });
+
+                    $('#cancelledDealModal').modal('show');
+
+                    $('#acknowledgeCancelled').on('click', function() {
+                        $('#cancelledDealModal').modal('hide');
+                        $('#cancelledDealModal').remove();
+                        $('select[name="flat_id"]').val('');
+                    });
+
+                    return;
+                }
 
                 // Base data
                 $('input[name="price_id"]').val(response.price_id);

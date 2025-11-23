@@ -251,6 +251,7 @@ class EmiController extends Controller
             'current_installment_amount' => $currentDueAmount,
             'emi_start_date' => $price->emi_start_date,
             'emi_due_date' => $nextEmiDueDate->format('Y-m-d'),
+            'is_cancelled' => $price->is_cancelled,
         ]);
     }
 

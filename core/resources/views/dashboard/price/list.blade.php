@@ -83,7 +83,7 @@
                                 <?php
                                     $x++;
                                 ?>
-                                <tr>
+                                <tr class="{{ $price->is_cancelled ? 'table-danger' : '' }}">
                                     <td class="text-center">{{ $x }}</td>
                                     <td class="text-center">{{ $price->project ? $price->project->title_en : 'N/A' }}</td>
                                     <td class="text-center">{{ $price->flat ? $price->flat->title : 'N/A' }}</td>
@@ -123,16 +123,26 @@
                                                    target="_blank"><i
                                                         class="material-icons">&#xe8f4;</i> {{ __('backend.preview') }}
                                                 </a>
-                                                @if(@Auth::user()->permissionsGroup->edit_status)
+                                                @if(@Auth::user()->permissionsGroup->edit_status && !$price->is_cancelled)
                                                     <a class="dropdown-item"
                                                        href="{{ route('price.edit', ['id'=>$price->id]) }}"><i
                                                             class="material-icons">&#xe3c9;</i> {{ __('backend.edit') }}
                                                     </a>
                                                 @endif
-                                                @if(@Auth::user()->permissionsGroup->delete_status)
+                                                @if(@Auth::user()->permissionsGroup->delete_status && !$price->is_cancelled)
                                                     <a class="dropdown-item text-danger"
                                                        onclick="DeletePrice('{{ $price->id }}')"><i
                                                             class="material-icons">&#xe872;</i> {{ __('backend.delete') }}
+                                                    </a>
+                                                @endif
+                                                @if(@Auth::user()->permissionsGroup->delete_status && !$price->is_cancelled)
+                                                    <a class="dropdown-item" onclick="openCancelModal('{{ $price->id }}')">
+                                                        <i class="fa fa-ban text-danger"></i> Cancel Deal
+                                                    </a>
+                                                @endif
+                                                @if($price->is_cancelled)
+                                                    <a class="dropdown-item text-success" onclick="openReopenModal('{{ $price->id }}')">
+                                                        <i class="fa fa-undo"></i> Reopen Deal
                                                     </a>
                                                 @endif
                                             </div>
@@ -202,6 +212,8 @@
     </div>
 @endsection
 @push("after-scripts")
+@include('dashboard.price.deal-cancel-modal') 
+@include('dashboard.price.deal-reopen-modal')
     <script type="text/javascript">
         $("#checkAll").click(function () {
             $('input:checkbox').not(this).prop('checked', this.checked);
@@ -217,10 +229,87 @@
         });
 
         function DeletePrice(id) {
-            console.log(id);
             $("#category_delete_btn").attr("href", '{{ route("price.destroy", ":id") }}'.replace(':id', id));
             $("#delete-category").modal("show");
         }
 
+        // SHOW MODAL
+        function openCancelModal(id) {
+            $('#cancel_price_id').val(id);
+            $('#cancel_reason').val('');
+            $('#cancelDealModal').modal('show');
+        }
+
+        // STOP MULTIPLE EVENT FIRING
+        $(document).off('click', '#cancelDealSubmit').on('click', '#cancelDealSubmit', function () {
+
+            let $btn = $(this); // button reference
+            let originalText = $btn.text();
+
+            let id = $('#cancel_price_id').val();
+            let reason = $('#cancel_reason').val();
+
+            if(!id) {
+                alert("Deal ID missing");
+                return;
+            }
+
+            if(reason.trim() === "") {
+                alert("Please write cancel reason");
+                return;
+            }
+
+            // Change button text & disable
+            $btn.prop('disabled', true).text('Cancelling...');
+
+            $.ajax({
+                url: "{{ route('deal.cancel') }}",
+                type: "POST",
+                data: {
+                    deal_id: id,
+                    reason: reason,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (res) {
+                    $('#cancelDealModal').modal('hide');
+                    location.reload();
+                },
+                error: function(err) {
+                    alert("Something went wrong!");
+                    // restore button
+                    $btn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+
+        // Open Reopen Modal
+        function openReopenModal(id) {
+            $('#reopen_price_id').val(id);
+            $('#reopenDealModal').modal('show');
+        }
+
+        // Reopen AJAX
+        $(document).off('click', '#reopenDealSubmit').on('click', '#reopenDealSubmit', function () {
+            let id = $('#reopen_price_id').val();
+            let $btn = $(this);
+            $btn.prop('disabled', true).text('Reopening...');
+
+            $.ajax({
+                url: "{{ route('deal.reopen') }}",
+                type: "POST",
+                data: {
+                    deal_id: id,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (res) {
+                    $('#reopenDealModal').modal('hide');
+                    location.reload();
+                },
+                error: function(err) {
+                    alert("Something went wrong!");
+                    $btn.prop('disabled', false).text('Yes, Reopen');
+                }
+            });
+        });
     </script>
 @endpush

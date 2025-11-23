@@ -430,4 +430,47 @@ class PriceController extends Controller
             return redirect()->back()->with('error', 'Price not found.');
         }
     }
+
+    public function cancelDeal(Request $request)
+    {
+        $request->validate([
+            'deal_id' => 'required',
+            'reason' => 'required'
+        ]);
+
+        $price = PriceModel::findOrFail($request->deal_id);
+        $Contact = Contact::find($price->customer_id);
+        $message = "Dear {$Contact->first_name} {$Contact->last_name},\n"
+            . "We regret to inform you that your deal for the flat ({$price->flat->title}) in project ({$price->project->title_en}) has been cancelled due to the following reason:\n"
+            . "{$request->reason}\n"
+            . "You have to pay 5% from your total paid amount as demurrage. If you have any questions or need further assistance, please contact our support team.\n"
+            . "We apologize for any inconvenience caused.\n"
+            . "- Building Technology & Architecture.";
+        SMSService::send($Contact->phone, $message);
+        $price->update([
+            'is_cancelled'   => 1,
+            'cancel_reason'  => $request->reason,
+        ]);
+
+        return redirect()->back()->with('success', 'Deal cancelled successfully');
+    }
+    public function reopenDeal(Request $request)
+    {
+        $request->validate([
+            'deal_id' => 'required',
+        ]);
+        $price = PriceModel::findOrFail($request->deal_id);
+        $Contact = Contact::find($price->customer_id);
+        $message = "Dear {$Contact->first_name} {$Contact->last_name},\n"
+                    . "Good news! Your deal for the flat ({$price->flat->title}) in project ({$price->project->title_en}) has been successfully reopened.\n"
+                    . "You may now continue all further processes regarding your purchase.\n"
+                    . "If you have any questions or need any assistance, please feel free to contact our support team.\n"
+                    . "Thank you for staying with us.\n"
+                    . "- Building Technology & Architecture.";
+        SMSService::send($Contact->phone, $message);
+        $price->is_cancelled = 0;
+        $price->save();
+
+        return response()->json(['success'=>true, 'message'=>'Deal reopened']);
+    }
 }

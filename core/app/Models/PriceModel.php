@@ -39,6 +39,8 @@ class PriceModel extends Model
         'discount_amount',
         'created_by',
         'updated_by',
+        'is_cancelled',
+        'cancel_reason',
     ];
 
     public $timestamps = true;

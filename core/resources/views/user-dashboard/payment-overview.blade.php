@@ -58,7 +58,7 @@
                 @endphp
 
                 @foreach($emis as $emi)
-                    <tr>
+                    <tr class="{{ $price->is_cancelled ? 'table-danger' : '' }}">
                         <td data-label="SL No">{{ $sl++ }}</td>
                         <td data-label="Customer Name">{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</td>
                         <td data-label="Project (Flat)">
@@ -88,11 +88,13 @@
                             {{ $emi->note ?? 'N/A' }}
                         </td> -->
                         @if($user->status == '1')
-                            <td data-label="Action">
+                        <td data-label="Action">
+                            @if($price->is_cancelled != '1')
                                 @if($emi->status == 'pending' && $user->status == '1')
                                     <a href="{{ route('emi.approve', $emi->id) }}" class="btn btn-sm btn-success">Approve</a>
                                     <a href="{{ route('emi.reject', $emi->id) }}" class="btn btn-sm btn-warning">Reject</a>
                                 @endif
+
                                 <form action="{{ route('emi.destroy', $emi->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
@@ -102,16 +104,16 @@
                                     </button>
                                 </form>
 
-                                <button type="button" 
-                                        class="btn btn-sm btn-warning editEmiBtn" 
+                                <button type="button" class="btn btn-sm btn-warning editEmiBtn"
                                         data-id="{{ $emi->id }}"
-                                        data-bs-toggle="modal" 
+                                        data-bs-toggle="modal"
                                         data-bs-target="#editEmiModal{{ $emi->id }}">
                                     <i class="fa fa-edit"></i> Edit
                                 </button>
                                 @include('user-dashboard.emi-schedule-edit', ['emi' => $emi])
-                            </td>
                             @endif
+                        </td>
+                        @endif
                         <td data-label="Document">
                             @if($emi->document_path)
                                 <div>
@@ -129,13 +131,15 @@
                                 N/A
                             @endif
                         </td>
-                        <td data-label="Invoice">
-                            <!-- Details Modal Trigger -->
-                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#invoiceModal{{ $emi->id }}">
-                                View Details
-                            </button>
-                            @include('user-dashboard.invoice-modal', ['emi' => $emi])
-                        </td>
+                            <td data-label="Invoice">
+                                @if($price->is_cancelled != 1)
+                                    <!-- Details Modal Trigger -->
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#invoiceModal{{ $emi->id }}">
+                                        View Details
+                                    </button>
+                                    @include('user-dashboard.invoice-modal', ['emi' => $emi])
+                                @endif
+                            </td>
                     </tr>
                 @endforeach
             @endforeach
