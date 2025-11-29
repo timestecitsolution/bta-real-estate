@@ -242,70 +242,123 @@ $Topics_upcoming = Helper::Topics(8,31,4);
     $projects = Helper::Topics(8);
   ?>
   <section class="booking-wrap">
-      <div class="container">
-        <div class="booking-content">
-          <div class="row align-items-center">
-            <div class="col-lg-5 ps-5">
-              <h3>Book a Visit or Inquiry</h3>
-              <p class="mb-5">
-                Use the form to book your visit, send an inquiry, or express interest in a project. Our team will respond within 24 hours.
-              </p>
-              <h5 class="mt-5">Business Hours:</h5>
-              <p>{{ Helper::GeneralSiteSettings("contact_t7_" . @Helper::currentLanguage()->code) }}</p>
-            </div>
-            <div class="col-lg-7">
-              <div class="booking-form">
-                <!-- resources/views/booking/form.blade.php -->
+    <div class="container">
+      <div class="booking-content">
+        <div class="row align-items-center">
+          <div class="col-lg-5 ps-5">
+            <h3>Book a Visit or Inquiry</h3>
+            <p class="mb-5">
+              Use the form to book your visit, send an inquiry, or express interest in a project. Our team will respond within 24 hours.
+            </p>
+            <h5 class="mt-5">Business Hours:</h5>
+            <p>{{ Helper::GeneralSiteSettings("contact_t7_" . @Helper::currentLanguage()->code) }}</p>
+          </div>
+          <div class="col-lg-7">
+            <div class="booking-form">
+              <!-- resources/views/booking/form.blade.php -->
 
-                  <form action="{{ route('booking.store') }}" method="POST" id="bookingForm">
-                        @csrf
-                      <div class="row g-3">
-                          <div class="col-lg-12">
-                              <input type="text" name="full_name" class="form-control" placeholder="Full name" required>
-                          </div>
-                          <div class="col-lg-6">
-                              <input type="email" name="email" class="form-control" placeholder="Email" required>
-                          </div>
-                          <div class="col-lg-6">
-                              <input type="number" name="phone" class="form-control" placeholder="Phone" required>
-                          </div>
-                          <div class="col-lg-12">
-                              <select class="form-select" id="project_id" name="project_id" required>
-                                  <option selected disabled>Project of Interest</option>
-                                  @foreach($projects as $project)
-                                      <option data-project_id="{{ $project->id }}" value="{{ $project->title_en }}">{{ $project->title_en }}</option>
-                                  @endforeach
-                              </select>
-                          </div>
-                          <div class="col-lg-12 mt-3" id="flat_section" style="display: none;">
-                              <select class="form-select" id="flat_id" name="flat_id" required>
-                                  <option selected disabled>Select Flat</option>
-                              </select>
-                          </div>
-                          <div class="col-lg-12">
-                              <input type="date" name="preferred_date" class="form-control">
-                          </div>
-                          <div class="col-lg-12">
-                              <textarea name="message" class="form-control" placeholder="Your Message / Inquiry"></textarea>
-                          </div>
-                          <div class="col-lg-7 form-check">
-                              <input class="form-check-input" type="checkbox" value="1" id="privacyCheck" name="privacy_check">
-                              <label class="form-check-label" for="privacyCheck">
-                                  We respect your privacy. Your data is safe and will only be used for project communication.
-                              </label>
-                          </div>
-                          <div class="col-lg-5 text-end">
-                              <button type="submit" class="btn btn-primary">Submit</button>
-                          </div>
-                      </div>
-                  </form>
+                <form action="{{ route('booking.store') }}" method="POST" id="bookingForm" enctype="multipart/form-data">
+                      @csrf
+                    <div class="row g-3">
+                        <div class="col-lg-12">
+                            <input type="text" name="full_name" class="form-control" placeholder="Full name" required>
+                            @error('full_name')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="email" name="email" class="form-control" placeholder="Email" required>
+                            @error('email')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror                               
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="number" name="phone" class="form-control" placeholder="Phone" required>
+                            @error('phone')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="number" name="nid_no" class="form-control" placeholder="NID No(In Between 10 to 17 Digits)" required>
+                            @error('nid_no')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="text" name="passport_no" maxlength="9" class="form-control" placeholder="Passport No(Max 9 Digits)" required>
+                            @error('passport_no')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror       
+                        </div>
+                        <div class="col-lg-12">
+                            <input type="text" name="birth_certificate_no" maxlength="17" class="form-control" placeholder="Birth Certificate No(Max 17 Digits)">
+                            @error('birth_certificate_no')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror       
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="text-white" for="nid_front_pic">NID Front Pic</label>
+                            <input type="file" name="nid_front_pic" class="form-control" placeholder="NID front pic" required>
+                            @error('nid_front_pic')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="text-white" for="nid_back_pic">NID Back Pic</label>
+                            <input type="file" name="nid_back_pic" class="form-control" placeholder="NID back pic" required>
+                            @error('nid_back_pic')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-12">
+                            <select class="form-select" id="project_id" name="project_id" required>
+                                <option selected disabled>Project of Interest</option>
+                                @foreach($projects as $project)
+                                    <option data-project_id="{{ $project->id }}" value="{{ $project->title_en }}">{{ $project->title_en }}</option>
+                                @endforeach
+                            </select>
+                            @error('project_id')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-12 mt-3" id="flat_section" style="display: none;">
+                            <select class="form-select" id="flat_id" name="flat_id" required>
+                                <option selected disabled>Select Flat</option>
+                            </select>
+                            @error('flat_id')
+                                <small class="text-white">{{ $message }}</small>   
+                            @enderror
+                        </div>
+                        <div class="col-lg-12">
+                            <input type="date" name="preferred_date" class="form-control">
+                            @error('preferred_date')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-12">
+                            <textarea name="message" class="form-control" placeholder="Your Message / Inquiry"></textarea>
+                            @error('message')
+                                <small class="text-white">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-lg-7 form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="privacyCheck" name="privacy_check">
+                            <label class="form-check-label" for="privacyCheck">
+                                We respect your privacy. Your data is safe and will only be used for project communication.
+                            </label>
+                        </div>
+                        <div class="col-lg-5 text-end">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
 
-              </div>
             </div>
           </div>
         </div>
       </div>
-  </section>
+    </div>
+</section>
 @include('frontEnd.layouts.popup',['Popup'=>@$Popup])
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
