@@ -35,7 +35,7 @@
         
 
 
-            <section class="booking-wrap">
+            <!-- <section class="booking-wrap">
                 <div class="container">
                   <div class="booking-content">
                     <div class="row align-items-center">
@@ -49,7 +49,6 @@
                       </div>
                       <div class="col-lg-7">
                         <div class="booking-form">
-                          <!-- resources/views/booking/form.blade.php -->
 
                             <form action="{{ route('booking.store') }}" method="POST" id="bookingForm">
                                  @csrf
@@ -98,6 +97,82 @@
                       </div>
                     </div>
                   </div>
+                </div>
+            </section> -->
+
+
+             <section class="land-query">
+                <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                    <div class="form-content">
+                        <div>
+                        <h3>Land Query</h3>
+                        <p>Use the contact form to reach us. Your feedback and<br> suggestions help to improve this platform.</p>
+                        </div>
+                        <div>
+                        <h6 class="mb-3">Phone / Email</h6>
+                        <p><i class="fa fa-phone me-1"></i>+{!! Helper::GeneralSiteSettings("contact_t3") !!}</p>
+                        <p><i class="fa fa-envelope me-1"></i> {!! Helper::GeneralSiteSettings("contact_t6") !!}</p>
+                        <a href="https://wa.me/{!! Helper::GeneralSiteSettings('contact_t3') !!}" class="whatsapp-button" target="_blank">
+                            <i class="fa-brands fa-whatsapp"></i> Message us on WhatsApp
+                        </a>
+
+                        </div>
+                        <div>
+                        <p>This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="col-lg-6">
+                    <form action="{{ route('land.query.submit') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                        <div class="col-lg-12">
+                            <input type="text" name="owner_name" placeholder="Land owner Name" class="form-control" required>
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="email" name="email" placeholder="Email" class="form-control" required>
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="text" name="phone" placeholder="Phone No" class="form-control" required>
+                        </div>
+                        <div class="col-lg-12">
+                            <input type="text" name="land_address" placeholder="Land address" class="form-control" required>
+                        </div>
+                        <div class="col-lg-12">
+                            <input type="text" name="land_info" placeholder="Land info ( jl no, mouja, dag no, khotian, rs, cs, sa )" class="form-control" required>
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="text" name="land_area" placeholder="Land area" class="form-control" required>
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="text" name="road_size" placeholder="Road size" class="form-control" required>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="upload-gallery">
+                            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+                                <div class="upload-icon">
+                                <img src="{{ asset('assets/frontend_new/assets/images/icon/5.svg') }}" alt="">
+                                </div>
+                                <p>Upload land picture or video</p>
+                                <input type="file" id="fileInput" name="attachments[]" multiple accept="image/*,video/*" style="display:none"
+                                    onchange="handleFiles(this.files)" />
+                            </div>
+                            <div class="preview-gallery" id="previewGallery"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <textarea name="review" placeholder="Write your review" class="form-control"></textarea>
+                        </div>
+                        <button class="btn btn-secondary mt-3">
+                            Submit <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </button>
+                        </div>
+                    </form>
+
+                    </div>
+                </div>
                 </div>
             </section>
         

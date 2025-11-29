@@ -51,6 +51,7 @@ Route::Group(['prefix' => config('smartend.backend_path')], function () {
 
 // Add your custom routes here
 Route::post('/submit-land-query', [LandQueryController::class, 'submit'])->name('land.query.submit');
+// Route::get('/land-query', [LandQueryController::class, 'index']);
 Route::get('/projects', [HomeController::class, 'projects'])->name('projects');
 Route::get('/details/{project_id?}', [HomeController::class, 'details'])->name('details');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');

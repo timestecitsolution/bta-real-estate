@@ -81,7 +81,8 @@ class BookingController extends Controller
         $mail_to = Helper::GeneralSiteSettings("land_query_mail");
         // Send Email
         Mail::to($query->email)->send(new BookingQueryMail($query));
-        return redirect()->route('dashboard-new')->with('success', 'Your booking is submitted and account created successfully!');
+        
+        return back()->with('success', 'Your booking is submitted and account created successfully!');
     }
 
     public function getFlats(Request $request)

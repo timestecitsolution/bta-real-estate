@@ -446,7 +446,6 @@ class HomeController extends Controller
                 // page meta tags
                 $meta_tags = $this->get_meta_tags($Topic, $lang);
 
-
                 // return view
                 $view = "topic";
                 $view = "service";
@@ -461,13 +460,9 @@ class HomeController extends Controller
                 {
                     $view = "contact";
                 }
-                if($Topic->seo_url_slug_en == 'visit')
+                if($Topic->seo_url_slug_en == 'land-query')
                 {
-                    $view = "visit";
-                }
-                if($Topic->seo_url_slug_en == 'book')
-                {
-                    $view = "book";
+                    $view = "land-query";
                 }
                 
                 // count topics by Category
@@ -498,7 +493,6 @@ class HomeController extends Controller
                         $Popup = Popup::where("show_in", 0)->where("status", 1)->first();
                     }
                 }
-
                 return view('frontEnd.' . $view, [
                     "PageTitle" => @$meta_tags["title"],
                     "PageDescription" => @$meta_tags["desc"],

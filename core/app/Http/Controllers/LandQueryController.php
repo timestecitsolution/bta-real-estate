@@ -11,7 +11,6 @@ class LandQueryController extends Controller
 {
     private $uploadPath = "uploads/land_query/";
 
-
     public function submit(Request $request)
     {
         $request->validate([
