@@ -240,6 +240,19 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                         </a>
                     </li>
 
+                    <?php
+                        $currentFolder = "client-visit-requests"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('client-visit-requests') }}">
+                            <span class="nav-icon">
+                            <i class="material-icons">&#xe7ef;</i>
+                            </span>
+                            <span class="nav-text">Clinet Visit Requests</span>
+                        </a>
+                    </li>
+
                     @if(Helper::GeneralWebmasterSettings("inbox_status"))
                         @if(@Auth::user()->permissionsGroup->inbox_status)
                             <?php

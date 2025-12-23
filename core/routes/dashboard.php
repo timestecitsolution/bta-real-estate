@@ -22,6 +22,7 @@ use App\Http\Controllers\Dashboard\MenusController;
 use App\Http\Controllers\Dashboard\FileManagerController;
 use App\Http\Controllers\Dashboard\TagController;
 use App\Http\Controllers\Dashboard\PopupController;
+use App\Http\Controllers\Dashboard\ClientVisitRequestController;
 use Illuminate\Support\Facades\Route;
 
 // Admin Home
@@ -245,6 +246,11 @@ Route::get('/material-type/{id}/edit', [MaterialTypeController::class, 'edit'])-
 Route::post('/material-type/{id}/update', [MaterialTypeController::class, 'update'])->name('material-type.update');
 Route::get('/material-type/{id}', [MaterialTypeController::class, 'show'])->name('material-type.show');
 Route::get('/material-type/destroy/{id}', [MaterialTypeController::class, 'destroy'])->name('material-type.destroy');
+
+// Client Visit Requests
+Route::get('/client-visit-requests', [ClientVisitRequestController::class, 'index'])->name('client-visit-requests');
+Route::get('/client-visit-requests/{id}', [ClientVisitRequestController::class, 'show'])->name('client-visit-requests.show');
+Route::get('/client-visit-requests/destroy/{id}', [ClientVisitRequestController::class, 'destroy'])->name('client-visit-request.destroy');
 
 // WebMails Groups
 Route::post('/webmails/storeGroup', [WebmailsController::class, 'storeGroup'])->name('webmailsStoreGroup');

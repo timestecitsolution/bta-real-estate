@@ -1,16 +1,16 @@
 @extends('dashboard.layouts.master')
-@section('title', "Price Module")
+@section('title', "Booking Details Module")
 @section('content')
     <div class="padding">
         <div class="box">
             <div class="box-header dker">
                 <div class="row">
                     <div class="col-lg-8 col-sm-6">
-                        <h3>List of Price</h3>
+                        <h3>List of Bookings</h3>
                         <small>
                             <a href="{{ route('adminHome') }}">{{ __('backend.home') }}</a> /
-                            <a>Prices</a> /
-                            <a>List of Price</a>
+                            <a>Bookings</a> /
+                            <a>List of Bookings</a>
                         </small>
                     </div>
                     <div class="col-lg-4 col-sm-6">
@@ -34,7 +34,7 @@
                                     <a class="btn btn-fw primary w-100" style="overflow: hidden"
                                        href="{{route('price.create')}}">
                                         <i class="material-icons">&#xe02e;</i>
-                                        &nbsp; {{ __('backend.addprice') }}</a>
+                                        &nbsp; Add Booking Details</a>
                                 @endif
                             </div>
                         </div>

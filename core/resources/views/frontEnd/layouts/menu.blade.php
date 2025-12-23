@@ -2,7 +2,6 @@
     <?php
     // Get list of main menu links
     $MenuLinks = \App\Helpers\SiteMenu::List(Helper::GeneralWebmasterSettings("header_menu_id"));
-    // dd($MenuLinks);
     ?>
     @if(count($MenuLinks)>0)
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
