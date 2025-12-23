@@ -29,7 +29,6 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
             'email' => 'required|email',
@@ -43,7 +42,20 @@ class BookingController extends Controller
             'message' => 'nullable|string',
             'nid_front_pic' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nid_back_pic'  => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+        ], 
+        [
+            // 🔴 Custom messages
+            'nid_front_pic.required' => 'NID front image is required.',
+            'nid_front_pic.image'    => 'NID front must be an image file.',
+            'nid_front_pic.mimes'    => 'NID front image must be jpeg, jpg or png format.',
+            'nid_front_pic.max'      => 'NID front image size must not exceed 2MB.',
+
+            'nid_back_pic.required' => 'NID back image is required.',
+            'nid_back_pic.image'    => 'NID back must be an image file.',
+            'nid_back_pic.mimes'    => 'NID back image must be jpeg, jpg or png format.',
+            'nid_back_pic.max'      => 'NID back image size must not exceed 2MB.',
+        ]
+        );
 
         // Store files
         $nidFrontPath = null;
@@ -83,7 +95,7 @@ class BookingController extends Controller
         // Send Email
         Mail::to($query->email)->send(new BookingQueryMail($query));
         
-        return back()->with('success', 'Your booking is submitted and account created successfully!');
+        return redirect()->back()->with('success', 'Your booking is submitted and account created successfully!');
     }
 
     public function getFlats(Request $request)
