@@ -188,6 +188,18 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                             </li>
                         @endif
                     @endif
+                    <?php
+                        $currentFolder = "landlord-engagements"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('landlordEngagements') }}">
+                            <span class="nav-icon">
+                            <i class="material-icons">&#xe7ef;</i>
+                            </span>
+                            <span class="nav-text">Landlord Engagements</span>
+                        </a>
+                    </li>
 
                     <?php
                         $currentFolder = "price"; 
@@ -198,7 +210,7 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                             <span class="nav-icon">
                             <i class="material-icons">&#xe7ef;</i>
                             </span>
-                            <span class="nav-text">Price</span>
+                            <span class="nav-text">Booking Details</span>
                         </a>
                     </li>
 
@@ -227,23 +239,6 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                             <span class="nav-text">Material Type</span>
                         </a>
                     </li>
-
-                    <!-- @if(Helper::GeneralWebmasterSettings("price_status"))
-                        @if(@Auth::user()->permissionsGroup->price_status)
-                            <?php
-                            // $currentFolder = "Price"; 
-                            // $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
-                            ?>
-                            <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
-                                <a href="{{ route('contacts') }}">
-                                    <span class="nav-icon">
-                                    <i class="material-icons">&#xe7ef;</i>
-                                    </span>
-                                    <span class="nav-text">{{ __('backend.price') }}</span>
-                                </a>
-                            </li>
-                        @endif
-                    @endif -->
 
                     @if(Helper::GeneralWebmasterSettings("inbox_status"))
                         @if(@Auth::user()->permissionsGroup->inbox_status)

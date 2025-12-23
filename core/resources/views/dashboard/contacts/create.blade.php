@@ -112,11 +112,18 @@
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-sm-3 form-control-label">{{ __('backend.notes') }}</label>
+                                <label class="col-sm-3 form-control-label">Type </label>
                                 <div class="col-sm-9">
-                                    {!! Form::textarea('notes','', array('placeholder' => '','class' => 'form-control','rows'=>'2')) !!}
+                                    <label class="mr-3">
+                                        {!! Form::radio('person_type', 'landlord', false, ['id' => 'landlord', 'required']) !!} Landlord
+                                    </label>
+
+                                    <label>
+                                        {!! Form::radio('person_type', 'client', false, ['id' => 'client', 'required']) !!} Client
+                                    </label>
                                 </div>
                             </div>
+
                             <div class="form-group row">
                                 <div class="col-sm-offset-3 col-sm-9">
                                     <button type="submit" class="btn btn-primary"><i

@@ -140,4 +140,9 @@ class Topic extends Model implements Feedable
     {
         return $this->belongsTo('App\Models\Popup', 'popup_id');
     }
+
+    public function projectDocuments()
+    {
+        return $this->hasMany(EngagementProjectDocument::class, 'project_id');
+    }
 }

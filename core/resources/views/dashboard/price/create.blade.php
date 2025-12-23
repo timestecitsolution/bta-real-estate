@@ -338,7 +338,7 @@ $projects = Helper::Topics(8);
                     <div class="form-group row">
                         <label class="col-sm-2 form-control-label">EMI Start Date *</label>
                         <div class="col-sm-10">
-                            {!! Form::date('emi_start_date', old('emi_start_date'), array('placeholder' => 'Enter EMI Start Date','class' => 'form-control','required'=>'true', 'dir'=>@$ActiveLanguage->direction)) !!}
+                            {!! Form::date('emi_start_date', old('emi_start_date'), array('id' => 'emi_start_date', 'placeholder' => 'Enter EMI Start Date','class' => 'form-control','required'=>'true', 'dir'=>@$ActiveLanguage->direction)) !!}
                         </div>
                     </div>
                     <div id="document-wrapper">
@@ -420,7 +420,7 @@ $projects = Helper::Topics(8);
                                     <div class="col-sm-4">
                                         <select name="material_type_id[]" class="form-control material-type">
                                             <option value="">-- Select Material --</option>
-                                            @foreach($materials as $material)
+                                            @foreach($materialTypes as $material)
                                                 <option value="{{ $material->id }}"
                                                     {{ $material->id == $matId ? 'selected' : '' }}>
                                                     {{ $material->material_type }}
@@ -531,6 +531,9 @@ $projects = Helper::Topics(8);
             function togglePriceField() {
             if ($("#is_negotiate_total_price").is(":checked")) {
                 $("#price_per_sqft_group").hide();
+                $("#price_per_sqft").prop("required", false);
+                $("#emi_count").prop("required", false);
+                $("#emi_start_date").prop("required", false);
                 $("#price_per_sqft").val("");
                 $("#booking_amount").val("");
                 $("#downpayment_amount").val("");

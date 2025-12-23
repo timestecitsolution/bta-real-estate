@@ -29,6 +29,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
             'email' => 'required|email',
@@ -66,17 +67,17 @@ class BookingController extends Controller
             return redirect()->route('login-new')->with('warning', 'You already have an account. Please login.');
         }
 
-         $user = User::create([
-            'name' => $validated['full_name'],
-            'email' => $validated['email'],
-            'password' => Hash::make('123456'),
-            'permissions_id' => 1, 
-            'must_change_password' => true,
-        ]);
-        if ($user) {
-            Auth::guard('user')->login($user);
-            return redirect()->route('change-password')->with('success', 'Please change your password first!');
-        }
+        //  $user = User::create([
+        //     'name' => $validated['full_name'],
+        //     'email' => $validated['email'],
+        //     'password' => Hash::make('123456'),
+        //     'permissions_id' => 1, 
+        //     'must_change_password' => true,
+        // ]);
+        // if ($user) {
+        //     Auth::guard('user')->login($user);
+        //     return redirect()->route('change-password')->with('success', 'Please change your password first!');
+        // }
 
         $mail_to = Helper::GeneralSiteSettings("land_query_mail");
         // Send Email
@@ -87,12 +88,25 @@ class BookingController extends Controller
 
     public function getFlats(Request $request)
     {
-        $bookedFlatIds = DB::table('price')->pluck('flat_id')->toArray();
+        $priceFlatIds = DB::table('price')
+            ->pluck('flat_id')
+            ->toArray();
+
+        $engagedFlatIds = DB::table('landlord_engagements')
+            ->pluck('flat_id')
+            ->toArray();
+
+        $excludedFlatIds = array_unique(array_merge(
+            $priceFlatIds,
+            $engagedFlatIds
+        ));
 
         $tags = DB::table('topic_tags')
             ->join('tags', 'topic_tags.tag_id', '=', 'tags.id')
             ->where('topic_tags.topic_id', $request->project_id)
-            ->whereNotIn('tags.id', $bookedFlatIds) 
+            ->when(!empty($excludedFlatIds), function ($q) use ($excludedFlatIds) {
+                $q->whereNotIn('tags.id', $excludedFlatIds);
+            })
             ->select('tags.id', 'tags.title')
             ->get();
 
@@ -100,6 +114,7 @@ class BookingController extends Controller
             'tags' => $tags
         ]);
     }
+
 
     public function getFlatsByCustomer($customer_id)
     {

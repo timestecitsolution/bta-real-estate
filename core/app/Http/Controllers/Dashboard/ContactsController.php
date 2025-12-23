@@ -20,7 +20,7 @@ use Redirect;
 class ContactsController extends Controller
 {
 
-    private $uploadPath = "uploads/contacts/";
+    private $uploadPath = "public/uploads/contacts/";
 
     // Define Default Variables
 
@@ -288,6 +288,8 @@ class ContactsController extends Controller
             'nid_no' => 'nullable|digits_between:10,17',             
             'passport_no' => 'nullable|alpha_num|max:9',                 
             'birth_certificate_no' => 'nullable|digits_between:10,17', 
+            'person_type' => 'required|in:landlord,client',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         // Upload Helper Function
@@ -323,6 +325,7 @@ class ContactsController extends Controller
         $Contact->nid_front = $nidFrontFile;
         $Contact->nid_back = $nidBackFile;
         $Contact->notes = $request->notes;
+        $Contact->person_type = $request->person_type;
         $Contact->status = 1;
         $Contact->created_by = Auth::user()->id;
         $Contact->save();
@@ -341,7 +344,7 @@ class ContactsController extends Controller
 
     public function getUploadPath()
     {
-        return $this->uploadPath;
+        return public_path('uploads/contacts/');
     }
 
     public function setUploadPath($uploadPath)
@@ -411,6 +414,8 @@ class ContactsController extends Controller
             'passport_no' => 'nullable|alpha_num|max:9',
             'nid_no' => 'nullable|numeric',
             'birth_certificate_no' => 'nullable|numeric',
+            'person_type' => 'required|in:landlord,client',
+            'notes' => 'nullable|string|max:1000', 
         ]);
 
         // Helper function for file upload
@@ -449,7 +454,8 @@ class ContactsController extends Controller
         $Contact->passport_no = $request->passport_no;
         $Contact->nid_no = $request->nid_no;
         $Contact->birth_certificate_no = $request->birth_certificate_no;
-        $Contact->status = $request->status;
+        // $Contact->status = $request->status;
+        $Contact->person_type = $request->person_type;
         $Contact->updated_by = Auth::user()->id;
         $Contact->save();
 

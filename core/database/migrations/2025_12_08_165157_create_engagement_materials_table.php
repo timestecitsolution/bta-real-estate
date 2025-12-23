@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('engagement_materials', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('engagement_id');
+            $table->unsignedBigInteger('material_type_id');
+
+            $table->text('material_details')->nullable();
+
+            $table->timestamps();
+
+            // Foreign Keys
+            $table->foreign('engagement_id')->references('id')->on('landlord_engagements')->onDelete('cascade');
+            $table->foreign('material_type_id')->references('id')->on('material_types')->onDelete('cascade');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('engagement_materials');
+    }
+};

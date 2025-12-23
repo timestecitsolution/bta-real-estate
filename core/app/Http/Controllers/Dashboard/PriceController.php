@@ -81,8 +81,8 @@ class PriceController extends Controller
             'booking_amount' => 'required|string',
             'downpayment_amount' => 'required|string',
             'due_amount' => 'required|string',
-            'emi_count' => 'required|string',
-            'emi_start_date' => 'required|string',
+            // 'emi_count' => 'required|string',
+            // 'emi_start_date' => 'required|string',
             'is_applicable_govt_gas' => 'nullable|boolean',
             'is_govt_gas_connection_paid' => 'nullable|boolean',
             'govt_gas_connection_payment_scheme' => 'nullable|string',
@@ -164,19 +164,25 @@ class PriceController extends Controller
             $prices = PriceModel::find($price->id);
             $project = $prices->project;
             $message = "Dear {$contacts->first_name} {$contacts->last_name},\n"
-                    . "Your flat booking is confirmed for the project: ({$project->title_en}),\n"
-                    . "Flat No: ({$prices->flat->title}),\n"
-                    . "Flat Size: {$validated['flat_size']} sq ft,\n"
-                    . "Price (Per Sqft): " . number_format($validated['price_per_sqft']) . " BDT,\n"
-                    . "Total Price: " . number_format($validated['price']) . " BDT,\n"
-                    . "Booking Money: " . number_format($validated['booking_amount']) . " BDT,\n"
-                    . "Downpayment: " . number_format($validated['downpayment_amount']) . " BDT,\n"
-                    . "Due: " . number_format($validated['due_amount']) . " BDT,\n"
-                    . "Total EMI: {$validated['emi_count']},\n"
-                    . "EMI: " . number_format($validated['emi']) . " BDT (Per Month),\n"
-                    . "1st EMI: " . date('d-m-Y', strtotime($validated['emi_start_date'])) . ".\n"
-                    . "Thank you for choosing us.\n"
-                    . "- Building Technology & Architecture.";
+                        . "Your flat booking is confirmed for the project: ({$project->title_en}),\n"
+                        . "Flat No: ({$prices->flat->title}),\n"
+                        . "Flat Size: {$validated['flat_size']} sq ft,\n"
+                        . "Price (Per Sqft): " . number_format($validated['price_per_sqft']) . " BDT,\n"
+                        . "Total Price: " . number_format($validated['price']) . " BDT,\n"
+                        . "Booking Money: " . number_format($validated['booking_amount']) . " BDT,\n"
+                        . "Downpayment: " . number_format($validated['downpayment_amount']) . " BDT,\n"
+                        . "Due: " . number_format($validated['due_amount']) . " BDT,\n";
+
+                    // Add EMI lines only if emi_count exists
+                    if(isset($validated['emi_count']) && !empty($validated['emi_count'])) {
+                        $message .= "Total EMI: {$validated['emi_count']},\n";
+                        $message .= "EMI: " . number_format($validated['emi']) . " BDT (Per Month),\n";
+                        $message .= "1st EMI: " . date('d-m-Y', strtotime($validated['emi_start_date'])) . ".\n";
+                    }
+
+                    $message .= "Thank you for choosing us.\n"
+                        . "- Building Technology & Architecture.";
+
 
             SMSService::send($customerPhone, $message);
 

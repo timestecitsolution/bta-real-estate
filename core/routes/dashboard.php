@@ -11,6 +11,7 @@ use App\Http\Controllers\Dashboard\BannersController;
 use App\Http\Controllers\Dashboard\CategoriesController;
 use App\Http\Controllers\Dashboard\TopicsController;
 use App\Http\Controllers\Dashboard\ContactsController;
+use App\Http\Controllers\Dashboard\LandlordEngagements;
 use App\Http\Controllers\Dashboard\PriceController;
 use App\Http\Controllers\Dashboard\DocumentTypeController;
 use App\Http\Controllers\Dashboard\MaterialTypeController;
@@ -201,6 +202,18 @@ Route::get('/contacts/{id}/edit', [ContactsController::class, 'edit'])->name('co
 Route::post('/contacts/{id}/update', [ContactsController::class, 'update'])->name('contactsUpdate');
 Route::get('/contacts/destroy/{id}', [ContactsController::class, 'destroy'])->name('contactsDestroy');
 Route::post('/contacts/updateAll', [ContactsController::class, 'updateAll'])->name('contactsUpdateAll');
+    
+//Landlord Engagements
+Route::get('/landlord-engagements', [LandlordEngagements::class, 'index'])->name('landlordEngagements');
+Route::get('/landlord-engagements/create', [LandlordEngagements::class, 'create'])->name('landlord-engagements.create');
+Route::post('/landlord-engagements/store', [LandlordEngagements::class, 'store'])->name('landlord-engagements.store');
+Route::get('/landlord-engagements/edit/{id}', [LandlordEngagements::class, 'edit'])
+    ->name('landlord-engagements.edit');
+
+Route::put('/landlord-engagements/update/{id}', [LandlordEngagements::class, 'update'])
+    ->name('landlord-engagements.update');
+
+Route::get('/landlord-engagements/destroy/{id}', [LandlordEngagements::class, 'destroy'])->name('landlord-engagements.destroy');
 
 // Price
 Route::get('/price', [PriceController::class, 'index'])->name('price');

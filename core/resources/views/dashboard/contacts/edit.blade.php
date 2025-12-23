@@ -158,6 +158,30 @@
                                 </div>
                             </div>
 
+                            <div class="form-group row">
+                                <label class="col-sm-3 form-control-label">Type </label>
+                                <div class="col-sm-9">
+                                    <label class="mr-3">
+                                        {!! Form::radio(
+                                            'person_type', 
+                                            'landlord', 
+                                            Session::get('ContactToEdit')->person_type === 'landlord', 
+                                            ['id' => 'landlord', 'required']
+                                        ) !!} Landlord
+                                    </label>
+
+                                    <label>
+                                        {!! Form::radio(
+                                            'person_type', 
+                                            'client', 
+                                            Session::get('ContactToEdit')->person_type === 'client', 
+                                            ['id' => 'client', 'required']
+                                        ) !!} Client
+                                    </label>
+                                </div>
+                            </div>
+
+
                             <!-- Notes -->
                             <div class="form-group row">
                                 <label class="col-sm-3 form-control-label">{{ __('backend.notes') }}</label>
@@ -166,28 +190,7 @@
                                 </div>
                             </div>
 
-                            <!-- Status -->
-                            <div class="form-group row">
-                                <label class="col-sm-3 form-control-label">{{ __('backend.status') }}</label>
-                                <div class="col-sm-9">
-                                    <div class="radio">
-                                        <label class="ui-check ui-check-md">
-                                            {!! Form::radio('status','1',(Session::get('ContactToEdit')->status==1),['class'=>'has-value']) !!}
-                                            <i class="dark-white"></i> {{ __('backend.active') }}
-                                        </label>
-                                        &nbsp;
-                                        <label class="ui-check ui-check-md">
-                                            {!! Form::radio('status','0',(Session::get('ContactToEdit')->status==0),['class'=>'has-value']) !!}
-                                            <i class="dark-white"></i> {{ __('backend.waitActivation') }}
-                                        </label>
-                                        &nbsp;
-                                        <label class="ui-check ui-check-md">
-                                            {!! Form::radio('status','2',(Session::get('ContactToEdit')->status==2),['class'=>'has-value']) !!}
-                                            <i class="dark-white"></i> {{ __('backend.notActive') }}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
+                        
 
                             <!-- Buttons -->
                             <div class="form-group row">
