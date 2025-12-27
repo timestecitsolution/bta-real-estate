@@ -39,6 +39,10 @@ COPY . .
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Copy all php.ini settings
+COPY php.ini /usr/local/etc/php/php.ini
+
+
 # Install Laravel dependencies (inside core/)
 WORKDIR /var/www/html/core
 RUN composer install --no-dev --optimize-autoloader

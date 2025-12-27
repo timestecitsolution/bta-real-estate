@@ -62,11 +62,10 @@
                                 <div class='input-group date'>
                                     {!! Form::text('date',Helper::formatDate(date("Y-m-d")), array('placeholder' => '','autocomplete' => 'off','class' => 'form-control','id'=>'form_date','required'=>'')) !!}
                                     <span class="input-group-addon">
-                  <span class="fa fa-calendar"></span>
-              </span>
+                                        <span class="fa fa-calendar"></span>
+                                    </span>
                                 </div>
                             </div>
-
                         </div>
                     @else
                         {!! Form::hidden('date',date("Y-m-d"), array('placeholder' => '','class' => 'form-control form_date','id'=>'form_date')) !!}

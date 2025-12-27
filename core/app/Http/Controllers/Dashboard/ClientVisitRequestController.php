@@ -15,8 +15,8 @@ class ClientVisitRequestController extends Controller
     public function index()
     {
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
-        $requests = BookingQuery::all();
-        // dd($requests);
+        $requests = BookingQuery::with('project')->get();
+        // dd($requests->project);
         return view('dashboard.client-visit-requests.list', compact('requests', 'GeneralWebmasterSections'));
     }
 

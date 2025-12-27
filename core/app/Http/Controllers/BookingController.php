@@ -38,19 +38,17 @@ class BookingController extends Controller
             'birth_certificate_no' => 'string|max:17',
             'project_id' => 'required',
             'flat_id' => 'required',
-            'preferred_date' => 'nullable|date',
+            'preferred_date' => 'required|nullable|date',
             'message' => 'nullable|string',
-            'nid_front_pic' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'nid_back_pic'  => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'nid_front_pic' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'nid_back_pic'  => 'image|mimes:jpeg,png,jpg|max:2048',
         ], 
         [
             // 🔴 Custom messages
-            'nid_front_pic.required' => 'NID front image is required.',
             'nid_front_pic.image'    => 'NID front must be an image file.',
             'nid_front_pic.mimes'    => 'NID front image must be jpeg, jpg or png format.',
             'nid_front_pic.max'      => 'NID front image size must not exceed 2MB.',
 
-            'nid_back_pic.required' => 'NID back image is required.',
             'nid_back_pic.image'    => 'NID back must be an image file.',
             'nid_back_pic.mimes'    => 'NID back image must be jpeg, jpg or png format.',
             'nid_back_pic.max'      => 'NID back image size must not exceed 2MB.',
@@ -112,7 +110,6 @@ class BookingController extends Controller
             $priceFlatIds,
             $engagedFlatIds
         ));
-
         $tags = DB::table('topic_tags')
             ->join('tags', 'topic_tags.tag_id', '=', 'tags.id')
             ->where('topic_tags.topic_id', $request->project_id)
@@ -121,7 +118,6 @@ class BookingController extends Controller
             })
             ->select('tags.id', 'tags.title')
             ->get();
-
         return response()->json([
             'tags' => $tags
         ]);

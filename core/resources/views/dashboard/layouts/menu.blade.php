@@ -249,7 +249,7 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                             <span class="nav-icon">
                             <i class="material-icons">&#xe7ef;</i>
                             </span>
-                            <span class="nav-text">Clinet Visit Requests</span>
+                            <span class="nav-text">Client Visit Requests</span>
                         </a>
                     </li>
 

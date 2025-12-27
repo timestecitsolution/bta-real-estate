@@ -18,7 +18,7 @@
                 @if(count($requests) > 0)
                     {{-- {{Form::open(['route'=>['categoriesUpdateAll',8],'method'=>'post'])}} --}}
                     <div class="table-responsive">
-                        <table class="table table-bordered m-a-0">
+                        <table id="bookingRequestTable" class="table table-bordered m-a-0">
                             <thead class="dker">
                             <tr>
                                 <th class="text-center w-64">Sl No</th>
@@ -43,7 +43,7 @@
                                 ?>
                                 <tr class="{{ $request->is_cancelled ? 'table-danger' : '' }}">
                                     <td class="text-center">{{ $x }}</td>
-                                    <td class="text-center">{{ $request->project_id ? $request->project_id : 'N/A' }}</td>
+                                    <td class="text-center">{{ $request->project ? $request->project->title_en : 'N/A' }}</td>
                                     <td class="text-center">{{ $request->flat_id ? $request->flat_id : 'N/A' }}</td>
                                      <td class="text-center">{{ $request->full_name ? $request->full_name : 'N/A' }}</td>
                                     <td class="text-center">{{ $request->email }}</td>
@@ -226,5 +226,54 @@
                 }
             });
         }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#bookingRequestTable').DataTable({
+                pageLength: 10,
+                ordering: true,
+                searching: true,
+                responsive: true,
+                dom: 'Bfrtip',
+
+                columnDefs: [
+                    {
+                        targets: -1,        
+                        orderable: false,   
+                        searchable: false, 
+                        exportable: false  
+                    }
+                ],
+                buttons: [
+                    {
+                        extend: 'print',
+                        text: '🖨 Print',
+                        title: 'Booking Requests',
+                        exportOptions: {
+                            columns: ':not(:last-child)' 
+                        }
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '📊 Excel',
+                        title: 'Booking Requests',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '📄 PDF',
+                        title: 'Booking Requests',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    }
+                ]
+            });
+        });
     </script>
 @endpush

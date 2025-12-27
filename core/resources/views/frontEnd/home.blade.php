@@ -261,84 +261,97 @@ $Topics_upcoming = Helper::Topics(8,31,4);
                       @csrf
                     <div class="row g-3">
                         <div class="col-lg-12">
-                            <input type="text" name="full_name" class="form-control" placeholder="Full name" required>
+                            <label class="text-white" for="full_name">Full Name *</label>
+                            <input type="text" name="full_name" value="{{ old('full_name') }}" class="form-control" placeholder="Full name *" required>
                             @error('full_name')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-6">
-                            <input type="email" name="email" class="form-control" placeholder="Email" required>
+                            <label class="text-white" for="email">Email *</label>
+                            <input type="email" name="email" value="{{ old('email') }}" class="form-control" placeholder="Email *" required>
                             @error('email')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror                               
                         </div>
                         <div class="col-lg-6">
-                            <input type="number" name="phone" class="form-control" placeholder="Phone" required>
+                            <label class="text-white" for="phone">Phone *</label>
+                            <input type="number" name="phone" value="{{ old('phone') }}" class="form-control" placeholder="Phone *" required>
                             @error('phone')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-6">
-                            <input type="number" name="nid_no" class="form-control" placeholder="NID No(In Between 10 to 17 Digits)" required>
+                            <label class="text-white"for="nid_no">NID No *</label>
+                            <input type="number" name="nid_no" value="{{ old('nid_no') }}" class="form-control" placeholder="NID No(In Between 10 to 17 Digits) *" required>
                             @error('nid_no')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-6">
-                            <input type="text" name="passport_no" maxlength="9" class="form-control" placeholder="Passport No(Max 9 Digits)" required>
+                            <label class="text-white" for="passport_no">Passport No *</label>
+                            <input type="text" name="passport_no" value="{{ old('passport_no') }}" maxlength="9" class="form-control" placeholder="Passport No(Max 9 Digits) *" required>
                             @error('passport_no')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror       
                         </div>
                         <div class="col-lg-12">
-                            <input type="text" name="birth_certificate_no" maxlength="17" class="form-control" placeholder="Birth Certificate No(Max 17 Digits)">
+                            <label class="text-white" for="birth_certificate_no">Birth Certificate No</label>
+                            <input type="text" name="birth_certificate_no" value="{{ old('birth_certificate_no') }}" maxlength="17" class="form-control" placeholder="Birth Certificate No(Max 17 Digits)">
                             @error('birth_certificate_no')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror       
                         </div>
                         <div class="col-lg-6">
-                            <label class="text-white" for="nid_front_pic">NID Front Pic</label>
-                            <input type="file" name="nid_front_pic" class="form-control" placeholder="NID front pic" required>
+                            <label class="text-white" for="nid_front_pic">NID Front Pic(Jpg, Jpeg, Png, max: 2MB)</label>
+                            <input type="file" name="nid_front_pic" class="form-control" placeholder="NID front pic">
                             @error('nid_front_pic')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-6">
-                            <label class="text-white" for="nid_back_pic">NID Back Pic</label>
-                            <input type="file" name="nid_back_pic" class="form-control" placeholder="NID back pic" required>
+                            <label class="text-white" for="nid_back_pic">NID Back Pic(Jpg, Jpeg, Png, max: 2MB)</label>
+                            <input type="file" name="nid_back_pic" class="form-control" placeholder="NID back pic">
                             @error('nid_back_pic')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-12">
+                            <label class="text-white" for="project_id">Project of Interest *</label>
                             <select class="form-select" id="project_id" name="project_id" required>
-                                <option selected disabled>Project of Interest</option>
+                                <option disabled {{ old('project_id') ? '' : 'selected' }}>Project of Interest</option>
                                 @foreach($projects as $project)
-                                    <option data-project_id="{{ $project->id }}" value="{{ $project->title_en }}">{{ $project->title_en }}</option>
+                                    <option value="{{ $project->id }}"
+                                        {{ old('project_id') == $project->id ? 'selected' : '' }}>
+                                        {{ $project->title_en }}
+                                    </option>
                                 @endforeach
                             </select>
                             @error('project_id')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="col-lg-12 mt-3" id="flat_section" style="display: none;">
+                        <div class="col-lg-12 mt-3" id="flat_section">
+                            <label class="text-white" for="flat_id">Select Flat *</label>
                             <select class="form-select" id="flat_id" name="flat_id" required>
-                                <option selected disabled>Select Flat</option>
+                                <option selected disabled>Select Flat *</option>
                             </select>
                             @error('flat_id')
-                                <small class="text-white">{{ $message }}</small>   
+                                <small class="text-danger">{{ $message }}</small>   
                             @enderror
                         </div>
                         <div class="col-lg-12">
-                            <input type="date" name="preferred_date" class="form-control">
+                            <label class="text-white" for="preferred_date">Preferred Date *</label>
+                            <input type="date" name="preferred_date" value="{{ old('preferred_date') }}" class="form-control" required>
                             @error('preferred_date')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-12">
-                            <textarea name="message" class="form-control" placeholder="Your Message / Inquiry"></textarea>
+                            <label class="text-white" for="message">Your Message / Inquiry</label>
+                            <textarea name="message" class="form-control" placeholder="Your Message / Inquiry">{{ old('message') }}</textarea>
                             @error('message')
-                                <small class="text-white">{{ $message }}</small>
+                                <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-7 form-check">
@@ -407,8 +420,8 @@ $('#fileInput').on('change', function () {
     <script>
         $(document).ready(function () {
             $('#project_id').on('change', function () {
-                let projectId = $(this).find('option:selected').data('project_id');
-              
+                // let projectId = $(this).find('option:selected').data('project_id');
+                let projectId = $(this).val();
                 $.ajax({
                     url: "{{ route('get.project.flats') }}",
                     type: "POST",
@@ -417,7 +430,7 @@ $('#fileInput').on('change', function () {
                         project_id: projectId
                     },
                     success: function (response) {
-                        let options = '<option selected disabled>Select Flat</option>';
+                        let options = '<option selected disabled>Select Flat *</option>';
 
                         if (response.tags.length > 0) {
                             response.tags.forEach(function (tag) {
@@ -425,10 +438,10 @@ $('#fileInput').on('change', function () {
                             });
 
                             $('#flat_id').html(options);
-                            $('#flat_section').show();
+                            // $('#flat_section').show();
                         } else {
                             $('#flat_id').html('<option>No tags found</option>');
-                            $('#flat_section').hide();
+                            // $('#flat_section').hide();
                         }
                     }
                 });
