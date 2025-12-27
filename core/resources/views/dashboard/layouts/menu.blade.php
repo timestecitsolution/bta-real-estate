@@ -253,6 +253,19 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                         </a>
                     </li>
 
+                    <?php
+                        $currentFolder = "land-query"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('land-query-list') }}">
+                            <span class="nav-icon">
+                            <i class="material-icons">&#xe7ef;</i>
+                            </span>
+                            <span class="nav-text">Land Query List</span>
+                        </a>
+                    </li>
+
                     @if(Helper::GeneralWebmasterSettings("inbox_status"))
                         @if(@Auth::user()->permissionsGroup->inbox_status)
                             <?php

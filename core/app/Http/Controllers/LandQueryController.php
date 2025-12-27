@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LandQuery;
+use App\Models\WebmasterSection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LandQueryMail;
@@ -10,6 +11,13 @@ use Helper;
 class LandQueryController extends Controller
 {
     private $uploadPath = "uploads/land_query/";
+
+    public function index()
+    {
+        $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
+        $landQueries = LandQuery::orderBy('id', 'DESC')->get();
+        return view('dashboard.land-query.list', compact('landQueries', 'GeneralWebmasterSections'));
+    }
 
     public function submit(Request $request)
     {
@@ -63,6 +71,34 @@ class LandQueryController extends Controller
         Mail::to($query->email)->send(new LandQueryMail($query));
 
         return back()->with('success', 'Query submitted successfully.');
+    }
+    public function show(string $id)
+    {
+        $landquery = LandQuery::findOrFail($id);
+        if (request()->ajax()) {
+            return response()->json($landquery);
+        }
+
+        return view('dashboard.land-query.preview', compact('landquery'));
+    }
+    public function destroy(string $id)
+    {
+        $landquery = LandQuery::find($id);
+        if ($landquery) {
+            // Delete attachments
+            if (!empty($landquery->attachments)) {
+                foreach ($landquery->attachments as $fileName) {
+                    $filePath = base_path('../uploads/land_query/' . $fileName);
+                    if (!empty($filePath) && file_exists($filePath) && is_file($filePath)) {
+                        if (is_writable($filePath)) {
+                            unlink($filePath);
+                        }
+                    }
+                }
+            }
+            $landquery->delete();
+        }
+        return redirect()->back()->with('success', 'Land Query deleted successfully.');
     }
 }
 ?>

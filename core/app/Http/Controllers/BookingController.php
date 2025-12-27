@@ -77,18 +77,6 @@ class BookingController extends Controller
             return redirect()->route('login-new')->with('warning', 'You already have an account. Please login.');
         }
 
-        //  $user = User::create([
-        //     'name' => $validated['full_name'],
-        //     'email' => $validated['email'],
-        //     'password' => Hash::make('123456'),
-        //     'permissions_id' => 1, 
-        //     'must_change_password' => true,
-        // ]);
-        // if ($user) {
-        //     Auth::guard('user')->login($user);
-        //     return redirect()->route('change-password')->with('success', 'Please change your password first!');
-        // }
-
         $mail_to = Helper::GeneralSiteSettings("land_query_mail");
         // Send Email
         Mail::to($query->email)->send(new BookingQueryMail($query));

@@ -23,6 +23,7 @@ use App\Http\Controllers\Dashboard\FileManagerController;
 use App\Http\Controllers\Dashboard\TagController;
 use App\Http\Controllers\Dashboard\PopupController;
 use App\Http\Controllers\Dashboard\ClientVisitRequestController;
+use App\Http\Controllers\LandQueryController;
 use Illuminate\Support\Facades\Route;
 
 // Admin Home
@@ -251,6 +252,12 @@ Route::get('/material-type/destroy/{id}', [MaterialTypeController::class, 'destr
 Route::get('/client-visit-requests', [ClientVisitRequestController::class, 'index'])->name('client-visit-requests');
 Route::get('/client-visit-requests/{id}', [ClientVisitRequestController::class, 'show'])->name('client-visit-requests.show');
 Route::get('/client-visit-requests/destroy/{id}', [ClientVisitRequestController::class, 'destroy'])->name('client-visit-request.destroy');
+
+
+//Land Query
+Route::get('/land-query-list', [LandQueryController::class, 'index'])->name('land-query-list');
+Route::get('/land-query-list/{id}', [LandQueryController::class, 'show'])->name('land-query.show');
+Route::get('/land-query-list/destroy/{id}', [LandQueryController::class, 'destroy'])->name('land-query.destroy');
 
 // WebMails Groups
 Route::post('/webmails/storeGroup', [WebmailsController::class, 'storeGroup'])->name('webmailsStoreGroup');
