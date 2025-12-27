@@ -249,7 +249,7 @@
                     {
                         extend: 'print',
                         text: '🖨 Print',
-                        title: 'Booking Requests',
+                        title: 'Visit Requests',
                         exportOptions: {
                             columns: ':not(:last-child)' 
                         }
@@ -257,7 +257,7 @@
                     {
                         extend: 'excelHtml5',
                         text: '📊 Excel',
-                        title: 'Booking Requests',
+                        title: 'Visit Requests',
                         exportOptions: {
                             columns: ':not(:last-child)'
                         }
@@ -265,7 +265,7 @@
                     {
                         extend: 'pdfHtml5',
                         text: '📄 PDF',
-                        title: 'Booking Requests',
+                        title: 'Visit Requests',
                         orientation: 'landscape',
                         pageSize: 'A4',
                         exportOptions: {
