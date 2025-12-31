@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BookingQuery;
 use App\Models\WebmasterSection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ClientVisitRequestController extends Controller
 {
@@ -71,10 +73,31 @@ class ClientVisitRequestController extends Controller
      */
     public function destroy(string $id)
     {
-        $request = BookingQuery::find($id);
-        if ($request) {
-            $request->delete();
+        DB::beginTransaction();
+
+        try {
+            $booking = BookingQuery::findOrFail($id);
+
+            //  Delete files if exist
+            if ($booking->nid_front_pic && Storage::disk('public')->exists($booking->nid_front_pic)) {
+                Storage::disk('public')->delete($booking->nid_front_pic);
+            }
+
+            if ($booking->nid_back_pic && Storage::disk('public')->exists($booking->nid_back_pic)) {
+                Storage::disk('public')->delete($booking->nid_back_pic);
+            }
+
+            //  Delete DB row
+            $booking->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Client Visit Request deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with('error', 'Something went wrong. Delete failed.');
         }
-        return redirect()->back()->with('success', 'Client Visit Request deleted successfully.');
     }
 }

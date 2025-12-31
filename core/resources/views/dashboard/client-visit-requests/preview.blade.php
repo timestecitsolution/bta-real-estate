@@ -62,16 +62,37 @@
                         <strong>NID Back:</strong><br>
                         <img id="nid_back_pic" src="" class="img-fluid img-thumbnail" width="150">
                     </div>
-
                 </div>
-
             </div>
-
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="printVisitPreview" class="btn btn-primary">Print</button>
             </div>
-
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('printVisitPreview').addEventListener('click', function() {
+    // Get modal content
+    var content = document.querySelector('#visitpreviewModal .modal-body').innerHTML;
+
+    // Open new window
+    var printWindow = window.open('', '', 'height=600,width=800');
+
+    // Write modal content
+    printWindow.document.write('<html><head><title>Visit Request Preview</title>');
+    // Optional: add Bootstrap CSS for proper styling
+    printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(content);
+    printWindow.document.write('</body></html>');
+
+    // Close document to finish loading
+    printWindow.document.close();
+
+    // Print
+    printWindow.print();
+});
+</script>
 

@@ -89,7 +89,7 @@
 </div>
 
 <style>
-/* ✅ Desktop view (default) */
+/*  Desktop view (default) */
 @media (min-width: 768px) {
     #booked-table {
         width: 100%;
@@ -107,7 +107,7 @@
     }
 }
 
-/* ✅ Mobile view (Vertical style) */
+/*  Mobile view (Vertical style) */
 @media (max-width: 767px) {
     #booked-table, 
     #booked-table thead, 

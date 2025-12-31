@@ -39,7 +39,7 @@ class LandlordEngagements extends Controller
      */
     public function create()
     {
-        $contacts = Contact::where('status', 1)->get();
+        $contacts = Contact::where('status', 2)->get();
         $documentTypes = DocumentType::all();
         $materialTypes = MaterialType::all();
         // General for all pages

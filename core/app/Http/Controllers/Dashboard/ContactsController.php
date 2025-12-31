@@ -215,62 +215,6 @@ class ContactsController extends Controller
         return redirect()->action('Dashboard\ContactsController@index');
     }
 
-    // public function store(Request $request)
-    // {
-    //     // Check Permissions
-    //     if (!@Auth::user()->permissionsGroup->add_status) {
-    //         return Redirect::to(route('NoPermission'))->send();
-    //     }
-
-    //     //
-    //     $this->validate($request, [
-    //         'email' => 'email|required|unique:users,email',
-    //         'phone' => 'required|unique:contacts,phone',
-    //         'file'  => 'image'
-    //     ]);
-
-    //     // Start of Upload Files
-    //     $formFileName = "file";
-    //     $fileFinalName_ar = "";
-    //     if ($request->$formFileName != "") {
-    //         $fileFinalName_ar = time() . rand(1111,
-    //                 9999) . '.' . $request->file($formFileName)->getClientOriginalExtension();
-    //         $path = $this->getUploadPath();
-    //         $request->file($formFileName)->move($path, $fileFinalName_ar);
-
-    //         // resize & optimize
-    //         Helper::imageResize($path.$fileFinalName_ar);
-    //         Helper::imageOptimize($path.$fileFinalName_ar);
-    //     }
-    //     // End of Upload Files
-
-    //     $Contact = new Contact;
-    //     $Contact->group_id = $request->group_id;
-    //     $Contact->first_name = strip_tags($request->first_name);
-    //     $Contact->last_name = strip_tags($request->last_name);
-    //     $Contact->company = strip_tags($request->company);
-    //     $Contact->email = strip_tags($request->email);
-    //     $Contact->password = $request->password;
-    //     $Contact->phone = $request->phone;
-    //     $Contact->country_id = $request->country_id;
-    //     $Contact->city = $request->city;
-    //     $Contact->address = strip_tags($request->address);
-    //     $Contact->photo = $fileFinalName_ar;
-    //     $Contact->notes = $request->notes;
-    //     $Contact->status = 1;
-    //     $Contact->created_by = Auth::user()->id;
-    //     $Contact->save();
-    //     $user = User::create([
-    //         'name' => $Contact->first_name,
-    //         'email' => $Contact->email,
-    //         'password' => Hash::make('123456'),
-    //         'permissions_id' => 1, 
-    //         'contact_id'    => $Contact->id,
-    //     ]);
-
-    //     return redirect()->action('Dashboard\ContactsController@index');
-    // }
-
     public function store(Request $request)
     {
         // Check Permissions
@@ -326,7 +270,11 @@ class ContactsController extends Controller
         $Contact->nid_back = $nidBackFile;
         $Contact->notes = $request->notes;
         $Contact->person_type = $request->person_type;
-        $Contact->status = 1;
+        if($Contact->person_type == 'landlord'){
+            $Contact->status = 2; 
+        } else {
+            $Contact->status = 1;
+        }
         $Contact->created_by = Auth::user()->id;
         $Contact->save();
 
@@ -454,8 +402,12 @@ class ContactsController extends Controller
         $Contact->passport_no = $request->passport_no;
         $Contact->nid_no = $request->nid_no;
         $Contact->birth_certificate_no = $request->birth_certificate_no;
-        // $Contact->status = $request->status;
         $Contact->person_type = $request->person_type;
+        if($Contact->person_type == 'landlord'){
+            $Contact->status = 2; 
+        } else {
+            $Contact->status = 1;
+        }
         $Contact->updated_by = Auth::user()->id;
         $Contact->save();
 
@@ -466,9 +418,6 @@ class ContactsController extends Controller
             $user->save();
         }
 
-        // return redirect()->action('Dashboard\ContactsController@index')
-        //                 ->with('ContactToEdit', $Contact)
-        //                 ->with('doneMessage2', __('backend.saveDone'));
         return redirect()->action('Dashboard\ContactsController@index')
                          ->with('ContactToEdit', Contact::find($id))
                          ->with('doneMessage2', __('backend.saveDone'));

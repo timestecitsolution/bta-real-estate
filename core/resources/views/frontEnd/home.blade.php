@@ -1,12 +1,6 @@
 @extends('frontEnd.layouts.master')
 
 @section('content')
-
-@if(session('success'))
-    <div class="alert alert-success mt-2" id="success-alert">
-        {{ session('success') }}
-    </div>
-@endif
   <section class="home-about">
     <div class="container">
       <div class="home-about-content">
@@ -276,7 +270,7 @@ $Topics_upcoming = Helper::Topics(8,31,4);
                         </div>
                         <div class="col-lg-6">
                             <label class="text-white" for="phone">Phone *</label>
-                            <input type="number" name="phone" value="{{ old('phone') }}" class="form-control" placeholder="Phone *" required>
+                            <input type="text" name="phone" value="{{ old('phone') }}" class="form-control" placeholder="Phone *" maxlength="11" pattern="[0-9]{11}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g,'').slice(0,11);" required>
                             @error('phone')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -304,14 +298,16 @@ $Topics_upcoming = Helper::Topics(8,31,4);
                         </div>
                         <div class="col-lg-6">
                             <label class="text-white" for="nid_front_pic">NID Front Pic(Jpg, Jpeg, Png, max: 2MB)</label>
-                            <input type="file" name="nid_front_pic" class="form-control" placeholder="NID front pic">
+                            <input type="file" name="nid_front_pic" id="nid_front_pic" class="form-control" accept="image/jpeg,image/png" placeholder="NID front pic">
+                            <small class="text-danger d-none" id="nid_front_error"></small>
                             @error('nid_front_pic')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-lg-6">
                             <label class="text-white" for="nid_back_pic">NID Back Pic(Jpg, Jpeg, Png, max: 2MB)</label>
-                            <input type="file" name="nid_back_pic" class="form-control" placeholder="NID back pic">
+                            <input type="file" name="nid_back_pic" id="nid_back_pic" class="form-control" accept="image/jpeg,image/png" placeholder="NID back pic">
+                            <small class="text-danger d-none" id="nid_back_error"></small>
                             @error('nid_back_pic')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -374,6 +370,20 @@ $Topics_upcoming = Helper::Topics(8,31,4);
 </section>
 @include('frontEnd.layouts.popup',['Popup'=>@$Popup])
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+@if(session('success'))
+<script>
+    $(document).ready(function () {
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+        };
+        toastr.success("{{ session('success') }}");
+    });
+</script>
+@endif
 
 <script>
 $('#fileInput').on('change', function () {
@@ -447,5 +457,41 @@ $('#fileInput').on('change', function () {
                 });
             });
         });
+
+
+        function validateNIDFile(inputId, errorId) {
+          const input = document.getElementById(inputId);
+          const error = document.getElementById(errorId);
+
+          input.addEventListener('change', function () {
+              error.classList.add('d-none');
+              error.innerText = '';
+
+              if (!this.files.length) return;
+
+              const file = this.files[0];
+              const allowedTypes = ['image/jpeg', 'image/png'];
+              const maxSize = 2 * 1024 * 1024; 
+
+              // File type check
+              if (!allowedTypes.includes(file.type)) {
+                  this.value = '';
+                  error.innerText = '❌ Only JPG, JPEG or PNG files are allowed.';
+                  error.classList.remove('d-none');
+                  return;
+              }
+
+              // File size check
+              if (file.size > maxSize) {
+                  this.value = '';
+                  error.innerText = '❌ File size must be less than 2MB.';
+                  error.classList.remove('d-none');
+                  return;
+              }
+          });
+      }
+
+      validateNIDFile('nid_front_pic', 'nid_front_error');
+      validateNIDFile('nid_back_pic', 'nid_back_error');
     </script>
 @endsection

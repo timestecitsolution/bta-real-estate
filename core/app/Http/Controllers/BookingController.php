@@ -55,6 +55,12 @@ class BookingController extends Controller
         ]
         );
 
+        // Ensure folder exists
+        $uploadPath = storage_path('app/public/uploads/nid_pics');
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true); 
+        }
+
         // Store files
         $nidFrontPath = null;
         $nidBackPath = null;
@@ -72,16 +78,11 @@ class BookingController extends Controller
 
         $query = BookingQuery::create($validated);
 
-        $existingUser = User::where('email', $validated['email'])->first();
-        if ($existingUser) {
-            return redirect()->route('login-new')->with('warning', 'You already have an account. Please login.');
-        }
-
         $mail_to = Helper::GeneralSiteSettings("land_query_mail");
         // Send Email
         Mail::to($query->email)->send(new BookingQueryMail($query));
         
-        return redirect()->back()->with('success', 'Your booking is submitted and account created successfully!');
+        return redirect()->back()->with('success', 'Your visit booking request is submitted successfully!');
     }
 
     public function getFlats(Request $request)

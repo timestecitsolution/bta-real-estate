@@ -19,6 +19,7 @@
 
 <link href="{{ URL::asset('assets/frontend/css/style.css') }}?v={{ Helper::system_version() }}" rel="stylesheet"/>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 @if( @Helper::currentLanguage()->direction=="rtl")
 <link href="{{ URL::asset('assets/frontend/css/rtl.css') }}?v={{ Helper::system_version() }}" rel="stylesheet"/>
