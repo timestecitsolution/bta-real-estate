@@ -15,6 +15,8 @@ use App\Models\FlatDocuments;
 use App\Models\BulkSmsData;
 use App\Models\Contact;
 use App\Models\EmiPayment;
+use App\Models\ClientApplicationSubject;
+use App\Models\CentralApplication;
 use Helper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -235,10 +237,14 @@ class BookingController extends Controller
         $Contact = Contact::find($user->contact_id);
         $customer_details = $prices_details->isNotEmpty() ? $prices_details->first()->customer : null;
         $allDocumentTypes = DocumentType::all();
+        $applicationSubjects = ClientApplicationSubject::all();
 
         $bulksmsdata = BulkSmsData::all();
+        $applicationdata = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator'])
+            ->where('applied_by', $user->id)
+            ->get();
 
-        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details'));
+        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details', 'applicationSubjects', 'applicationdata'));
     }
 
 

@@ -10,6 +10,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\EmiController;
 use App\Http\Controllers\BulkSmsController;
+use App\Http\Controllers\centralApplicationController;
+use App\Http\Controllers\Dashboard\ClientApplicationSubjectController;
 use App\Services\EmiNotificationService;
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +107,10 @@ Route::middleware(['force.password.change'])->group(function() {
     Route::post('/material/action/{id}', [MaterialDetailsController::class, 'MaterialChangeApproval'])->name('material.action');
     Route::post('/send-sms', [BulkSmsController::class, 'bulksms'])->name('bulk.sms');
 
+    Route::post('/central-application/store', [CentralApplicationController::class, 'store'])->name('central-application.store');
+    Route::get('/application-subject/{id}/body', [ClientApplicationSubjectController::class, 'getBody']);
+    Route::post('/application/feedback/store', [ClientApplicationSubjectController::class, 'feedbackreplystore'])
+    ->name('application.feedback.store');
 });
 
 Route::get('/login-new', [BookingController::class, 'UserLogin'])->name('login-new');

@@ -24,6 +24,8 @@ use App\Http\Controllers\Dashboard\TagController;
 use App\Http\Controllers\Dashboard\PopupController;
 use App\Http\Controllers\Dashboard\ClientVisitRequestController;
 use App\Http\Controllers\LandQueryController;
+use App\Http\Controllers\Dashboard\ClientApplicationSubjectController;
+use App\Http\Controllers\Dashboard\ApplicationListController;
 use Illuminate\Support\Facades\Route;
 
 // Admin Home
@@ -247,6 +249,22 @@ Route::get('/material-type/{id}/edit', [MaterialTypeController::class, 'edit'])-
 Route::post('/material-type/{id}/update', [MaterialTypeController::class, 'update'])->name('material-type.update');
 Route::get('/material-type/{id}', [MaterialTypeController::class, 'show'])->name('material-type.show');
 Route::get('/material-type/destroy/{id}', [MaterialTypeController::class, 'destroy'])->name('material-type.destroy');
+
+
+// Client Application Subject
+Route::get('/client-application-subject', [ClientApplicationSubjectController::class, 'index'])->name('client-application-subject');
+Route::get('/client-application-subject/create', [ClientApplicationSubjectController::class, 'create'])->name('client-application-subject.create');
+Route::post('/client-application-subject/store', [ClientApplicationSubjectController::class, 'store'])->name('client-application-subject.store');
+Route::get('/client-application-subject/{id}/edit', [ClientApplicationSubjectController::class, 'edit'])->name('client-application-subject.edit');
+Route::post('/client-application-subject/{id}/update', [ClientApplicationSubjectController::class, 'update'])->name('client-application-subject.update');
+Route::get('/client-application-subject/{id}', [ClientApplicationSubjectController::class, 'show'])->name('client-application-subject.show');
+Route::get('/client-application-subject/destroy/{id}', [ClientApplicationSubjectController::class, 'destroy'])->name('client-application-subject.destroy');
+
+//Application lists
+Route::get('/application-list', [ApplicationListController::class, 'index'])->name('application-list');
+Route::get('/application-list/{id}', [ApplicationListController::class, 'show'])->name('application-list.show');
+Route::post('/application-list/{id}/approve-reject', [ApplicationListController::class, 'approveReject'])->name('application.approve-reject');
+Route::get('/application-list/destroy/{id}', [ApplicationListController::class, 'destroy'])->name('application-list.destroy');
 
 // Client Visit Requests
 Route::get('/client-visit-requests', [ClientVisitRequestController::class, 'index'])->name('client-visit-requests');

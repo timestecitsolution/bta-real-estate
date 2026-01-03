@@ -41,6 +41,11 @@
                     Material Details
                 </button>
             </li>
+            <li class="nav-item" role="material_details">
+                <button class="nav-link" style="color: black !important;" id="application-form-tab" data-bs-toggle="tab" data-bs-target="#application-form" type="button" role="tab" aria-controls="application-form" aria-selected="false">
+                    Application
+                </button>
+            </li>
             <div class="ms-3">
                 <form method="POST" action="{{ route('user.logout') }}">
                     @csrf
@@ -76,6 +81,9 @@
             </div>
             <div class="tab-pane fade" id="material-details" role="tabpanel" aria-labelledby="material-details-tab">
                 @include('user-dashboard.material-details')
+            </div>
+            <div class="tab-pane fade" id="application-form" role="tabpanel" aria-labelledby="application-form-tab">
+                @include('user-dashboard.application-form')
             </div>
         </div>
     </div>

@@ -148,6 +148,61 @@
       ]
     });
 
+    $('#applicaton-list-table').DataTable({
+        pageLength: 10,
+        ordering: true,
+        searching: true,
+        dom: `<"d-flex justify-content-between align-items-center mb-2"
+                <"d-flex align-items-center"l>
+                <"d-flex justify-content-center mt-4" B>
+                <"d-flex"f>
+            >
+            rt
+            <"d-flex justify-content-between align-items-center mt-2"ip>`,
+
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                text: '📊 Download Excel',
+                className: 'btn btn-success mb-3',
+                exportOptions: {
+                    columns: [0,1,2,3,4,5],
+                    format: {
+                        body: function (data, row, column) {
+                            return $('<div>').html(data).text(); // HTML strip
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'print',
+                text: '🖨️ Print Application',
+                className: 'btn btn-info mb-3',
+                exportOptions: {
+                    columns: [0,1,2,3,4,5],
+                    format: {
+                        body: function (data, row, column) {
+                            return $('<div>').html(data).text();
+                        }
+                    }
+                }
+            }
+        ],
+
+        columnDefs: [
+            {
+                targets: 2, // Body column index
+                render: function (data, type, row) {
+                    let text = $('<div>').html(data).text(); // HTML remove
+                    return text.length > 120
+                        ? text.substring(0, 120) + '...'
+                        : text;
+                }
+            }
+        ]
+    });
+
+
     $(document).ready(function() {
         // Initialize Select2
         $('#customerSelect').select2({

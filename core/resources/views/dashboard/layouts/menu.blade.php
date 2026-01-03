@@ -239,6 +239,31 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                             <span class="nav-text">Material Type</span>
                         </a>
                     </li>
+                    
+                    <?php
+                        $currentFolder = "client-application-subject"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('client-application-subject') }}">
+                            <span class="nav-icon">
+                            <i class="material-icons">&#xe7ef;</i>
+                            </span>
+                            <span class="nav-text">Client Application Subject</span>
+                        </a>
+                    </li>
+                    <?php
+                        $currentFolder = "application-list"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('application-list') }}">
+                            <span class="nav-icon">
+                                <i class="material-icons">&#xe7ef;</i>
+                            </span>
+                            <span class="nav-text">Application list</span>
+                        </a>
+                    </li>
 
                     <?php
                         $currentFolder = "client-visit-requests"; 

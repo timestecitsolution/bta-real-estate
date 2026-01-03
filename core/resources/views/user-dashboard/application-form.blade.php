@@ -1,0 +1,285 @@
+<h3>Application</h3>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs" id="smsTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="application_form-tab" style="color: black !important;" data-bs-toggle="tab" data-bs-target="#application_form" type="button" role="tab">Application Form</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="application_list-tab" style="color: black !important;" data-bs-toggle="tab" data-bs-target="#application_list" type="button" role="tab">Application list</button>
+    </li>
+</ul>
+
+<div class="tab-content mt-3" id="smsTabContent">
+    <!-- Send SMS Tab -->
+    <div class="tab-pane fade show active" id="application_form" role="tabpanel">
+        <form id="smsForm" method="POST" action="{{ route('central-application.store') }}">
+            @csrf
+
+            <div class="form-group mb-3">
+                <label>Subject</label>
+                <select name="subject_id" id="subject_id" class="form-control" required>
+                    <option value="all">-- Subject --</option>
+                    @foreach($applicationSubjects as $applicationSubject)
+                        <option value="{{ $applicationSubject->id }}">
+                            {{ $applicationSubject->subject }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            @error('subject_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+
+            <div class="form-group mb-3">
+                <label>Application Body</label>
+                <textarea id="application_body" name="application_body" rows="5" class="form-control" placeholder="Type your message within 250 words..."></textarea>
+                <div class="text-muted mt-1" id="wordCount">0 / 250 words</div>
+            </div>
+
+            @error('application_body')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-paper-plane"></i> Send Application
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- SMS History Tab -->
+    <div class="tab-pane fade" id="application_list" role="tabpanel">
+        <table class="table table-bordered" id="applicaton-list-table">
+            <thead>
+                <tr>
+                    <th>Sl No</th>
+                    <th>Subject</th>
+                    <th>Body</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Preview</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                $key = 1;
+                @endphp
+                @foreach($applicationdata as $data)
+                <tr>
+                    <td>{{ $key++ }}</td>
+                    <td>{{ $data->subject->subject }}</td>
+
+                    <td>
+                        <div class="application-preview">
+                            {!! $data->body !!}
+                        </div>
+                    </td>
+
+                    <td>{{ ucfirst($data->status) }}</td>
+                    <td>{{ $data->created_at->format('d M Y, h:i A') }}</td>
+
+                    <td>
+                        <button
+                            class="btn btn-sm btn-primary preview-btn"
+                            data-id="{{ $data->id }}"
+                            data-subject="{{ $data->subject->subject }}"
+                            data-body='@json($data->body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)'
+                            data-date="{{ $data->created_at->format('d M Y, h:i A') }}"
+                            data-status="{{ ucfirst($data->status) }}"
+                            data-feedback='@json($data->feedbacks)'
+                        >
+                            👁 Preview
+                        </button>
+                    </td>
+                </tr>
+                @endforeach
+                @include('user-dashboard.application-preview')
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+
+<script>
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+
+        return date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    $(document).on('click', '.preview-btn', function () {
+
+        $('#previewSubject').text($(this).data('subject'));
+        $('#previewDate').text($(this).data('date'));
+        $('#status').text($(this).data('status'));
+        $('#previewBody').html($(this).data('body'));
+        window.authUserId = {{ auth()->guard('user')->id() }};
+
+        let appId = $(this).data('id');
+        $('#feedbackApplicationId').val(appId);
+
+        // BODY as HTML
+        $('#previewBody').html($(this).data('body'));
+
+        let feedbacks = $(this).data('feedback');
+        let feedbackHtml = '';
+
+        if (feedbacks && feedbacks.length > 0) {
+            feedbacks.forEach(function (item) {
+
+                const isOwn = item.created_by == window.authUserId;
+
+                feedbackHtml += `
+                    <div class="feedback-row ${isOwn ? 'feedback-right' : 'feedback-left'}">
+                        <div class="feedback-bubble ${isOwn ? 'feedback-user' : 'feedback-admin'}">
+                            <strong>
+                                ${(item.feedback_creator?.first_name ?? 'Admin')}
+                            </strong>
+                            <br>
+                            <small class="text-muted">
+                                ${formatDate(item.created_at)}
+                            </small>
+                            <div style="margin-top:6px;">
+                                ${item.feedback}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            $('#previewFeedback').html(feedbackHtml);
+            $('#feedbackSection').show();
+        } else {
+            $('#feedbackSection').hide();
+        }
+
+        $('#applicationPreviewModal').modal('show');
+    });
+
+
+    let applicationEditor; // global editor instance
+    const maxWords = 250;
+
+    // ===============================
+    // CKEDITOR INIT
+    // ===============================
+    ClassicEditor
+        .create(document.querySelector('#application_body'))
+        .then(editor => {
+            applicationEditor = editor;
+
+            const counter = document.getElementById('wordCount');
+
+            editor.model.document.on('change:data', () => {
+                let text = editor.getData()
+                    .replace(/<[^>]*>/g, '')
+                    .trim();
+
+                let words = text.split(/\s+/).filter(w => w.length > 0);
+
+                if (words.length > maxWords) {
+                    let trimmed = words.slice(0, maxWords).join(' ');
+                    editor.setData(trimmed);
+                    words = trimmed.split(/\s+/);
+                }
+
+                counter.innerText = words.length + ' / ' + maxWords + ' words';
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+
+    $('#subject_id').on('change', function () {
+        let subjectId = $(this).val();
+        if (!subjectId) {
+            setEditorData('');
+            return;
+        }
+
+        $.ajax({
+            url: '/application-subject/' + subjectId + '/body',
+            type: 'GET',
+            success: function (response) {
+                setEditorData(response.body);
+            },
+            error: function () {
+                alert('Failed to load subject body');
+            }
+        });
+    });
+
+    function setEditorData(data) {
+        if (!applicationEditor) return;
+
+        if (data === null || data === undefined || data.trim() === '') {
+            applicationEditor.setData('<p>Dear <strong>BTA,</strong></p>');
+            return;
+        }
+
+        applicationEditor.setData(data);
+    }
+
+
+</script>
+
+<style>
+.ck-editor__editable_inline {
+    min-height: 300px; 
+}
+.application-preview {
+    max-height: 90px;              
+    overflow: hidden;
+    position: relative;
+}
+.application-preview::after {
+    content: ".......";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: white;
+    padding-left: 10px;
+}
+
+.feedback-row {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.feedback-left {
+    justify-content: flex-start;
+}
+
+.feedback-right {
+    justify-content: flex-end;
+}
+
+.feedback-bubble {
+    max-width: 70%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.feedback-admin {
+    background: #f1f1f1;
+    border-left: 4px solid #0d6efd;
+}
+
+.feedback-user {
+    background: #e9f7ef;
+    border-right: 4px solid #28a745;
+    text-align: right;
+}
+</style>
