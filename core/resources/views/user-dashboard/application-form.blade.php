@@ -84,8 +84,8 @@
                         <button
                             class="btn btn-sm btn-primary preview-btn"
                             data-id="{{ $data->id }}"
-                            data-subject="{{ $data->subject->subject }}"
-                            data-body='@json($data->body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)'
+                            data-subject="{{ e($data->subject->subject) }}"
+                            data-body="{{ base64_encode($data->body) }}"
                             data-date="{{ $data->created_at->format('d M Y, h:i A') }}"
                             data-status="{{ ucfirst($data->status) }}"
                             data-feedback='@json($data->feedbacks)'
@@ -117,41 +117,111 @@
         });
     }
 
+    // $(document).on('click', '.preview-btn', function () {
+
+    //     const encodedBody = $(this).attr('data-body'); 
+    //     const decodedBody = atob(encodedBody);  
+    //     console.log(decodedBody);       
+
+    //     $('#previewSubject').text($(this).data('subject'));
+    //     $('#previewDate').text($(this).data('date'));
+    //     $('#status').text($(this).data('status'));
+
+    //     $('#previewBody').html(decodedBody);
+    //     const $preview = $('#previewBody');
+    //     $preview.html(decodedBody);
+    //     console.log('PreviewBody after html():', $preview.html());
+
+    //     window.authUserId = {{ auth()->guard('user')->id() }};
+
+    //     let appId = $(this).data('id');
+    //     $('#feedbackApplicationId').val(appId);
+
+    //     // BODY as HTML
+    //     $('#previewBody').html($(this).data('body'));
+
+    //     let feedbacks = $(this).data('feedback');
+    //     let feedbackHtml = '';
+
+    //     if (feedbacks && feedbacks.length > 0) {
+    //         feedbacks.forEach(function (item) {
+
+    //             const isOwn = item.created_by == window.authUserId;
+
+    //             feedbackHtml += `
+    //                 <div class="feedback-row ${isOwn ? 'feedback-right' : 'feedback-left'}">
+    //                     <div class="feedback-bubble ${isOwn ? 'feedback-user' : 'feedback-admin'}">
+    //                         <strong>
+    //                             ${(item.feedback_creator?.first_name ?? 'Admin')}
+    //                         </strong>
+    //                         <br>
+    //                         <small class="text-muted">
+    //                             ${formatDate(item.created_at)}
+    //                         </small>
+    //                         <div style="margin-top:6px;">
+    //                             ${item.feedback}
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //             `;
+    //         });
+
+    //         $('#previewFeedback').html(feedbackHtml);
+    //         $('#feedbackSection').show();
+    //     } else {
+    //         $('#feedbackSection').hide();
+    //     }
+
+    //     $('#applicationPreviewModal').modal('show');
+    // });
     $(document).on('click', '.preview-btn', function () {
 
+        // 1️⃣ Base64 decode the body
+        const encodedBody = $(this).attr('data-body');
+        let decodedBody = '';
+
+        try {
+            decodedBody = atob(encodedBody);
+        } catch(e) {
+            console.error('Failed to decode body:', e);
+            decodedBody = $(this).attr('data-body'); // fallback
+        }
+
+        console.log('Decoded Body:', decodedBody);
+
+        // 2️⃣ Set main fields
         $('#previewSubject').text($(this).data('subject'));
         $('#previewDate').text($(this).data('date'));
         $('#status').text($(this).data('status'));
-        $('#previewBody').html($(this).data('body'));
+
+        // 3️⃣ Set body HTML
+        const $preview = $('#previewBody');
+        $preview.empty();       // clear previous
+        $preview.append(decodedBody);  // append decoded HTML
+        console.log('PreviewBody after html():', $preview.html());
+
+        // 4️⃣ Current auth user ID
         window.authUserId = {{ auth()->guard('user')->id() }};
 
+        // 5️⃣ Set hidden input for feedback form (if exists)
         let appId = $(this).data('id');
         $('#feedbackApplicationId').val(appId);
 
-        // BODY as HTML
-        $('#previewBody').html($(this).data('body'));
-
+        // 6️⃣ Render feedbacks
         let feedbacks = $(this).data('feedback');
         let feedbackHtml = '';
 
         if (feedbacks && feedbacks.length > 0) {
             feedbacks.forEach(function (item) {
-
                 const isOwn = item.created_by == window.authUserId;
 
                 feedbackHtml += `
                     <div class="feedback-row ${isOwn ? 'feedback-right' : 'feedback-left'}">
                         <div class="feedback-bubble ${isOwn ? 'feedback-user' : 'feedback-admin'}">
-                            <strong>
-                                ${(item.feedback_creator?.first_name ?? 'Admin')}
-                            </strong>
+                            <strong>${item.feedback_creator?.first_name ?? 'Admin'}</strong>
                             <br>
-                            <small class="text-muted">
-                                ${formatDate(item.created_at)}
-                            </small>
-                            <div style="margin-top:6px;">
-                                ${item.feedback}
-                            </div>
+                            <small class="text-muted">${formatDate(item.created_at)}</small>
+                            <div style="margin-top:6px;">${item.feedback}</div>
                         </div>
                     </div>
                 `;
@@ -160,12 +230,14 @@
             $('#previewFeedback').html(feedbackHtml);
             $('#feedbackSection').show();
         } else {
+            $('#previewFeedback').hide();
             $('#feedbackSection').hide();
         }
 
+        // 7️⃣ Show modal after everything is ready
         $('#applicationPreviewModal').modal('show');
-    });
 
+    });
 
     let applicationEditor; // global editor instance
     const maxWords = 250;

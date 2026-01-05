@@ -55,7 +55,9 @@ class ApplicationListController extends Controller
                     "Status: {$statusText}\n\n" .
                     "Thank you for choosing us.\n" .
                     "- Building Technology & Architecture";
-                SMSService::send($application->creator->phone, $message);
+                    if(!empty($application->creator->phone)){
+                        SMSService::send($application->creator->phone, $message);
+                    }
             }
 
             $feedbackModel = null;
