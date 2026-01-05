@@ -68,7 +68,7 @@
                     $isReadonly = in_array($applications->status, ['approved', 'rejected']);
                 @endphp
 
-                <form action="{{ route('application.approve-reject', $applications->id) }}" method="POST">
+                <form id="approveRejectForm" action="{{ route('application.approve-reject', $applications->id) }}" method="POST">
                     @csrf
 
                     {{-- Status --}}
@@ -102,6 +102,7 @@
                         <label><strong>Add New Feedback</strong></label>
 
                         <textarea name="feedback"
+                                id="approveFeedback"
                                 class="form-control"
                                 rows="3"
                                 placeholder="Write your reply here..."></textarea>
@@ -123,15 +124,29 @@
                 </form>
                 <hr>
                 {{-- Existing Feedback Thread --}}
-                <div class="mb-4">
+                <div class="mb-4" id="feedbackList">
 
-                    @forelse($applications->feedbacks as $item)
-                        <div class="mb-3 p-3"
-                            style="background:#f9f9f9; border-left:4px solid #007bff; border-radius:4px;">
+                @forelse($applications->feedbacks as $item)
 
+                    @php
+                        $authUserId = Auth::id();
+                        $isMine = $item->created_by == $authUserId;
+                    @endphp
+
+                    <div class="d-flex mb-3 {{ $isMine ? 'justify-content-end' : 'justify-content-start' }}">
+                        <div
+                            class="p-3 mb-2"
+                            style="
+                                max-width:70%;
+                                background: {{ $isMine ? '#e9f7ef' : '#f1f3f5' }};
+                                border-left: {{ $isMine ? '0' : '4px solid #007bff' }};
+                                border-right: {{ $isMine ? '4px solid #28a745' : '0' }};
+                                border-radius:8px;
+                            "
+                        >
                             <div class="d-flex justify-content-between mb-1">
                                 <strong>
-                                    {{ optional($item->feedbackCreator)->first_name ?? 'System/User' }}
+                                    {{ optional($item->feedbackCreator)->first_name ?? 'System' }}
                                 </strong>
                                 <small class="text-muted">
                                     {{ $item->created_at->format('d M Y, h:i A') }}
@@ -142,9 +157,11 @@
                                 {{ $item->feedback }}
                             </div>
                         </div>
-                    @empty
-                        <p class="text-muted">No feedback yet.</p>
-                    @endforelse
+                    </div>
+
+                @empty
+                    <p class="text-muted">No feedback yet.</p>
+                @endforelse
 
                 </div>
             </div>
@@ -155,4 +172,60 @@
 
 @push("after-scripts")
 <script src="{{ asset("assets/dashboard/js/iconpicker/fontawesome-iconpicker.js") }}"></script>
+<script>
+$('#approveRejectForm').on('submit', function (e) {
+    e.preventDefault();
+
+    let form = $(this);
+
+    $.ajax({
+        url: form.attr('action'),
+        type: "POST",
+        data: form.serialize(),
+        success: function (res) {
+            // textarea clear
+            $('#approveFeedback').val('');
+
+            // feedback append
+            if(res.feedback){
+                let fb = res.feedback;
+                $('#feedbackList').append(`
+                    <div class="d-flex mb-3 justify-content-end">
+                        <div style="
+                            max-width:70%;
+                            background:#e9f7ef;
+                            border-right:4px solid #28a745;
+                            border-radius:8px;
+                            padding:12px;
+                        ">
+                            <div class="d-flex justify-content-between mb-1">
+                                <strong>${fb.creator_name}</strong>
+                                <small class="text-muted">${fb.created_at}</small>
+                            </div>
+                            <div style="white-space:pre-line;">
+                                ${fb.text}
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }
+
+            // status update
+            if(res.status){
+                // Update radio selection
+                $(`input[name="status"][value="${res.status}"]`).prop('checked', true);
+
+                // Disable all radios if approved/rejected
+                if(['approved','rejected'].includes(res.status)){
+                    $('input[name="status"]').prop('disabled', true);
+                }
+            }
+        },
+        error: function () {
+            alert('Failed to submit');
+        }
+    });
+});
+
+</script>
 @endpush

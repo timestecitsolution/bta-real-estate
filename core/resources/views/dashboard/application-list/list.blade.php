@@ -56,7 +56,6 @@
                                 <th>Subject</th>
                                 <th>Body</th>
                                 <th class="text-center" style="width:50px;">{{ __('backend.status') }}</th>
-                                <th>Feedback</th>
                                 <th>Created At</th>
                                 <th class="text-center" style="width:60px;">{{ __('backend.options') }}</th>
                             </tr>
@@ -81,7 +80,6 @@
                                         </div>
                                     </td>
                                     <td class="text-center">{{ ucfirst($data->status) }}</td>
-                                    <td class="text-center">{{ $data->feedback }}</td>
                                     <td class="text-center">{{ $data->created_at->format('d M Y, h:i A') }}</td>
                                     
                                     <td class="text-center">
@@ -96,8 +94,7 @@
                                                        onclick="DeleteApplication('{{ $data->id }}')"><i
                                                             class="material-icons">&#xe872;</i> {{ __('backend.delete') }}
                                                     </a>
-                                                    <a href="{{ route('application-list.show', $data->id) }}" class="dropdown-item text-danger"><i
-                                                            class="material-icons">&#xe872;</i> Approve/Reject
+                                                    <a href="{{ route('application-list.show', $data->id) }}" class="dropdown-item text-primary"><i class="material-icons">check</i> Approve/Reject
                                                     </a>
                                                 @endif
                                             </div>
@@ -105,7 +102,6 @@
                                     </td>
                                 </tr>
                             @endforeach
-
                             </tbody>
                         </table>
 
