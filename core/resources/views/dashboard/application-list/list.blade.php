@@ -54,7 +54,7 @@
                                 <th class="text-center w-64">Sl No</th>
                                 <th>Client</th>
                                 <th>Subject</th>
-                                <th>Body</th>
+                                <!-- <th>Body</th> -->
                                 <th class="text-center" style="width:50px;">{{ __('backend.status') }}</th>
                                 <th>Created At</th>
                                 <th class="text-center" style="width:60px;">{{ __('backend.options') }}</th>
@@ -74,11 +74,11 @@
                                     <td class="text-center">{{ $x }}</td>
                                     <td class="text-center">{{ $data->creator->first_name }}</td>
                                     <td class="text-center">{{ $data->subject->subject }}</td>
-                                    <td class="text-center">
+                                    <!-- <td class="text-center">
                                         <div class="application-preview">
                                             {!! $data->body !!}
                                         </div>
-                                    </td>
+                                    </td> -->
                                     <td class="text-center">{{ ucfirst($data->status) }}</td>
                                     <td class="text-center">{{ $data->created_at->format('d M Y, h:i A') }}</td>
                                     

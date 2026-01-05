@@ -176,7 +176,7 @@
     // });
     $(document).on('click', '.preview-btn', function () {
 
-        // 1️⃣ Base64 decode the body
+        // Base64 decode the body
         const encodedBody = $(this).attr('data-body');
         let decodedBody = '';
 
@@ -187,27 +187,25 @@
             decodedBody = $(this).attr('data-body'); // fallback
         }
 
-        console.log('Decoded Body:', decodedBody);
-
-        // 2️⃣ Set main fields
+        // Set main fields
         $('#previewSubject').text($(this).data('subject'));
         $('#previewDate').text($(this).data('date'));
         $('#status').text($(this).data('status'));
 
-        // 3️⃣ Set body HTML
+        // Set body HTML
         const $preview = $('#previewBody');
         $preview.empty();       // clear previous
         $preview.append(decodedBody);  // append decoded HTML
         console.log('PreviewBody after html():', $preview.html());
 
-        // 4️⃣ Current auth user ID
+        // Current auth user ID
         window.authUserId = {{ auth()->guard('user')->id() }};
 
-        // 5️⃣ Set hidden input for feedback form (if exists)
+        // Set hidden input for feedback form (if exists)
         let appId = $(this).data('id');
         $('#feedbackApplicationId').val(appId);
 
-        // 6️⃣ Render feedbacks
+        // Render feedbacks
         let feedbacks = $(this).data('feedback');
         let feedbackHtml = '';
 
@@ -234,7 +232,7 @@
             $('#feedbackSection').hide();
         }
 
-        // 7️⃣ Show modal after everything is ready
+        // Show modal after everything is ready
         $('#applicationPreviewModal').modal('show');
 
     });
