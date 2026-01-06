@@ -142,7 +142,7 @@ class BookingController extends Controller
     {
         $user = Auth::guard('user')->user();
 
-        $all_prices_details = PriceModel::with(['customer'])
+        $all_prices_details = PriceModel::with(['project', 'flat', 'customer'])
         ->when($user->status == 0, function ($query) use ($user) {
             return $query->where('customer_id', $user->contact_id);
         })
@@ -240,7 +240,7 @@ class BookingController extends Controller
         $applicationSubjects = ClientApplicationSubject::all();
 
         $bulksmsdata = BulkSmsData::all();
-        $applicationdata = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator'])
+        $applicationdata = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator', 'attachments', 'project', 'flat'])
             ->where('applied_by', $user->id)
             ->get();
 

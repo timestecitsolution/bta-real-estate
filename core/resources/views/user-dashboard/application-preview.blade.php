@@ -16,6 +16,8 @@
                 <div class="row application-header">
                     <div class="col-6 left-info">
                         <p><strong>Date:</strong> <span id="previewDate"></span></p>
+                        <p><strong>Project:</strong> <span id="previewProject"></span></p>
+                        <p><strong>Flat:</strong> <span id="previewFlat"></span></p>
                         <p><strong>Subject:</strong> <span id="previewSubject"></span></p>
                     </div>
                     <div class="col-6 right-info">
@@ -24,6 +26,13 @@
                 </div>
                 <hr>
                 <div id="previewBody" class="application-body"></div>
+                <br>
+                <!-- Attachments -->
+                <div id="attachmentSection" class="mt-3" style="display:none;">
+                    <hr>
+                    <h6>Attachments</h6>
+                    <ul id="attachmentList"></ul>
+                </div>
                 <br>
                 <p>
                     Yours sincerely,<br>

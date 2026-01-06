@@ -1,3 +1,13 @@
+@php
+    $priceJsData = $all_prices_details->map(function ($item) {
+        return [
+            'project_id' => $item->project->id,
+            'flat_id'    => $item->flat->id,
+            'flat_title' => $item->flat->title,
+        ];
+    })->values();
+@endphp
+
 <h3>Application</h3>
 
 <!-- Tabs -->
@@ -13,25 +23,51 @@
 <div class="tab-content mt-3" id="smsTabContent">
     <!-- Send SMS Tab -->
     <div class="tab-pane fade show active" id="application_form" role="tabpanel">
-        <form id="smsForm" method="POST" action="{{ route('central-application.store') }}">
+        <form id="smsForm" method="POST" action="{{ route('central-application.store') }}" enctype="multipart/form-data">
             @csrf
-
-            <div class="form-group mb-3">
-                <label>Subject</label>
-                <select name="subject_id" id="subject_id" class="form-control" required>
-                    <option value="all">-- Subject --</option>
-                    @foreach($applicationSubjects as $applicationSubject)
-                        <option value="{{ $applicationSubject->id }}">
-                            {{ $applicationSubject->subject }}
-                        </option>
-                    @endforeach
-                </select>
+            <div class="row mb-2">
+                <div class="form-group col-4">
+                    <label>Project * </label>
+                    <div class="col-sm-10">
+                        <select name="project_id" id="project_id" class="form-control c-select" required>
+                            <option value="">- - Select Project - -</option>
+                            @foreach($all_prices_details as $all_prices_detail)
+                                <option value="{{ $all_prices_detail->project->id }}" data-project_id="{{ $all_prices_detail->project->id }}"
+                                    {{ old('project_id') == $all_prices_detail->project->id ? 'selected' : '' }}>
+                                    {{ $all_prices_detail->project->title_en }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group col-4" id="flat_section">
+                    <label>Flat *</label>
+                    <div class="col-sm-10">
+                        <select class="form-control c-select" id="flat_id" name="flat_id" required>
+                            <option selected disabled>Select Flat</option>
+                        </select>
+                    </div>
+                    @error('flat_id')
+                        <small class="text-white">{{ $message }}</small>   
+                    @enderror
+                </div>
+                <div class="form-group col-4 mb-3">
+                    <label>Subject</label>
+                    <select name="subject_id" id="subject_id" class="form-control" required>
+                        <option value="all">-- Subject --</option>
+                        @foreach($applicationSubjects as $applicationSubject)
+                            <option value="{{ $applicationSubject->id }}">
+                                {{ $applicationSubject->subject }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('subject_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
-            @error('subject_id')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-
-            <div class="form-group mb-3">
+            
+            <div class="form-group mb-1">
                 <label>Application Body</label>
                 <textarea id="application_body" name="application_body" rows="5" class="form-control" placeholder="Type your message within 250 words..."></textarea>
                 <div class="text-muted mt-1" id="wordCount">0 / 250 words</div>
@@ -41,6 +77,27 @@
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
 
+            <div class="form-group mb-3">
+                <label>Attachments (Optional)</label>
+
+                <input type="file"
+                    name="attachments[]"
+                    class="form-control"
+                    multiple
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+
+                <small class="text-muted">
+                    You can upload multiple files (PDF, DOC, JPG, PNG). Max 5MB per file.
+                </small>
+            </div>
+
+            @error('attachments')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
+            @enderror
+
+            @error('attachments.*')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
+            @enderror
             <div class="text-end">
                 <button type="submit" class="btn btn-success">
                     <i class="fa fa-paper-plane"></i> Send Application
@@ -84,11 +141,14 @@
                         <button
                             class="btn btn-sm btn-primary preview-btn"
                             data-id="{{ $data->id }}"
+                            data-project="{{ e($data->project->title_en) }}"
+                            data-flat="{{ e($data->flat->title) }}"
                             data-subject="{{ e($data->subject->subject) }}"
                             data-body="{{ base64_encode($data->body) }}"
                             data-date="{{ $data->created_at->format('d M Y, h:i A') }}"
                             data-status="{{ ucfirst($data->status) }}"
                             data-feedback='@json($data->feedbacks)'
+                            data-attachments='@json($data->attachments)'
                         >
                             👁 Preview
                         </button>
@@ -104,6 +164,38 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
 
 <script>
+    window.priceData = @json($priceJsData);
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#project_id').on('change', function () {
+
+            let projectId = $(this).val();
+            let $flat = $('#flat_id');
+
+            $flat.html('<option value="">Select Flat</option>');
+
+            if (!projectId) return;
+
+            // filter flats for selected project
+            let flats = window.priceData.filter(item => item.project_id == projectId);
+            console.log('Filtered flats:', flats);
+
+            // remove duplicate flats (important)
+            let uniqueFlats = {};
+            flats.forEach(f => uniqueFlats[f.flat_id] = f);
+
+            Object.values(uniqueFlats).forEach(flat => {
+                $flat.append(
+                    `<option value="${flat.flat_id}">${flat.flat_title}</option>`
+                );
+            });
+        });
+
+    });
+
     function formatDate(dateString) {
         const date = new Date(dateString);
 
@@ -188,6 +280,8 @@
         }
 
         // Set main fields
+        $('#previewProject').text($(this).data('project'));
+        $('#previewFlat').text($(this).data('flat'));
         $('#previewSubject').text($(this).data('subject'));
         $('#previewDate').text($(this).data('date'));
         $('#status').text($(this).data('status'));
@@ -196,7 +290,6 @@
         const $preview = $('#previewBody');
         $preview.empty();       // clear previous
         $preview.append(decodedBody);  // append decoded HTML
-        console.log('PreviewBody after html():', $preview.html());
 
         // Current auth user ID
         window.authUserId = {{ auth()->guard('user')->id() }};
@@ -231,6 +324,47 @@
             $('#previewFeedback').hide();
             $('#feedbackSection').hide();
         }
+        
+        // 🔹 Attachments
+        let attachments = $(this).data('attachments');
+        const $attachSection = $('#attachmentSection');
+        const $attachList = $('#attachmentList');
+        $attachList.empty();
+
+        if (attachments && attachments.length > 0) {
+            attachments.forEach(function(att) {
+                const url = `{{ asset('storage') }}/${att.file_path}`;
+                const ext = att.file_name.split('.').pop().toLowerCase();
+                const isImage = ['jpg','jpeg','png','gif'].includes(ext);
+
+                if (isImage) {
+                    $attachList.append(`
+                        <li>
+                            <a href="#" class="attachment-preview" data-url="${url}" data-name="${att.file_name}">
+                                ${att.file_name}
+                            </a>
+                        </li>
+                    `);
+                } else {
+                    $attachList.append(`
+                        <li>
+                            <a href="${url}" target="_blank" download>${att.file_name}</a>
+                        </li>
+                    `);
+                }
+            });
+            $attachSection.show();
+        } else {
+            $attachSection.hide();
+        }
+
+        // Image preview modal
+        $('.attachment-preview').on('click', function(e) {
+            e.preventDefault();
+            $('#attachmentPreviewTitle').text($(this).data('name'));
+            $('#attachmentPreviewImage').attr('src', $(this).data('url'));
+            $('#attachmentPreviewModal').modal('show');
+        });
 
         // Show modal after everything is ready
         $('#applicationPreviewModal').modal('show');

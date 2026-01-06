@@ -22,7 +22,8 @@ class ApplicationListController extends Controller
     public function show($id)
     {
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
-        $applications = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator'])->findOrFail($id);
+        $applications = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator', 'attachments', 'project', 'flat'])->findOrFail($id);
+        // dd($applications);
         return view('dashboard.application-list.application-view', compact('applications', 'GeneralWebmasterSections'));
     }
     public function approveReject(Request $request, $id)

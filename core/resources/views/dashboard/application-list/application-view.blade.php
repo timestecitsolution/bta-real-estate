@@ -35,6 +35,22 @@
                 <hr style="width:120px;">
             </div>
 
+            <!-- Project -->
+            <div class="mb-4">
+                <strong>Project:</strong>
+                <span style="margin-left:10px;">
+                    {{ $applications->project->title_en ?? 'N/A' }}
+                </span>
+            </div>
+
+            <!-- Flat -->
+            <div class="mb-4">
+                <strong>Flat:</strong>
+                <span style="margin-left:10px;">
+                    {{ $applications->flat->title ?? 'N/A' }}
+                </span>
+            </div>
+
             <!-- Subject -->
             <div class="mb-4">
                 <strong>Subject:</strong>
@@ -47,6 +63,50 @@
             <div style="line-height:1.8; text-align:justify; white-space:pre-line;">
                 {!! $applications->body !!}
             </div>
+
+            <!-- Attachments Section -->
+            @if($applications->attachments && $applications->attachments->count() > 0)
+                <div class="mt-4">
+                    <strong>Attachments:</strong>
+                    <ul>
+                        @foreach($applications->attachments as $attachment)
+                            @php
+                                $fileUrl = Storage::disk('public')->url($attachment->file_path);
+                                $fileExt = pathinfo($attachment->file_name, PATHINFO_EXTENSION);
+                                $isImage = in_array(strtolower($fileExt), ['jpg','jpeg','png','gif']);
+                            @endphp
+
+                            <li>
+                                @if($isImage)
+                                    <a href="#" class="attachment-preview" data-url="{{ $fileUrl }}" data-name="{{ $attachment->file_name }}">
+                                        {{ $attachment->file_name }}
+                                    </a>
+                                @else
+                                    <a href="{{ $fileUrl }}" target="_blank" download>
+                                        {{ $attachment->file_name }}
+                                    </a>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                <!-- Preview Modal -->
+                <div class="modal fade" id="attachmentPreviewModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="attachmentPreviewTitle"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="attachmentPreviewImage" src="" class="img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            @endif
 
             <!-- Footer -->
             <div class="mt-5 text-left">
@@ -162,7 +222,6 @@
                 @empty
                     <p class="text-muted">No feedback yet.</p>
                 @endforelse
-
                 </div>
             </div>
         </div>
@@ -172,7 +231,7 @@
 
 @push("after-scripts")
 <script src="{{ asset("assets/dashboard/js/iconpicker/fontawesome-iconpicker.js") }}"></script>
-<script>
+<script>   
 $('#approveRejectForm').on('submit', function (e) {
     e.preventDefault();
 
@@ -226,6 +285,21 @@ $('#approveRejectForm').on('submit', function (e) {
         }
     });
 });
+</script>
+<!-- Attatchment Preview Script -->
+<script>
+    $(document).ready(function () {
+        $('.attachment-preview').on('click', function (e) {
+            e.preventDefault();
 
+            let url = $(this).data('url');
+            let name = $(this).data('name');
+
+            $('#attachmentPreviewTitle').text(name);
+            $('#attachmentPreviewImage').attr('src', url);
+
+            $('#attachmentPreviewModal').modal('show');
+        });
+    });
 </script>
 @endpush

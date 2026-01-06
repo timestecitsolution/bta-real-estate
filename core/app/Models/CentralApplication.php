@@ -12,6 +12,8 @@ class CentralApplication extends Model
     protected $table = 'central_application';
 
     protected $fillable = [
+        'project_id',
+        'flat_id',
         'subject_id',
         'body',
         'status',
@@ -34,5 +36,20 @@ class CentralApplication extends Model
     public function feedbacks()
     {
         return $this->hasMany(ApplicationFeedback::class, 'application_id');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(CentralApplicationAttachment::class, 'central_application_id');
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Topic::class, 'project_id');
+    }
+
+    public function flat()
+    {
+        return $this->belongsTo(Tags::class, 'flat_id');
     }
 }
