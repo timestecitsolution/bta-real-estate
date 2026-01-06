@@ -82,6 +82,7 @@
 
                 <input type="file"
                     name="attachments[]"
+                    id="attachments"
                     class="form-control"
                     multiple
                     accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
@@ -89,6 +90,7 @@
                 <small class="text-muted">
                     You can upload multiple files (PDF, DOC, JPG, PNG). Max 5MB per file.
                 </small>
+                <div class="text-danger mt-1 d-none" id="attachmentError"></div>
             </div>
 
             @error('attachments')
@@ -436,6 +438,41 @@
     }
 
 
+</script>
+<script>
+document.getElementById('attachments').addEventListener('change', function () {
+
+    const allowedExtensions = ['pdf','doc','docx','jpg','jpeg','png'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const errorDiv = document.getElementById('attachmentError');
+
+    errorDiv.classList.add('d-none');
+    errorDiv.innerHTML = '';
+
+    for (let i = 0; i < this.files.length; i++) {
+
+        const file = this.files[i];
+        const fileSize = file.size;
+        const fileName = file.name;
+        const fileExt = fileName.split('.').pop().toLowerCase();
+
+        // Size validation
+        if (fileSize > maxSize) {
+            errorDiv.innerHTML = `❌ "${fileName}" is larger than 5MB`;
+            errorDiv.classList.remove('d-none');
+            this.value = '';
+            return;
+        }
+
+        //  Extension validation
+        if (!allowedExtensions.includes(fileExt)) {
+            errorDiv.innerHTML = `❌ "${fileName}" format is not allowed`;
+            errorDiv.classList.remove('d-none');
+            this.value = '';
+            return;
+        }
+    }
+});
 </script>
 
 <style>
