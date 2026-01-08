@@ -1,4 +1,7 @@
 <?php
+ini_set('post_max_size', '128M');
+ini_set('upload_max_filesize', '128M');
+date_default_timezone_set('Asia/Dhaka');
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;

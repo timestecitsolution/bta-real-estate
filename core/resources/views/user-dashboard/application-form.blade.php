@@ -164,6 +164,7 @@
 </div>
 
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
     window.priceData = @json($priceJsData);
@@ -210,64 +211,6 @@
             hour12: true
         });
     }
-
-    // $(document).on('click', '.preview-btn', function () {
-
-    //     const encodedBody = $(this).attr('data-body'); 
-    //     const decodedBody = atob(encodedBody);  
-    //     console.log(decodedBody);       
-
-    //     $('#previewSubject').text($(this).data('subject'));
-    //     $('#previewDate').text($(this).data('date'));
-    //     $('#status').text($(this).data('status'));
-
-    //     $('#previewBody').html(decodedBody);
-    //     const $preview = $('#previewBody');
-    //     $preview.html(decodedBody);
-    //     console.log('PreviewBody after html():', $preview.html());
-
-    //     window.authUserId = {{ auth()->guard('user')->id() }};
-
-    //     let appId = $(this).data('id');
-    //     $('#feedbackApplicationId').val(appId);
-
-    //     // BODY as HTML
-    //     $('#previewBody').html($(this).data('body'));
-
-    //     let feedbacks = $(this).data('feedback');
-    //     let feedbackHtml = '';
-
-    //     if (feedbacks && feedbacks.length > 0) {
-    //         feedbacks.forEach(function (item) {
-
-    //             const isOwn = item.created_by == window.authUserId;
-
-    //             feedbackHtml += `
-    //                 <div class="feedback-row ${isOwn ? 'feedback-right' : 'feedback-left'}">
-    //                     <div class="feedback-bubble ${isOwn ? 'feedback-user' : 'feedback-admin'}">
-    //                         <strong>
-    //                             ${(item.feedback_creator?.first_name ?? 'Admin')}
-    //                         </strong>
-    //                         <br>
-    //                         <small class="text-muted">
-    //                             ${formatDate(item.created_at)}
-    //                         </small>
-    //                         <div style="margin-top:6px;">
-    //                             ${item.feedback}
-    //                         </div>
-    //                     </div>
-    //                 </div>
-    //             `;
-    //         });
-
-    //         $('#previewFeedback').html(feedbackHtml);
-    //         $('#feedbackSection').show();
-    //     } else {
-    //         $('#feedbackSection').hide();
-    //     }
-
-    //     $('#applicationPreviewModal').modal('show');
-    // });
     $(document).on('click', '.preview-btn', function () {
 
         // Base64 decode the body
@@ -443,7 +386,7 @@
 document.getElementById('attachments').addEventListener('change', function () {
 
     const allowedExtensions = ['pdf','doc','docx','jpg','jpeg','png'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024; 
     const errorDiv = document.getElementById('attachmentError');
 
     errorDiv.classList.add('d-none');
@@ -474,7 +417,27 @@ document.getElementById('attachments').addEventListener('change', function () {
     }
 });
 </script>
+@if(session('success'))
+    <script>
+        toastr.success("{{ session('success') }}", "Success", {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 4000,
+            positionClass: "toast-top-right"
+        });
+    </script>
+@endif
 
+@if(session('error'))
+    <script>
+        toastr.error("{{ session('error') }}", "Error", {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 4000,
+            positionClass: "toast-top-right"
+        });
+    </script>
+@endif
 <style>
 .ck-editor__editable_inline {
     min-height: 300px; 
