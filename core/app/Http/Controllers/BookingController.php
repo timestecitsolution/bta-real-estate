@@ -17,6 +17,7 @@ use App\Models\Contact;
 use App\Models\EmiPayment;
 use App\Models\ClientApplicationSubject;
 use App\Models\CentralApplication;
+use App\Models\LandlordEngagement;
 use Helper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -158,8 +159,7 @@ class BookingController extends Controller
         $filter_to_date = $request->input('filter_to_date');
 
         // Step 2: If form is submitted (POST) and customer selected
-        if ($request->isMethod('post') && $request->filled('filter_customer_id')) {
-
+        if ($request->isMethod('post') && $request->filled('filter_customer_id')) {   
             // Step 3: Fetch prices based on customer
             $prices_details = PriceModel::with(['project', 'flat', 'customer'])
                 ->where('customer_id', $filter_customer_id)
@@ -196,8 +196,6 @@ class BookingController extends Controller
 
                     $total_paid = $booking_amount + $downpayment_amount;
                     $total_paid_with_extras = $booking_amount + $downpayment_amount;
-                    // $total_paid = 0;
-                    // $total_paid_with_extras = 0;
                     $actual_emi_paid_count = 0;
 
                     foreach ($emis as $index => $emi) {
@@ -232,9 +230,20 @@ class BookingController extends Controller
                     ->join('material_types', 'material_details.material_type_id', '=', 'material_types.id')
                     ->select('material_details.*', 'material_types.material_type')
                     ->get();
+        }elseif($request->isMethod('post') && $request->filled('landlord_id')){
+            $landlord_id = $request->input('landlord_id');
+
+            // Step 3: Fetch prices based on landlord
+            $allocated_flats = LandlordEngagement::with(['project', 'flat', 'customer', 'flatDocuments', 'materials.materialType'])
+                ->where('landlord_id', $landlord_id)
+                ->when($user->status == 0, function ($query) use ($user) {
+                    return $query->where('landlord_id', $user->contact_id);
+                })
+                ->get();
         }
         // Step 5: Static data
         $Contact = Contact::find($user->contact_id);
+
         $customer_details = $prices_details->isNotEmpty() ? $prices_details->first()->customer : null;
         $allDocumentTypes = DocumentType::all();
         $applicationSubjects = ClientApplicationSubject::all();
@@ -244,7 +253,7 @@ class BookingController extends Controller
             ->where('applied_by', $user->id)
             ->get();
 
-        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details', 'applicationSubjects', 'applicationdata'));
+        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details', 'applicationSubjects', 'applicationdata', 'allocated_flats', 'landlord_id'));
     }
 
 

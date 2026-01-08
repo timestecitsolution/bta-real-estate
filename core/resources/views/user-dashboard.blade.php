@@ -4,6 +4,7 @@
     <div class="container">
         <!-- ===== Nav Tabs ===== -->
         <ul class="nav nav-tabs mb-4" id="userDashboardTabs" role="tablist">
+            @if($Contact->status == '0' || $user->status == '1')
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" style="color: black !important;" id="payment-overview-tab" data-bs-toggle="tab" data-bs-target="#payment-overview" type="button" role="tab" aria-controls="payment-overview" aria-selected="true">
                     Payment Overview
@@ -19,6 +20,14 @@
                     EMI Payment Form
                 </button>
             </li>
+            @endif
+            @if($Contact->status == '2')
+            <li class="nav-item" style="color: black !important;"role="presentation">
+                <button class="nav-link" style="color: black !important;" id="allocated-flats-tab" data-bs-toggle="tab" data-bs-target="#allocated-flats" type="button" role="tab" aria-controls="allocated-flats" aria-selected="false">
+                    Allocated Flats
+                </button>
+            </li>
+            @endif
             <li class="nav-item" role="presentation">
                 <button class="nav-link" style="color: black !important;" id="user-profile-tab" data-bs-toggle="tab" data-bs-target="#user-profile" type="button" role="tab" aria-controls="user-profile" aria-selected="false">
                     User Profile
@@ -56,22 +65,29 @@
 
         <!-- ===== Tab Content ===== -->
         <div class="tab-content" id="userDashboardTabsContent">
-            <div class="tab-pane fade show active" id="payment-overview" role="tabpanel" aria-labelledby="payment-overview-tab">
-                @include('user-dashboard.payment-overview')
+            @if($Contact->status == '0' || $user->status == '1')
+                <div class="tab-pane fade show active" id="payment-overview" role="tabpanel" aria-labelledby="payment-overview-tab">
+                    @include('user-dashboard.payment-overview')
+                </div>
+                <div class="tab-pane fade" id="booking-overview" role="tabpanel" aria-labelledby="booking-overview-tab">
+                    @include('user-dashboard.booking-overview')
+                </div>
+                <div class="tab-pane fade" id="emi-schedule" role="tabpanel" aria-labelledby="emi-schedule-tab">
+                    @include('user-dashboard.emi-schedule')
+                </div>
+            @endif
+            @if($Contact->status == '2')
+            <div class="tab-pane fade" id="allocated-flats" role="tabpanel" aria-labelledby="allocated-flats-tab">
+                @include('user-dashboard.allocated-flats')
             </div>
-            <div class="tab-pane fade" id="booking-overview" role="tabpanel" aria-labelledby="booking-overview-tab">
-                @include('user-dashboard.booking-overview')
-            </div>
-            <div class="tab-pane fade" id="emi-schedule" role="tabpanel" aria-labelledby="emi-schedule-tab">
-                @include('user-dashboard.emi-schedule')
-            </div>
+            @endif
             <div class="tab-pane fade" id="user-profile" role="tabpanel" aria-labelledby="user-profile-tab">
                 @include('user-dashboard.user-profile')
             </div>
-            @if($user->status == '1')
-            <div class="tab-pane fade" id="bulk-sms" role="tabpanel" aria-labelledby="bulk-sms-tab">
-                @include('user-dashboard.bulk-sms')
-            </div>
+            @if($Contact->status == '0')
+                <div class="tab-pane fade" id="bulk-sms" role="tabpanel" aria-labelledby="bulk-sms-tab">
+                    @include('user-dashboard.bulk-sms')
+                </div>
             @endif
             <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
                 @include('user-dashboard.reset-password')
