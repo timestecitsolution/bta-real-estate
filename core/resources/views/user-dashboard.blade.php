@@ -4,7 +4,7 @@
     <div class="container">
         <!-- ===== Nav Tabs ===== -->
         <ul class="nav nav-tabs mb-4" id="userDashboardTabs" role="tablist">
-            @if($Contact->status == '0' || $user->status == '1')
+            @if($Contact->status == '0' || $Contact->status == '1' ||$user->status == '1')
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" style="color: black !important;" id="payment-overview-tab" data-bs-toggle="tab" data-bs-target="#payment-overview" type="button" role="tab" aria-controls="payment-overview" aria-selected="true">
                     Payment Overview
@@ -65,7 +65,7 @@
 
         <!-- ===== Tab Content ===== -->
         <div class="tab-content" id="userDashboardTabsContent">
-            @if($Contact->status == '0' || $user->status == '1')
+            @if($Contact->status == '0' || $Contact->status == '1' ||$user->status == '1')
                 <div class="tab-pane fade show active" id="payment-overview" role="tabpanel" aria-labelledby="payment-overview-tab">
                     @include('user-dashboard.payment-overview')
                 </div>

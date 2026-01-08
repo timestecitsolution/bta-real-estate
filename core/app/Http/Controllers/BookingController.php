@@ -152,6 +152,9 @@ class BookingController extends Controller
         $prices_details = collect();
         $emi_details = collect();
         $material_details = collect();
+        $allocated_flats = collect(); 
+        $landlord_id = null;
+
 
         $filter_customer_id = $request->input('filter_customer_id');
         $filter_flat_id = $request->input('filter_flat_id');
