@@ -59,8 +59,33 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">
+                    Type <span class="text-danger">*</span>
+                </label>
 
+                <div class="col-sm-10">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="notice" value="notice" 
+                            {{ old('type', isset($clientApplicationSubject) ? $clientApplicationSubject->type : '') == 'notice' ? 'checked' : '' }} required>
+                        <label class="form-check-label" for="notice">
+                            Notice
+                        </label>
+                    </div>
 
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="application" value="application" 
+                            {{ old('type', isset($clientApplicationSubject) ? $clientApplicationSubject->type : '') == 'application' ? 'checked' : '' }} required>
+                        <label class="form-check-label" for="application">
+                            Application
+                        </label>
+                    </div>
+
+                    @error('type')
+                        <div class="text-danger mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
 
             <div class="form-group row m-t-md">
                 <div class="offset-sm-2 col-sm-10">

@@ -39,11 +39,13 @@ class ClientApplicationSubjectController extends Controller
         $request->validate([
             'application_subject' => 'required|string|unique:client_application_subjects,subject',
             'application_body' => 'nullable|string',
+            'type' => 'required|in:notice,application',
         ]);
 
         ClientApplicationSubject::create([
             'subject' => $request->application_subject,
             'body' => $request->application_body,
+            'type' => $request->type,
         ]);
 
         return redirect()->route('client-application-subject')->with('success', 'Application Subject created successfully!');
@@ -76,11 +78,13 @@ class ClientApplicationSubjectController extends Controller
         $request->validate([
             'subject' => 'required|string|unique:client_application_subjects,subject,' . $clientApplicationSubject->id,
             'application_body' => 'nullable|string',
+            'type' => 'required|in:notice,application',
         ]);
 
         $clientApplicationSubject->update([
             'subject' => $request->subject,
             'body' => $request->application_body,
+            'type' => $request->type,
         ]);
 
         return redirect()->route('client-application-subject')->with('success', 'Client Application Subject updated successfully!');

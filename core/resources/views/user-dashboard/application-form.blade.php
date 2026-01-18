@@ -52,7 +52,7 @@
                     @enderror
                 </div>
                 <div class="form-group col-4 mb-3">
-                    <label>Subject</label>
+                    <label>Subject *</label>
                     <select name="subject_id" id="subject_id" class="form-control" required>
                         <option value="all">-- Subject --</option>
                         @foreach($applicationSubjects as $applicationSubject)
@@ -162,10 +162,7 @@
         </table>
     </div>
 </div>
-
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
+@push('scripts')
 <script>
     window.priceData = @json($priceJsData);
 </script>
@@ -438,6 +435,7 @@ document.getElementById('attachments').addEventListener('change', function () {
         });
     </script>
 @endif
+@endpush
 <style>
 .ck-editor__editable_inline {
     min-height: 300px; 

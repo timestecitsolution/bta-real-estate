@@ -11,6 +11,9 @@ class LandlordEngagement extends Model
 
     protected $fillable = [
         'project_id',
+        'number_of_parking',
+        'number_of_gas_connection',
+        'number_of_utility',
         'landlord_id',
         'flat_id',
     ];

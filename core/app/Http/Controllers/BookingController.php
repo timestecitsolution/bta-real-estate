@@ -249,7 +249,7 @@ class BookingController extends Controller
 
         $customer_details = $prices_details->isNotEmpty() ? $prices_details->first()->customer : null;
         $allDocumentTypes = DocumentType::all();
-        $applicationSubjects = ClientApplicationSubject::all();
+        $applicationSubjects = ClientApplicationSubject::where('type', 'application')->get();
 
         $bulksmsdata = BulkSmsData::all();
         $applicationdata = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator', 'attachments', 'project', 'flat'])

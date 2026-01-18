@@ -30,43 +30,64 @@ $projects = Helper::Topics(8);
                 </ul>
             </div>
             <div class="box-body p-a-2">
-                {{Form::open(['route'=>['client-application-subject.store'],'method'=>'POST','files'=>true])}}
+                    {{Form::open(['route'=>['client-application-subject.store'],'method'=>'POST','files'=>true])}}
+                        <div class="form-group row">
+                            <label class="col-sm-2 form-control-label">Application Subject *</label>
+                            <div class="col-sm-10">
+                                {!! Form::text('application_subject', null, array('id' => 'application_subject', 'placeholder' => 'Enter Application Subject','class' => 'form-control','required'=>'true')) !!}
+                            </div>
+                        </div>
+                    
                     <div class="form-group row">
-                        <label class="col-sm-2 form-control-label">Application Subject *</label>
+                        <label class="col-sm-2 col-form-label">
+                            Application Body
+                        </label>
+
                         <div class="col-sm-10">
-                            {!! Form::text('application_subject', null, array('id' => 'application_subject', 'placeholder' => 'Enter Application Subject','class' => 'form-control','required'=>'true')) !!}
+                            <textarea
+                                id="application_body"
+                                name="application_body"
+                                rows="6"
+                                class="form-control"
+                                placeholder="Type your message within 250 words..."></textarea>
+
+                            <div class="text-muted mt-1" id="wordCount">
+                                0 / 250 words
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">
+                            Type <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="col-sm-10">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="type" id="notice" value="notice" required>
+                                <label class="form-check-label" for="notice">
+                                    Notice
+                                </label>
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="type" id="application" value="application" required>
+                                <label class="form-check-label" for="application">
+                                    Application
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row m-t-md">
+                        <div class="offset-sm-2 col-sm-10"> 
+                            <button type="submit" class="btn btn-lg btn-primary m-t"><i class="material-icons">
+                                    &#xe31b;</i> {!! __('backend.add') !!}</button>
+                            <a href="{{ route('price') }}"
+                            class="btn btn-lg btn-default m-t"><i class="material-icons">
+                                    &#xe5cd;</i> {!! __('backend.cancel') !!}</a>
                         </div>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">
-                        Application Body
-                    </label>
-
-                    <div class="col-sm-10">
-                        <textarea
-                            id="application_body"
-                            name="application_body"
-                            rows="6"
-                            class="form-control"
-                            placeholder="Type your message within 250 words..."></textarea>
-
-                        <div class="text-muted mt-1" id="wordCount">
-                            0 / 250 words
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group row m-t-md">
-                    <div class="offset-sm-2 col-sm-10"> 
-                        <button type="submit" class="btn btn-lg btn-primary m-t"><i class="material-icons">
-                                &#xe31b;</i> {!! __('backend.add') !!}</button>
-                        <a href="{{ route('price') }}"
-                           class="btn btn-lg btn-default m-t"><i class="material-icons">
-                                &#xe5cd;</i> {!! __('backend.cancel') !!}</a>
-                    </div>
-                </div>
-
                 {{Form::close()}}
             </div>
         </div>
