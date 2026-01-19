@@ -254,87 +254,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('landlord_engagement','1',($Permissions->landlord_engagement==1) ? true : false, array('id' => 'landlord_engagement')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="landlord_engagement">Landlord Engagements</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('booking_details','1',($Permissions->booking_details==1) ? true : false, array('id' => 'booking_details')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="booking_details">Booking Details</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('document_type','1',($Permissions->document_type==1) ? true : false, array('id' => 'document_type')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="document_type">Document Type</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('material_type','1',($Permissions->material_type==1) ? true : false, array('id' => 'material_type')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="material_type">Material Type</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('client_application_subject','1',($Permissions->client_application_subject==1) ? true : false, array('id' => 'client_application_subject')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="client_application_subject">Client Application Subject</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('application_list','1',($Permissions->application_list==1) ? true : false, array('id' => 'application_list')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="application_list">Application List</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('client_visit_request','1',($Permissions->client_visit_request==1) ? true : false, array('id' => 'client_visit_request')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="client_visit_request">Client Visit Requests</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('land_query_list','1',($Permissions->land_query_list==1) ? true : false, array('id' => 'land_query_list')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="land_query_list">Land Query List</label>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="checkbox">
-                                                <label class="ui-check">
-                                                    {!! Form::checkbox('client_notice','1',($Permissions->client_notice==1) ? true : false, array('id' => 'client_notice')) !!}
-                                                    <i class="dark-white"></i><label
-                                                        for="client_notice">Client Notice</label>
-                                                </label>
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -409,26 +329,6 @@
                                     &nbsp; &nbsp;
                                     <label class="ui-check ui-check-md" style="margin-bottom: 5px;">
                                         {!! Form::radio('delete_status','0',($Permissions->delete_status==0) ? true : false, array('id' => 'delete_status2','class'=>'has-value')) !!}
-                                        <i class="dark-white"></i>
-                                        {{ __('backend.no') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="action_status1"
-                                   class="col-sm-2 form-control-label">Approve/Reject Permission</label>
-                            <div class="col-sm-10">
-                                <div class="radio">
-                                    <label class="ui-check ui-check-md" style="margin-bottom: 5px;">
-                                        {!! Form::radio('action_status','1',($Permissions->action_status==1) ? true : false, array('id' => 'action_status1','class'=>'has-value')) !!}
-                                        <i class="dark-white"></i>
-                                        {{ __('backend.yes') }}
-                                    </label>
-                                    &nbsp; &nbsp;
-                                    <label class="ui-check ui-check-md" style="margin-bottom: 5px;">
-                                        {!! Form::radio('action_status','0',($Permissions->action_status==0) ? true : false, array('id' => 'action_status2','class'=>'has-value')) !!}
                                         <i class="dark-white"></i>
                                         {{ __('backend.no') }}
                                     </label>

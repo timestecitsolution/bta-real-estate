@@ -383,7 +383,6 @@ class UsersController extends Controller
             $Permissions->add_status = ($request->add_status) ? 1 : 0;
             $Permissions->edit_status = ($request->edit_status) ? 1 : 0;
             $Permissions->delete_status = ($request->delete_status) ? 1 : 0;
-            $Permissions->action_status = ($request->action_status) ? 1 : 0;
             $Permissions->active_status = ($request->active_status) ? 1 : 0;
             $Permissions->analytics_status = ($request->analytics_status) ? 1 : 0;
             $Permissions->inbox_status = ($request->inbox_status) ? 1 : 0;
@@ -396,15 +395,6 @@ class UsersController extends Controller
             $Permissions->tags_status = ($request->tags_status) ? 1 : 0;
             $Permissions->menus_status = ($request->menus_status) ? 1 : 0;
             $Permissions->settings_status = ($request->settings_status) ? 1 : 0;
-            $Permissions->landlord_engagement = ($request->landlord_engagement) ? 1 : 0;
-            $Permissions->booking_details = ($request->booking_details) ? 1 : 0;
-            $Permissions->document_type = ($request->document_type) ? 1 : 0;
-            $Permissions->material_type = ($request->material_type) ? 1 : 0;
-            $Permissions->client_application_subject = ($request->client_application_subject) ? 1 : 0;
-            $Permissions->application_list = ($request->application_list) ? 1 : 0;
-            $Permissions->client_visit_request = ($request->client_visit_request) ? 1 : 0;
-            $Permissions->land_query_list = ($request->land_query_list) ? 1 : 0;
-            $Permissions->client_notice = ($request->client_notice) ? 1 : 0;
 
             if ($id != 1) {
                 $Permissions->roles_status = ($request->roles_status) ? 1 : 0;

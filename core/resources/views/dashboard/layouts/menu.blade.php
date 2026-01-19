@@ -188,7 +188,6 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                             </li>
                         @endif
                     @endif
-                    @if(@Auth::user()->permissionsGroup->landlord_engagement)
                     <?php
                         $currentFolder = "landlord-engagements"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -196,13 +195,12 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('landlordEngagements') }}">
                             <span class="nav-icon">
-                            <i class="material-icons">&#xe7ee;</i>
+                            <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Landlord Engagements</span>
                         </a>
                     </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->booking_details)
+
                     <?php
                         $currentFolder = "price"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -210,13 +208,12 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('price') }}">
                             <span class="nav-icon">
-                            <i class="material-icons">&#xe873;</i>
+                            <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Booking Details</span>
                         </a>
                     </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->document_type)
+
                     <?php
                         $currentFolder = "document-type"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -224,13 +221,12 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('document-type') }}">
                             <span class="nav-icon">
-                            <i class="material-icons">&#xe24d;</i>
+                            <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Document Type</span>
                         </a>
                     </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->material_type)
+
                     <?php
                         $currentFolder = "material-type"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -238,13 +234,12 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('material-type') }}">
                             <span class="nav-icon">
-                            <i class="material-icons">&#xe896;</i>
+                            <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Material Type</span>
                         </a>
                     </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->client_application_subject)
+                    
                     <?php
                         $currentFolder = "client-application-subject"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -252,13 +247,11 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('client-application-subject') }}">
                             <span class="nav-icon">
-                            <i class="material-icons">&#xe0be;</i>
+                            <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Client Application Subject</span>
                         </a>
                     </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->application_list)
                     <?php
                         $currentFolder = "application-list"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -266,27 +259,12 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('application-list') }}">
                             <span class="nav-icon">
-                                <i class="material-icons">&#xe149;</i>
+                                <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Application list</span>
                         </a>
                     </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->client_notice)
-                    <?php
-                        $currentFolder = "client-notice"; 
-                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
-                    ?>
-                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
-                        <a href="{{ route('client-notice') }}">
-                            <span class="nav-icon">
-                            <i class="material-icons">announcement</i>
-                            </span>
-                            <span class="nav-text">Client Notice</span>
-                        </a>
-                    </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->client_visit_request)
+
                     <?php
                         $currentFolder = "client-visit-requests"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -294,13 +272,12 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('client-visit-requests') }}">
                             <span class="nav-icon">
-                            <i class="material-icons">&#xe55f;</i>
+                            <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Client Visit Requests</span>
                         </a>
                     </li>
-                    @endif
-                    @if(@Auth::user()->permissionsGroup->land_query_list)
+
                     <?php
                         $currentFolder = "land-query"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -308,12 +285,12 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
                         <a href="{{ route('land-query-list') }}">
                             <span class="nav-icon">
-                            <i class="material-icons">&#xe887;</i>
+                            <i class="material-icons">&#xe7ef;</i>
                             </span>
                             <span class="nav-text">Land Query List</span>
                         </a>
                     </li>
-                    @endif
+
                     @if(Helper::GeneralWebmasterSettings("inbox_status"))
                         @if(@Auth::user()->permissionsGroup->inbox_status)
                             <?php

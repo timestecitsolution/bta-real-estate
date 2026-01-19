@@ -369,10 +369,11 @@ header {
 }
 
 .home-about-content {
-  background-image: url(../images/bg/bg2.svg);
+  background: #ffffff;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom right;
+  border-radius: 50px;
 }
 
 .home-about-content h6 {
@@ -423,7 +424,7 @@ header {
 }
 
 .feature {
-  background-image: url(../images/bg/bg4.png);
+  background-color: #113616;
   background-size: cover;
   background-repeat: no-repeat;
   padding: 140px 0px;
@@ -560,10 +561,8 @@ header {
 }
 
 .why-choose .home-about-content {
-  background-image: url(../images/bg/bg2.svg);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: bottom left;
+  background: #ffffff;
+  border-radius: 50px;
 }
 
 .why-choose .col-lg-4:first-child .statistics-single {
@@ -1119,23 +1118,18 @@ header {
 }
 
 .booking-wrap {
-  background: url(../images/bg/bg6.svg);
-  background-size: cover;
-  background-repeat: no-repeat;
+  background: #7bc6ea;
   padding: 120px 0px;
 }
 
 .booking-content {
-  background: url(../images/bg/bg2.svg);
-  background-size: cover;
-  background-repeat: no-repeat;
+  background: #ffffff;
+  border-radius: 50px;;
   padding: 120px 50px;
 }
 
 .booking-form {
-  background: url(../images/bg/bg13.svg);
-  background-size: cover;
-  background-repeat: no-repeat;
+  background: #042e24;
   padding: 40px;
   border-radius: 20px;
 }
@@ -1189,10 +1183,7 @@ header {
 }
 
 .why-choose-us {
-  background: url(../images/bg/bg16.png);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: bottom;
+  background: #399bf7;
   padding: 120px 0px;
 }
 

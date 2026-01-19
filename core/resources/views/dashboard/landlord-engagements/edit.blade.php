@@ -486,6 +486,57 @@ $(document).ready(function () {
         $(this).closest(".document-item").remove();
     });
 
+    /* ===============================
+        MATERIAL ADD / REMOVE
+    =============================== */
+    // $(document).on("click", ".add-material", function () {
+    //     let set = $(this).closest(".engagement-set");
+    //     let wrapper = set.find(".material-wrapper");
+    //     let item = $(this).closest(".material-item");
+
+    //     // Validate all material selects in this engagement set
+    //     let allSelected = true;
+    //     wrapper.find("select[name^='material_type_id']").each(function () {
+    //         if ($(this).val() === "") {
+    //             allSelected = false;
+    //             return false; // break loop
+    //         }
+    //     });
+
+    //     if (!allSelected) {
+    //         alert("Please select a material type in all rows before adding a new one.");
+    //         return;
+    //     }
+
+    //     let usedTypes = [];
+    //     wrapper.find("select[name^='material_type_id']").each(function () {
+    //         if ($(this).val()) usedTypes.push($(this).val());
+    //     });
+
+    //     // Clone current item
+    //     let clone = item.clone(false);
+
+    //     // Clear values
+    //     clone.find("select").val("");
+    //     clone.find("input[type='text']").val("");
+    //     clone.find("input[type='file']").val("");
+    //     clone.find(".file-preview").html("");
+    //     clone.find("label").html("&nbsp;");
+
+
+    //     clone.find("select[name^='material_type_id'] option").each(function () {
+    //         if (usedTypes.includes($(this).val())) $(this).remove();
+    //     });
+
+    //     // Convert add button to remove button
+    //     clone.find(".add-material")
+    //         .removeClass("btn-success add-material")
+    //         .addClass("btn-danger remove-material")
+    //         .text("-");
+
+    //     wrapper.append(clone);
+    // });
+
     $(document).on("click", ".add-material", function () {
 
         let set     = $(this).closest(".engagement-set");

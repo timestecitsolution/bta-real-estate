@@ -7,7 +7,7 @@
                 <label>Landlord <span>*</span></label>
                 <select name="landlord_id" class="form-select" required>
                     <option value="">Select Landlord</option>
-                    @foreach($allocated_flats->pluck('customer')->unique('id') as $customer)
+                    @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
                         <option value="{{ $customer->id }}" 
                             {{ (isset($landlord_id) && $landlord_id==$customer->id) ? 'selected' : '' }}>
                             {{ $customer->first_name }} {{ $customer->last_name }}

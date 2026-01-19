@@ -31,10 +31,10 @@
                     <div class="col-sm-10">
                         <select name="project_id" id="project_id" class="form-control c-select" required>
                             <option value="">- - Select Project - -</option>
-                            @foreach($allocated_flats as $allocated_flat)
-                                <option value="{{ $allocated_flat->project->id }}" data-project_id="{{ $allocated_flat->project->id }}"
-                                    {{ old('project_id') == $allocated_flat->project->id ? 'selected' : '' }}>
-                                    {{ $allocated_flat->project->title_en }}
+                            @foreach($all_prices_details as $all_prices_detail)
+                                <option value="{{ $all_prices_detail->project->id }}" data-project_id="{{ $all_prices_detail->project->id }}"
+                                    {{ old('project_id') == $all_prices_detail->project->id ? 'selected' : '' }}>
+                                    {{ $all_prices_detail->project->title_en }}
                                 </option>
                             @endforeach
                         </select>
@@ -52,7 +52,7 @@
                     @enderror
                 </div>
                 <div class="form-group col-4 mb-3">
-                    <label>Subject *</label>
+                    <label>Subject</label>
                     <select name="subject_id" id="subject_id" class="form-control" required>
                         <option value="all">-- Subject --</option>
                         @foreach($applicationSubjects as $applicationSubject)
@@ -162,7 +162,10 @@
         </table>
     </div>
 </div>
-@push('scripts')
+
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <script>
     window.priceData = @json($priceJsData);
 </script>
@@ -435,7 +438,6 @@ document.getElementById('attachments').addEventListener('change', function () {
         });
     </script>
 @endif
-@endpush
 <style>
 .ck-editor__editable_inline {
     min-height: 300px; 

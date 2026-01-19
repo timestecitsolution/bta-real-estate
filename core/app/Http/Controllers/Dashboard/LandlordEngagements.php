@@ -58,9 +58,6 @@ class LandlordEngagements extends Controller
             'project_id' => 'required|integer',
             'project_document_type_id.*' => 'nullable|integer',
             'project_document.*'         => 'nullable|file|max:10240',
-            'number_of_parking' => 'nullable|integer',
-            'number_of_gas_connection' => 'nullable|integer',
-            'number_of_utility' => 'nullable|integer',
 
             'landlord_id.*' => 'required|integer',
             'flat_id.*'     => 'required|integer',

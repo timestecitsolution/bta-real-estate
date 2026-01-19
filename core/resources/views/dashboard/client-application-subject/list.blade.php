@@ -61,7 +61,6 @@
                             <tr>
                                 <th class="text-center w-64">Sl No</th>
                                 <th class="text-center" style="width:100px;">Subject</th>
-                                <th class="text-center" style="width:100px;">Type</th>
                                 {{-- <th class="text-center" style="width:50px;">{{ __('backend.status') }}</th> --}}
                                 <th class="text-center" style="width:60px;">{{ __('backend.options') }}</th>
                             </tr>
@@ -79,10 +78,6 @@
                                 <tr>
                                     <td class="text-center">{{ $x }}</td>
                                     <td class="text-center">{{ $ClientApplicationSubject->subject }}</td>
-                                    <td class="text-center">
-                                        {{ $ClientApplicationSubject->type == 'application' ? 'Application' : ($ClientApplicationSubject->type == 'notice' ? 'Notice' : '') }}
-                                    </td>
-
                                     {{-- <td class="h6 nowrap">
                                         {!! Form::text('row_no_'.$ClientApplicationSubject->id,$ClientApplicationSubject->row_no, array('class' => 'form-control row_no light','autocomplete'=>'off')) !!}
                                         @if (@Auth::user()->permissionsGroup->edit_status)

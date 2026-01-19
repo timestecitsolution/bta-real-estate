@@ -103,7 +103,7 @@
 @else
 <p class="text-center text-muted mt-3">No Material Details Found.</p>
 @endif
-@push('scripts')
+
 <script>
     $('#filter_customer_id').on('change', function () {
         let customerId = $(this).val();
@@ -143,4 +143,3 @@
         }
     });
 </script>
-@endpush

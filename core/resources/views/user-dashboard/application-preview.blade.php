@@ -104,7 +104,6 @@
     }
 }
 </style>
-@push('scripts')
 <script>
     $('#feedbackReplyForm').on('submit', function (e) {
     e.preventDefault();
@@ -171,4 +170,3 @@ function printApplication() {
 
 </script>
 
-@endpush

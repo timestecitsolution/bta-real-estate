@@ -136,14 +136,14 @@
                                     <small><i class="material-icons">&#xe3c9;</i> {{ __('backend.edit') }}
                                     </small>
                                 </a>
-                            @if(!in_array($Permission->flag, [1, 2]))
+
                                 <button class="btn btn-sm danger" data-toggle="modal"
                                         data-target="#p-{{ $Permission->id }}" ui-toggle-class="bounce"
                                         ui-target="#animate">
                                     <small><i class="material-icons">&#xe872;</i> {{ __('backend.delete') }}
                                     </small>
                                 </button>
-                            @endif
+
 
                             </td>
                         </tr>

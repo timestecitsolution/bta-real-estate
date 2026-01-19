@@ -11,6 +11,5 @@ class ClientApplicationSubject extends Model
     protected $fillable = [
         'subject',
         'body',
-        'type',
     ];
 }
