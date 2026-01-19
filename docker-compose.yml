@@ -22,8 +22,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: bta_real_estate
-    ports:
-      - "3307:3306"
+    # ports:
+    #   - "3307:3306"
+    #   - "${DB_PORT:-3306}:3306"
 
     volumes:
       - db_data:/var/lib/mysql
@@ -32,7 +33,9 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: global_phpmyadmin
     environment:
-      PMA_ARBITRARY: 1   
+      PMA_HOST: db       
+      PMA_USER: root
+      PMA_PASSWORD: root
     ports:
       - "8081:80"
 

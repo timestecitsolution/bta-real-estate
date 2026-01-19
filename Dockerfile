@@ -1,7 +1,9 @@
-# Use PHP with Apache (because you want to serve index.php + Laravel together)
+# Use PHP with Apache
 FROM php:8.2-apache
 
-# Install system dependencies
+# -----------------------------
+# [NO CHANGE] System dependencies
+# -----------------------------
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -23,35 +25,44 @@ RUN apt-get update && apt-get install -y \
         bcmath \
         gd \
         zip
-    
-# Install PHP extensions
-RUN docker-php-ext-install zip pdo_mysql
 
-# Enable Apache mod_rewrite
+# -----------------------------
+# [NO CHANGE]
+# -----------------------------
 RUN a2enmod rewrite
 
-# Set working directory
+# -----------------------------
+# [NO CHANGE]
+# -----------------------------
 WORKDIR /var/www/html
-
-# Copy all project files
 COPY . .
 
-# Install Composer
+# -----------------------------
+# ✅ ADD (Git ownership fix)
+# -----------------------------
+RUN git config --global --add safe.directory /var/www/html
+RUN git config --global --add safe.directory /var/www/html/core
+
+# -----------------------------
+# [NO CHANGE] Install Composer
+# -----------------------------
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy all php.ini settings
+# -----------------------------
+# [NO CHANGE]
+# -----------------------------
 COPY php.ini /usr/local/etc/php/php.ini
 
-
-# Install Laravel dependencies (inside core/)
+# -----------------------------
+# ✅ ADD (Composer install INSIDE Docker – production style)
+# -----------------------------
 WORKDIR /var/www/html/core
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-# Permissions
-RUN chmod -R 777 storage bootstrap/cache
+# -----------------------------
+# ⚠️ PERMISSION FIX (777 → 775)
+# -----------------------------
+RUN chmod -R 775 storage bootstrap/cache
 
-# Expose Apache port
 EXPOSE 80
-
-# Start Apache
 CMD ["apache2-foreground"]
