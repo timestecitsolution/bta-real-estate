@@ -26,6 +26,7 @@ use App\Http\Controllers\Dashboard\ClientVisitRequestController;
 use App\Http\Controllers\LandQueryController;
 use App\Http\Controllers\Dashboard\ClientApplicationSubjectController;
 use App\Http\Controllers\Dashboard\ApplicationListController;
+use App\Http\Controllers\Dashboard\ClientNoticeController;
 use Illuminate\Support\Facades\Route;
 
 // Admin Home
@@ -259,6 +260,16 @@ Route::get('/client-application-subject/{id}/edit', [ClientApplicationSubjectCon
 Route::post('/client-application-subject/{id}/update', [ClientApplicationSubjectController::class, 'update'])->name('client-application-subject.update');
 Route::get('/client-application-subject/{id}', [ClientApplicationSubjectController::class, 'show'])->name('client-application-subject.show');
 Route::get('/client-application-subject/destroy/{id}', [ClientApplicationSubjectController::class, 'destroy'])->name('client-application-subject.destroy');
+
+//client notice
+Route::get('/client-notice', [ClientNoticeController::class, 'index'])->name('client-notice');
+Route::get('/client-notice/create', [ClientNoticeController::class, 'create'])->name('client-notice.create');
+Route::post('/client-notice/store', [ClientNoticeController::class, 'store'])->name('client-notice.store');
+Route::get('/client-notice/{id}/edit', [ClientNoticeController::class, 'edit'])->name('client-notice.edit');
+Route::post('/client-notice/{id}/update', [ClientNoticeController::class, 'update'])->name('client-notice.update');
+Route::get('/client-notice/{id}', [ClientNoticeController::class, 'show'])->name('client-notice.show');
+Route::get('/client-notice/destroy/{id}', [ClientNoticeController::class, 'destroy'])->name('client-notice.destroy');
+Route::post('/client-notice/action', [ClientNoticeController::class, 'action'])->name('client-notice.action');
 
 //Application lists
 Route::get('/application-list', [ApplicationListController::class, 'index'])->name('application-list');

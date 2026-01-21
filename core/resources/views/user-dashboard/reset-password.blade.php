@@ -20,7 +20,7 @@
 </form>
 
 <div id="resetResult" class="mt-3"></div>
-
+@push('scripts')
 <script>
 $(document).ready(function(){
     $('#resetDefaultBtn').on('click', function(e){
@@ -62,3 +62,4 @@ $(document).ready(function(){
     });
 });
 </script>
+@endpush

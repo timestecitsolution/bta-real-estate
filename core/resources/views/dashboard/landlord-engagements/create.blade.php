@@ -113,6 +113,23 @@ $projects = Helper::Topics(8);
                             </div>
                         @endif
                     </div>
+                    <div class="form-group row">
+                        <div class="col-sm-2">
+                            <label class="form-control-label">Facilities </label>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="number_of_parking" class="form-control-label">Number of parking </label>
+                            <input type="number" name="number_of_parking" id="number_of_parking" class="form-control" value="{{ old('number_of_parking') }}" min="0">
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="no_of_gas_connection" class="form-control-label">Number of Gas Connection </label>
+                            <input type="number" name="number_of_gas_connection" id="number_of_gas_connection" class="form-control" value="{{ old('number_of_gas_connection') }}" min="0">
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="no_of_utility" class="form-control-label">Number of Utility </label>
+                            <input type="number" name="number_of_utility" id="number_of_utility" class="form-control" value="{{ old('number_of_utility') }}" min="0">
+                        </div>
+                    </div> 
                     <div id="engagement-wrapper" >
                         <div class="engagement-set card flat-section"  style="padding: 20px;" >
                             <div class="form-group row">

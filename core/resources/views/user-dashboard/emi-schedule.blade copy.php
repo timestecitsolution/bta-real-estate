@@ -155,7 +155,8 @@
   </div>
   <button type="submit" class="btn btn-primary mt-3">Submit</button>
 </form>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+@push('scripts')
 <script>
   $(document).ready(function() {
 
@@ -360,3 +361,4 @@
     });
 });
 </script>
+@endpush

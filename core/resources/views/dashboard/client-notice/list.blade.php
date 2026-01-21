@@ -1,16 +1,16 @@
 @extends('dashboard.layouts.master')
-@section('title', "Client Application Subjects")
+@section('title', "Client Notices")
 @section('content')
     <div class="padding">
         <div class="box">
             <div class="box-header dker">
                 <div class="row">
                     <div class="col-lg-8 col-sm-6">
-                        <h3>List of Subjects</h3>
+                        <h3>List of Notices</h3>
                         <small>
                             <a href="{{ route('adminHome') }}">{{ __('backend.home') }}</a> /
-                            <a>Client Application Subjects</a> /
-                            <a>List of Subjects</a>
+                            <a>Client Notices</a> /
+                            <a>List of Notices</a>
                         </small>
                     </div>
                     <div class="col-lg-4 col-sm-6">
@@ -32,9 +32,9 @@
                             <div class="col-sm-5" style="float: right !important;">
                                 @if(@Auth::user()->permissionsGroup->add_status)
                                     <a class="btn btn-fw primary w-100" style="overflow: hidden"
-                                       href="{{route('client-application-subject.create')}}">
+                                       href="{{route('client-notice.create')}}">
                                         <i class="material-icons">&#xe02e;</i>
-                                        &nbsp; Add Subject</a>
+                                        &nbsp; Create notice</a>
                                 @endif
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                 </div>
             </div>
             <div class="b-t">
-                @if(count($ClientApplicationSubjects) < 0)
+                @if(count($ClientNotices) < 0)
                     <div class="row p-a">
                         <div class="col-sm-12">
                             <div class=" p-a text-center ">
@@ -53,15 +53,16 @@
                     </div>
                 @endif 
 
-                @if(count($ClientApplicationSubjects) > 0)
+                @if(count($ClientNotices) > 0)
                     {{-- {{Form::open(['route'=>['categoriesUpdateAll',8],'method'=>'post'])}} --}}
                     <div class="table-responsive">
                         <table class="table table-bordered m-a-0">
                             <thead class="dker">
                             <tr>
                                 <th class="text-center w-64">Sl No</th>
+                                <th class="text-center" style="width:100px;">Client</th>
                                 <th class="text-center" style="width:100px;">Subject</th>
-                                <th class="text-center" style="width:100px;">Type</th>
+                                <th class="text-center" style="width:100px;">Body</th>
                                 {{-- <th class="text-center" style="width:50px;">{{ __('backend.status') }}</th> --}}
                                 <th class="text-center" style="width:60px;">{{ __('backend.options') }}</th>
                             </tr>
@@ -72,36 +73,20 @@
                             $title_var2 = "title_" . config('smartend.default_language');
                             $x = 0;
                             ?>
-                            @foreach($ClientApplicationSubjects as $ClientApplicationSubject)
+                            @foreach($ClientNotices as $ClientNotice)
                                 <?php
                                     $x++;
                                 ?>
                                 <tr>
                                     <td class="text-center">{{ $x }}</td>
-                                    <td class="text-center">{{ $ClientApplicationSubject->subject }}</td>
+                                    <td class="text-center">{{ $ClientNotice->client->first_name }} {{ $ClientNotice->client->last_name }} ({{ $ClientNotice->client->phone }})</td>
+                                    <td class="text-center">{{ $ClientNotice->subject->subject }}</td>
                                     <td class="text-center">
-                                        {{ $ClientApplicationSubject->type == 'application' ? 'Application' : ($ClientApplicationSubject->type == 'notice' ? 'Notice' : '') }}
+                                        {!! $ClientNotice->notice_body !!}
                                     </td>
-
-                                    {{-- <td class="h6 nowrap">
-                                        {!! Form::text('row_no_'.$ClientApplicationSubject->id,$ClientApplicationSubject->row_no, array('class' => 'form-control row_no light','autocomplete'=>'off')) !!}
-                                        @if (@Auth::user()->permissionsGroup->edit_status)
-                                            <a href="{{ route("categoriesEdit",["id"=>$ClientApplicationSubject->id]) }}">
-                                                @if($ClientApplicationSubject->icon !="")
-                                                    <i class="fa {!! $ClientApplicationSubject->icon !!} "></i>
-                                                @endif
-                                                {{ $title }}
-                                            </a>
-                                        @else
-                                            @if($Section->icon !="")
-                                                <i class="fa {!! $Section->icon !!} "></i>
-                                            @endif
-                                            {{ $title }}
-                                        @endif
-                                    </td> --}}
                                     
                                     <td class="text-center">
-                                        <div class="dropdown {{ (($x+1) >= count($ClientApplicationSubjects))?"dropup":"" }}">
+                                        <div class="dropdown {{ (($x+1) >= count($ClientNotices))?"dropup":"" }}">
                                             <button type="button" class="btn btn-sm light dk dropdown-toggle"
                                                     data-toggle="dropdown"><i class="material-icons">&#xe5d4;</i>
                                                 {{ __('backend.options') }}
@@ -109,14 +94,20 @@
                                             <div class="dropdown-menu pull-right">
                                                 @if(@Auth::user()->permissionsGroup->edit_status)
                                                     <a class="dropdown-item"
-                                                       href="{{ route('client-application-subject.edit', ['id'=>$ClientApplicationSubject->id]) }}"><i
+                                                       href="{{ route('client-notice.edit', ['id'=>$ClientNotice->id]) }}"><i
                                                             class="material-icons">&#xe3c9;</i> {{ __('backend.edit') }}
                                                     </a>
                                                 @endif
                                                 @if(@Auth::user()->permissionsGroup->delete_status)
                                                     <a class="dropdown-item text-danger"
-                                                       onclick="DeleteSubject('{{ $ClientApplicationSubject->id }}')"><i
+                                                       onclick="DeleteNotice('{{ $ClientNotice->id }}')"><i
                                                             class="material-icons">&#xe872;</i> {{ __('backend.delete') }}
+                                                    </a>
+                                                @endif
+                                                @if(@Auth::user()->permissionsGroup->action_status)
+                                                    <a class="dropdown-item"
+                                                       onclick="ActionNotice('{{ $ClientNotice->id }}')"><i
+                                                            class="material-icons">assignment_turned_in</i> Action
                                                     </a>
                                                 @endif
                                             </div>
@@ -184,6 +175,7 @@
             </div><!-- /.modal-content -->
         </div>
     </div>
+    @include('dashboard.client-notice.action-modal')
 @endsection
 @push("after-scripts")
     <script type="text/javascript">
@@ -200,10 +192,16 @@
             }
         });
 
-        function DeleteSubject(id) {
-            $("#category_delete_btn").attr("href", '{{ route("client-application-subject.destroy", ":id") }}'.replace(':id', id));
+        function DeleteNotice(id) {
+            $("#category_delete_btn").attr("href", '{{ route("client-notice.destroy", ":id") }}'.replace(':id', id));
             $("#delete-category").modal("show");
         }
 
+    </script>
+    <script>
+        function ActionNotice(id){
+            $('#notice_id').val(id);
+            $('#actionNoticeModal').modal('show');
+        }
     </script>
 @endpush

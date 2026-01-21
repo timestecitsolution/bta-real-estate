@@ -146,13 +146,19 @@ class BookingController extends Controller
         $all_prices_details = PriceModel::with(['project', 'flat', 'customer'])
         ->when($user->status == 0, function ($query) use ($user) {
             return $query->where('customer_id', $user->contact_id);
-        })
-        ->get();
+        })->get();
+        
+
+        $allocated_flats = LandlordEngagement::with(['project', 'flat', 'customer', 'flatDocuments', 'materials.materialType'])
+                ->when($user->status == 0, function ($query) use ($user) {
+                    return $query->where('landlord_id', $user->contact_id);
+                })->get();
+                
         // Step 1: Default empty collections
         $prices_details = collect();
         $emi_details = collect();
         $material_details = collect();
-        $allocated_flats = collect(); 
+        // $allocated_flats = collect(); 
         $landlord_id = null;
 
 
@@ -249,7 +255,7 @@ class BookingController extends Controller
 
         $customer_details = $prices_details->isNotEmpty() ? $prices_details->first()->customer : null;
         $allDocumentTypes = DocumentType::all();
-        $applicationSubjects = ClientApplicationSubject::all();
+        $applicationSubjects = ClientApplicationSubject::where('type', 'application')->get();
 
         $bulksmsdata = BulkSmsData::all();
         $applicationdata = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator', 'attachments', 'project', 'flat'])
