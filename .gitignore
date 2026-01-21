@@ -1,4 +1,4 @@
-# Laravel / PHP
+# Laravel / PHP///uploads/
 /vendor/
 /node_modules/
 .env
@@ -6,12 +6,14 @@
 .env.*.backup
 /.idea/
 /.vscode/
-/storage/*.key
 /public/storage
 /core/public/emi_payment_document/
 /core/public/flat_document/
 /core/public/uploads/
+/core/uploads/
 /core/uploads/land_query/
+/uploads/*
+!/uploads/.gitkeep
 
 Homestead.yaml
 Homestead.json
@@ -28,9 +30,19 @@ package-lock.json
 .pnpm-debug.log*
 
 # Laravel specific
-/storage/*.log
-/storage/framework/*
-/storage/logs/*
+# Storage runtime files (logs, cache, sessions, compiled views)
+core/storage/logs/*.log
+core/storage/framework/cache/*
+core/storage/framework/sessions/*
+core/storage/framework/views/*
+core/storage/app/public/*
+
+# Keep folders structure
+!core/storage/framework/.gitkeep
+!core/storage/framework/cache/.gitkeep
+!core/storage/framework/sessions/.gitkeep
+!core/storage/framework/views/.gitkeep
+!core/storage/app/public/.gitkeep
 /bootstrap/cache/*.php
 
 # OS / IDE files
@@ -51,7 +63,16 @@ Thumbs.db
 *.tmp
 
 # Apache / Server files
-.htaccess
+.tar.gz
+*.rar
+*.7z
+*.bak
+*.tmp
+
+# Apache / Server files
+es
+es
+s
 .htpasswd
 web.config
 

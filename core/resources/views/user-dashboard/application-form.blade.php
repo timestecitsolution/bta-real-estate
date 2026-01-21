@@ -31,10 +31,10 @@
                     <div class="col-sm-10">
                         <select name="project_id" id="project_id" class="form-control c-select" required>
                             <option value="">- - Select Project - -</option>
-                            @foreach($all_prices_details as $all_prices_detail)
-                                <option value="{{ $all_prices_detail->project->id }}" data-project_id="{{ $all_prices_detail->project->id }}"
-                                    {{ old('project_id') == $all_prices_detail->project->id ? 'selected' : '' }}>
-                                    {{ $all_prices_detail->project->title_en }}
+                            @foreach($allocated_flats as $allocated_flat)
+                                <option value="{{ $allocated_flat->project->id }}" data-project_id="{{ $allocated_flat->project->id }}"
+                                    {{ old('project_id') == $allocated_flat->project->id ? 'selected' : '' }}>
+                                    {{ $allocated_flat->project->title_en }}
                                 </option>
                             @endforeach
                         </select>
