@@ -3,7 +3,7 @@
         <div class="modal-content" id="printArea{{ $price->id }}">
             <div class="modal-header">
                 <h4 class="modal-title fw-bold" id="detailsModalLabel{{ $price->id }}">
-                    Invoice - Flat: {{ $price->flat->title ?? 'N/A' }}
+                    Invoice - {{ $price->flat->title ?? 'N/A' }}
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
