@@ -14,7 +14,7 @@
                     <img src="{{ asset('uploads/settings/logo-short.svg') }}" alt="Company Logo" class="mb-2" style="max-height: 60px;">
                     <h2 class="fw-bold text-uppercase">Building Technology Architecture</h2>
                     <p class="mb-0">Client Name: {{ $price->customer->first_name ?? 'N/A' }} {{ $price->customer->last_name ?? '' }}</p>
-                    <p class="mb-0">Project: {{ $price->project->title_en ?? 'N/A' }} (Flat: {{ $price->flat->title ?? 'N/A' }})</p>
+                    <p class="mb-0">Project: {{ $price->project->title_en ?? 'N/A' }} ({{ $price->flat->title ?? 'N/A' }})</p>
                     <p class="mb-0">Flat Size: {{ $price->flat_size ?? 'N/A' }} sqft</p>
                     <small>Invoice No: {{ $price->invoices->invoice_no ?? 'N/A' }}</small>
                 </div>
