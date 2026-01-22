@@ -119,7 +119,7 @@
                 <div class="mt-2 text-end">
                     <h5 class="fw-bold">Grand Total: {{ number_format($price->price, 2) ?? 'N/A' }} Tk</h5>
                 </div>
-                <div class="signature-section mt-3 d-flex justify-content-between">
+                <!-- <div class="signature-section mt-3 d-flex justify-content-between">
                     <div class="signature text-center">
                         <div class="signature-line" style="margin-top:60px;border-top:1px solid #000;width:200px;"></div>
                         <p>Client Signature</p>
@@ -132,7 +132,7 @@
                         <div class="signature-line" style="margin-top:60px;border-top:1px solid #000;width:200px;"></div>
                         <p>Authority Signature</p>
                     </div>
-                </div>
+                </div> -->
                  <div class="mt-3 text-center">
                     <p><b>Note:</b> This is a system-generated invoice. Please keep it for your records.</p>
                 </div>

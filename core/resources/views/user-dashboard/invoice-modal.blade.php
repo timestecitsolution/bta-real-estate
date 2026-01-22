@@ -109,7 +109,7 @@
                         </tr>
                     </tfoot>
                 </table>
-                <div class="signature-section mt-5 d-flex justify-content-between">
+                <!-- <div class="signature-section mt-5 d-flex justify-content-between">
                     <div class="signature text-center">
                         <div class="signature-line" style="margin-top:60px;border-top:1px solid #000;width:200px;"></div>
                         <p>Client Signature</p>
@@ -122,7 +122,7 @@
                         <div class="signature-line" style="margin-top:60px;border-top:1px solid #000;width:200px;"></div>
                         <p>Authority Signature</p>
                     </div>
-                </div>
+                </div> -->
                 <!-- Footer Notes -->
                 <div class="mt-5">
                     <p><b>Note:</b> This is a system-generated invoice. Please keep it for your records.</p>
