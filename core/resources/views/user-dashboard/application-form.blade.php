@@ -1,11 +1,21 @@
 @php
-    $priceJsData = $all_prices_details->map(function ($item) {
-        return [
-            'project_id' => $item->project->id,
-            'flat_id'    => $item->flat->id,
-            'flat_title' => $item->flat->title,
-        ];
-    })->values();
+    if($Contact->status == '2'){
+        $priceJsData = $allocated_flats->map(function ($item) {
+            return [
+                'project_id' => optional($item->project)->id,
+                'flat_id'    => optional($item->flat)->id,
+                'flat_title' => optional($item->flat)->title,
+            ];
+        })->values();
+    }else{
+        $priceJsData = $all_prices_details->map(function ($item) {
+            return [
+                'project_id' => $item->project->id,
+                'flat_id'    => $item->flat->id,
+                'flat_title' => $item->flat->title,
+            ];
+        })->values();
+    }
 @endphp
 
 <h3>Application</h3>
@@ -30,13 +40,23 @@
                     <label>Project * </label>
                     <div class="col-sm-10">
                         <select name="project_id" id="project_id" class="form-control c-select" required>
-                            <option value="">- - Select Project - -</option>
-                            @foreach($allocated_flats as $allocated_flat)
-                                <option value="{{ $allocated_flat->project->id }}" data-project_id="{{ $allocated_flat->project->id }}"
-                                    {{ old('project_id') == $allocated_flat->project->id ? 'selected' : '' }}>
-                                    {{ $allocated_flat->project->title_en }}
-                                </option>
-                            @endforeach
+                            @if($Contact->status == '2')
+                                <option value="">- - Select Project - -</option>
+                                @foreach($allocated_flats as $allocated_flat)
+                                    <option value="{{ $allocated_flat->project->id }}" data-project_id="{{ $allocated_flat->project->id }}"
+                                        {{ old('project_id') == $allocated_flat->project->id ? 'selected' : '' }}>
+                                        {{ $allocated_flat->project->title_en }}
+                                    </option>
+                                @endforeach
+                            @else
+                                <option value="">- - Select Project - -</option>
+                                @foreach($all_prices_details as $all_prices_detail)
+                                    <option value="{{ $all_prices_detail->project->id }}" data-project_id="{{ $all_prices_detail->project->id }}"
+                                        {{ old('project_id') == $all_prices_detail->project->id ? 'selected' : '' }}>
+                                        {{ $all_prices_detail->project->title_en }}
+                                    </option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
                 </div>

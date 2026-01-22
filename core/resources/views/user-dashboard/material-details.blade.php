@@ -6,12 +6,21 @@
         <div class="col-md-3">
             <label>Client <span>*</span></label>
             <select id="filter_customer_id" name="filter_customer_id" class="custom-select form-control" required>
-                <option value="">Select Client</option>
-                @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
-                    <option value="{{ $customer->id }}" {{ $filter_customer_id == $customer->id ? 'selected' : '' }}>
-                        {{ $customer->first_name }} {{ $customer->last_name }}
-                    </option>
-                @endforeach
+                @if($Contact->status == '2')
+                    <option value="">Select Client</option>
+                    @foreach($allocated_flats->pluck('customer')->unique('id') as $customer)
+                        <option value="{{ $customer->id }}" {{ $filter_customer_id == $customer->id ? 'selected' : '' }}>
+                            {{ $customer->first_name }} {{ $customer->last_name }}
+                        </option>
+                    @endforeach
+                @else
+                    <option value="">Select Client</option>
+                    @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
+                        <option value="{{ $customer->id }}" {{ $filter_customer_id == $customer->id ? 'selected' : '' }}>
+                            {{ $customer->first_name }} {{ $customer->last_name }}
+                        </option>
+                    @endforeach
+                @endif
             </select>
         </div>
 
@@ -113,7 +122,7 @@
 
         if (customerId) {
             $.ajax({
-                url: "{{ route('get.flats.by.customer', '') }}/" + customerId,
+                url: "{{ route('get.flats.by.landlord', '') }}/" + customerId,
                 type: "GET",
                 success: function (data) {
 

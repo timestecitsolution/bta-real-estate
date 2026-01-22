@@ -89,6 +89,9 @@ Route::post('/get-project-flats', [BookingController::class, 'getFlats'])->name(
 Route::get('/get-flats-by-customer/{customer_id}', [BookingController::class, 'getFlatsByCustomer'])
     ->name('get.flats.by.customer');
 
+Route::get('/get-flats-by-landlord/{customer_id}', [BookingController::class, 'getFlatsByLandlord'])
+    ->name('get.flats.by.landlord');
+
 
 Route::middleware(['force.password.change'])->group(function() {
     Route::get('/dashboard-new', [BookingController::class, 'dashboard'])->name('dashboard-new')->middleware('user');

@@ -4,12 +4,21 @@
     <div class="form-group">
         <label>Client</label>
         <select name="customer_id_select" id="customer_id_select" class="custom-select form-control" required>
-            <option value="">Select Client</option>
-            @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
-                <option value="{{ $customer->id }}">
-                    {{ $customer->first_name }} {{ $customer->last_name }}
-                </option>
-            @endforeach
+            @if($Contact->status == '2')
+                <option value="">Select Client</option>
+                @foreach($allocated_flats->pluck('customer')->unique('id') as $customer)
+                    <option value="{{ $customer->id }}">
+                        {{ $customer->first_name }} {{ $customer->last_name }}
+                    </option>
+                @endforeach
+            @else
+                <option value="">Select Client</option>
+                @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
+                    <option value="{{ $customer->id }}">
+                        {{ $customer->first_name }} {{ $customer->last_name }}
+                    </option>
+                @endforeach
+            @endif
         </select>
         @error('customer_id_select')
             <div class="invalid-feedback">{{ $message }}</div>

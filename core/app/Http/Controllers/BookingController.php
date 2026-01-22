@@ -125,6 +125,14 @@ class BookingController extends Controller
                     ->pluck('flat');  
         return response()->json($flats);
     }
+    public function getFlatsByLandlord($customer_id)
+    {
+        $flats = LandlordEngagement::where('landlord_id', $customer_id)
+                    ->with(['project', 'flat', 'customer', 'flatDocuments', 'materials.materialType'])
+                    ->get()
+                    ->pluck('flat');  
+        return response()->json($flats);
+    }
 
     public function loginbookinguser(Request $request)
     {
@@ -147,8 +155,6 @@ class BookingController extends Controller
         ->when($user->status == 0, function ($query) use ($user) {
             return $query->where('customer_id', $user->contact_id);
         })->get();
-        
-
         $allocated_flats = LandlordEngagement::with(['project', 'flat', 'customer', 'flatDocuments', 'materials.materialType'])
                 ->when($user->status == 0, function ($query) use ($user) {
                     return $query->where('landlord_id', $user->contact_id);
@@ -158,7 +164,6 @@ class BookingController extends Controller
         $prices_details = collect();
         $emi_details = collect();
         $material_details = collect();
-        // $allocated_flats = collect(); 
         $landlord_id = null;
 
 
