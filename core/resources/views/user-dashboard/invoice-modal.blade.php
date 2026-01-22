@@ -28,7 +28,7 @@
                     <div class="col-6">
                         <h5>Bill To:</h5>
                         <p class="mb-1"><b>{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</b></p>
-                        <p class="mb-1">Flat: {{ $price->flat->title ?? 'N/A' }}</p>
+                        <p class="mb-1">{{ $price->flat->title ?? 'N/A' }}</p>
                         <p>Project: {{ $price->project->title_en ?? 'N/A' }}</p>
                     </div>
                     <div class="col-6 text-end">

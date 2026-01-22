@@ -135,11 +135,7 @@
     <section class="hero-banner">
       <div class="container">
         <div class="innerheader ps-0 ps-lg-5">
-          <h6>{!! Helper::GeneralSiteSettings("banner_title") !!}</h6>
-          <h1>User Dashboard</h1>
-          <a href="/book" class="btn btn-primary">
-            Book Now <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </a>
+          <h1>{{ $Contact->first_name }} {{ $Contact->last_name }}</h1>
         </div>
       </div>
 

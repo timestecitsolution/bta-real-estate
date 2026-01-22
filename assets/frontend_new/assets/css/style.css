@@ -178,7 +178,6 @@
 
 body {
   font-family: "Montserrat", sans-serif;
-  font-weight: 100;
   font-style: normal;
   background-color: #ffffff;
 }
@@ -1359,4 +1358,82 @@ footer {
   margin: 0 8px;
   font-size: 16px;
   text-decoration: none;
+}
+.dashboard-wrap{
+  background-color: white;
+  padding:50px;
+  border-radius: 50px;
+}
+.dashboard-wrap h3{
+  font-size: 20px;
+  margin:30px 0px;
+}
+.dashboard-wrap .form-control, .dashboard-wrap select{
+  margin-bottom: 15px;
+}
+/* Nav Tabs Container */
+#userDashboardTabs {
+    border-bottom: 2px solid #e5e7eb;
+    gap: 6px;
+}
+
+/* Nav Item */
+#userDashboardTabs .nav-item {
+    margin-bottom: -2px;
+}
+
+/* Default Tab Button */
+#userDashboardTabs .nav-link {
+    color: #111827 !important;
+    font-weight: 500;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    background-color: transparent;
+    transition: all 0.25s ease;
+    font-size: 14px;
+}
+
+/* Hover Effect */
+#userDashboardTabs .nav-link:hover {
+    background-color: #f3f4f6;
+    color: #111827 !important;
+}
+
+/* Active Tab */
+#userDashboardTabs .nav-link.active {
+    background-color: #ffffff;
+    color: #1f2937 !important;
+    font-weight: 600;
+    border-bottom: 3px solid #2563eb;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Logout Button Styling */
+#userDashboardTabs .btn-danger {
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 600;
+    background-color: #dc2626 !important;
+    border: none;
+    transition: all 0.25s ease;
+}
+
+/* Logout Hover */
+#userDashboardTabs .btn-danger:hover {
+    background-color: #b91c1c !important;
+    transform: translateY(-1px);
+}
+
+/* Responsive Scroll for Small Screens */
+@media (max-width: 768px) {
+    #userDashboardTabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: thin;
+    }
+
+    #userDashboardTabs .nav-link {
+        white-space: nowrap;
+    }
 }
