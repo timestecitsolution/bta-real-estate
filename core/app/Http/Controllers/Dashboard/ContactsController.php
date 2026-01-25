@@ -10,6 +10,7 @@ use App\Models\Country;
 use App\Http\Requests;
 use App\Models\WebmasterSection;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Auth;
 use File;
 use Helper;
@@ -120,7 +121,19 @@ class ContactsController extends Controller
             compact("Contacts", "GeneralWebmasterSections", "ContactsGroups", "Countries", "WaitContactsCount",
                 "BlockedContactsCount", "AllContactsCount", "group_id", "search_word"));
     }
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
 
+        $path = $basePath . $subFolder . '/';
+
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
+    }
     public function search(Request $request)
     {
         //
@@ -236,12 +249,16 @@ class ContactsController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
+
+        DB::beginTransaction();
+
+        try {
         // Upload Helper Function
         $uploadFile = function ($inputName) use ($request) {
             if ($request->hasFile($inputName)) {
                 $file = $request->file($inputName);
                 $fileFinalName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
-                $path = $this->getUploadPath();
+                $path = $this->getUploadPath('contacts');
                 $file->move($path, $fileFinalName);
 
                 // resize & optimize
@@ -286,13 +303,23 @@ class ContactsController extends Controller
             'contact_id' => $Contact->id,
         ]);
 
+        DB::commit();
+
         return redirect()->action('Dashboard\ContactsController@index');
-    }
 
+        } catch (\Throwable $e) {
 
-    public function getUploadPath()
-    {
-        return public_path('uploads/contacts/');
+            DB::rollBack();
+
+            // (Optional but recommended) log error
+            \Log::error('Contact store failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Something went wrong. Please try again.']);
+        }
     }
 
     public function setUploadPath($uploadPath)
@@ -335,9 +362,98 @@ class ContactsController extends Controller
         }
     }
 
+    // public function update(Request $request, $id)
+    // {
+    //     // Check Permissions
+    //     if (!@Auth::user()->permissionsGroup->edit_status) {
+    //         return Redirect::to(route('NoPermission'))->send();
+    //     }
+
+    //     // Fetch contact
+    //     if (@Auth::user()->permissionsGroup->view_status) {
+    //         $Contact = Contact::where('created_by', '=', Auth::user()->id)->find($id);
+    //     } else {
+    //         $Contact = Contact::find($id);
+    //     }
+
+    //     if (empty($Contact)) {
+    //         return redirect()->action('Dashboard\ContactsController@index');
+    //     }
+
+    //     // Validation
+    //     $this->validate($request, [
+    //         'email' => 'required|email',
+    //         'file' => 'nullable|image',
+    //         'nid_front' => 'nullable|image',
+    //         'nid_back' => 'nullable|image',
+    //         'passport_no' => 'nullable|alpha_num|max:9',
+    //         'nid_no' => 'nullable|numeric',
+    //         'birth_certificate_no' => 'nullable|numeric',
+    //         'person_type' => 'required|in:landlord,client',
+    //         'notes' => 'nullable|string|max:1000', 
+    //     ]);
+
+    //     // Helper function for file upload
+    //     $uploadFile = function ($fileInputName, $oldFile = null) {
+    //         if ($fileInputName && request()->hasFile($fileInputName)) {
+    //             $file = request()->file($fileInputName);
+    //             $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+    //             $path = $this->getUploadPath();
+    //             $file->move($path, $fileName);
+
+    //             // Resize & optimize
+    //             Helper::imageResize($path.$fileName);
+    //             Helper::imageOptimize($path.$fileName);
+
+    //             // Delete old file
+    //             if ($oldFile && File::exists($path.$oldFile)) {
+    //                 File::delete($path.$oldFile);
+    //             }
+
+    //             return $fileName;
+    //         }
+    //         return $oldFile; // keep old if no new upload
+    //     };
+
+    //     // Update files
+    //     $Contact->photo = $uploadFile('file', $Contact->photo);
+    //     $Contact->nid_front = $uploadFile('nid_front', $Contact->nid_front);
+    //     $Contact->nid_back = $uploadFile('nid_back', $Contact->nid_back);
+
+    //     // Update other fields
+    //     $Contact->first_name = strip_tags($request->first_name);
+    //     $Contact->last_name = strip_tags($request->last_name);
+    //     $Contact->email = strip_tags($request->email);
+    //     $Contact->phone = $request->phone;
+    //     $Contact->notes = $request->notes;
+    //     $Contact->passport_no = $request->passport_no;
+    //     $Contact->nid_no = $request->nid_no;
+    //     $Contact->birth_certificate_no = $request->birth_certificate_no;
+    //     $Contact->person_type = $request->person_type;
+    //     if($Contact->person_type == 'landlord'){
+    //         $Contact->status = 2; 
+    //     } else {
+    //         $Contact->status = 1;
+    //     }
+    //     $Contact->updated_by = Auth::user()->id;
+    //     $Contact->save();
+
+    //     $user = User::where('contact_id', $id)->first();
+    //     if ($user) {
+    //         $user->name = trim($Contact->first_name . ' ' . $Contact->last_name);
+    //         $user->email = $Contact->email;
+    //         $user->save();
+    //     }
+
+    //     return redirect()->action('Dashboard\ContactsController@index')
+    //                      ->with('ContactToEdit', Contact::find($id))
+    //                      ->with('doneMessage2', __('backend.saveDone'));
+
+    // }
+
     public function update(Request $request, $id)
     {
-        // Check Permissions
+        // Permission check
         if (!@Auth::user()->permissionsGroup->edit_status) {
             return Redirect::to(route('NoPermission'))->send();
         }
@@ -363,67 +479,99 @@ class ContactsController extends Controller
             'nid_no' => 'nullable|numeric',
             'birth_certificate_no' => 'nullable|numeric',
             'person_type' => 'required|in:landlord,client',
-            'notes' => 'nullable|string|max:1000', 
+            'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Helper function for file upload
-        $uploadFile = function ($fileInputName, $oldFile = null) {
-            if ($fileInputName && request()->hasFile($fileInputName)) {
-                $file = request()->file($fileInputName);
-                $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
-                $path = public_path('uploads/contacts/');
-                $file->move($path, $fileName);
+        // Keep track of uploaded files for rollback
+        $uploadedFiles = [];
 
-                // Resize & optimize
-                Helper::imageResize($path.$fileName);
-                Helper::imageOptimize($path.$fileName);
+        DB::beginTransaction();
 
-                // Delete old file
-                if ($oldFile && File::exists($path.$oldFile)) {
-                    File::delete($path.$oldFile);
+        try {
+
+            // Helper function for file upload
+            $uploadFile = function ($fileInputName, $oldFile = null) use (&$uploadedFiles) {
+                if ($fileInputName && request()->hasFile($fileInputName)) {
+                    $file = request()->file($fileInputName);
+                    $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                    $path = $this->getUploadPath('contacts');
+
+                    // Create directory if not exists
+                    if (!is_dir($path)) {
+                        mkdir($path, 0755, true);
+                    }
+
+                    $file->move($path, $fileName);
+                    $uploadedFiles[] = $path . $fileName;
+
+                    // Resize & optimize
+                    Helper::imageResize($path . $fileName);
+                    Helper::imageOptimize($path . $fileName);
+
+                    // Delete old file
+                    if ($oldFile && File::exists($path . $oldFile)) {
+                        File::delete($path . $oldFile);
+                    }
+
+                    return $fileName;
                 }
+                return $oldFile; // keep old if no new upload
+            };
 
-                return $fileName;
+            // Update files
+            $Contact->photo = $uploadFile('file', $Contact->photo);
+            $Contact->nid_front = $uploadFile('nid_front', $Contact->nid_front);
+            $Contact->nid_back = $uploadFile('nid_back', $Contact->nid_back);
+
+            // Update other fields
+            $Contact->first_name = strip_tags($request->first_name);
+            $Contact->last_name = strip_tags($request->last_name);
+            $Contact->email = strip_tags($request->email);
+            $Contact->phone = $request->phone;
+            $Contact->notes = $request->notes;
+            $Contact->passport_no = $request->passport_no;
+            $Contact->nid_no = $request->nid_no;
+            $Contact->birth_certificate_no = $request->birth_certificate_no;
+            $Contact->person_type = $request->person_type;
+            $Contact->status = ($Contact->person_type === 'landlord') ? 2 : 1;
+            $Contact->updated_by = Auth::user()->id;
+            $Contact->save();
+
+            // Update related user
+            $user = User::where('contact_id', $id)->first();
+            if ($user) {
+                $user->name = trim($Contact->first_name . ' ' . $Contact->last_name);
+                $user->email = $Contact->email;
+                $user->save();
             }
-            return $oldFile; // keep old if no new upload
-        };
 
-        // Update files
-        $Contact->photo = $uploadFile('file', $Contact->photo);
-        $Contact->nid_front = $uploadFile('nid_front', $Contact->nid_front);
-        $Contact->nid_back = $uploadFile('nid_back', $Contact->nid_back);
+            DB::commit();
 
-        // Update other fields
-        $Contact->first_name = strip_tags($request->first_name);
-        $Contact->last_name = strip_tags($request->last_name);
-        $Contact->email = strip_tags($request->email);
-        $Contact->phone = $request->phone;
-        $Contact->notes = $request->notes;
-        $Contact->passport_no = $request->passport_no;
-        $Contact->nid_no = $request->nid_no;
-        $Contact->birth_certificate_no = $request->birth_certificate_no;
-        $Contact->person_type = $request->person_type;
-        if($Contact->person_type == 'landlord'){
-            $Contact->status = 2; 
-        } else {
-            $Contact->status = 1;
+            return redirect()->action('Dashboard\ContactsController@index')
+                            ->with('ContactToEdit', Contact::find($id))
+                            ->with('doneMessage2', __('backend.saveDone'));
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            // Cleanup uploaded files if transaction fails
+            foreach ($uploadedFiles as $file) {
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
+
+            \Log::error('Contact update failed', [
+                'error' => $e->getMessage(),
+                'contact_id' => $id,
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Update failed. Please try again.']);
         }
-        $Contact->updated_by = Auth::user()->id;
-        $Contact->save();
-
-        $user = User::where('contact_id', $id)->first();
-        if ($user) {
-            $user->name = trim($Contact->first_name . ' ' . $Contact->last_name);
-            $user->email = $Contact->email;
-            $user->save();
-        }
-
-        return redirect()->action('Dashboard\ContactsController@index')
-                         ->with('ContactToEdit', Contact::find($id))
-                         ->with('doneMessage2', __('backend.saveDone'));
-
     }
-
 
     public function updateGroup(Request $request, $id)
     {

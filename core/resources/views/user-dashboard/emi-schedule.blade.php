@@ -43,69 +43,6 @@
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
   </div>
-  <!-- <div class="form-group" id="total_amount_group">
-    <label >Total Amount</label>
-    <input type="text" id="total_amount" class="form-control" name="total_amount" placeholder="Total Amount" readonly>
-    @error('total_amount')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="total_emi_count_group">
-    <label >Total EMI Count</label>
-    <input type="text" id="total_emi_count" class="form-control" name="total_emi_count" placeholder="Total EMI Count" readonly>
-    @error('total_emi_count')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="remaining_emi_count_group">
-    <label >Remaining EMI Count</label>
-    <input type="text" id="remaining_emi_count" class="form-control" name="remaining_emi_count" placeholder="Remaining EMI Count" readonly>
-    @error('remaining_emi_count')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="total_paid_amount_group">
-    <label >Total Paid Amount (Booking + Downpayment + All Installments)</label>
-    <input type="text" id="total_paid_amount" class="form-control" name="total_paid_amount" placeholder="Total Paid Amount (EMI)" readonly>
-    @error('total_paid_amount')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="total_paid_amount_with_extras_group">
-    <label >Total Paid Amount (Booking + Downpayment + All Installments + Extras)</label>
-    <input type="text" id="total_paid_amount_with_extras" class="form-control" name="total_paid_amount_with_extras" placeholder="Total Paid Amount (With Extras)" readonly>
-    @error('total_paid_amount_with_extras')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="total_due_amount_group">
-    <label >Total Due Amount (EMI)</label>
-    <input type="text" id="due_amount" class="form-control" name="due_amount" placeholder="Total Due Amount (EMI)" readonly>
-    @error('due_amount')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="total_due_amount_with_extras_group">
-    <label >Total Due Amount (With Extras)</label>
-    <input type="text" id="due_amount_with_extras" class="form-control" name="due_amount_with_extras" placeholder="Total Due Amount (With Extras)" readonly>
-    @error('due_amount_with_extras')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="remaining_due_amount_group">
-    <label >Remaining Due Amount (EMI)</label>
-    <input type="text" id="remaining_due_amount" class="form-control" name="remaining_due_amount" placeholder="Remaining Due Amount (EMI)" readonly>
-    @error('remaining_due_amount')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div>
-  <div class="form-group" id="remaining_due_amount_with_extras_group">
-    <label >Remaining Due Amount (With Extras)</label>
-    <input type="text" id="remaining_due_amount_with_extras" class="form-control" name="remaining_due_amount_with_extras" placeholder="Remaining Due Amount (With Extras)" readonly>
-    @error('remaining_due_amount_with_extras')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-  </div> -->
   <div class="form-group" id="current_installment_amount_group">
     <label >Current Installment Amount</label>
     <input type="text" id="current_installment_amount" class="form-control" name="current_installment_amount" placeholder="Current Installment Amount">
@@ -304,34 +241,6 @@
                 $('input[name="total_paid_amount_with_extras"]').val(response.total_paid_amount_with_extras).prop('readonly', true);
                 $('input[name="due_amount_with_extras"]').val(response.due_amount_with_extras).prop('readonly', true);
                 $('input[name="remaining_due_amount_with_extras"]').val(response.remaining_due_amount_with_extras).prop('readonly', true);
-
-                // Function to update totals based on current installment and extras
-                // function updateTotals() {
-                //     var currentInstallment = parseFloat($currentInstallmentInput.val()) || 0;
-                //     var totalPaid = totalPaidPrevious + currentInstallment;
-
-                //     var extrasAmountInput = 0;
-                //     if($('#extras_amount_check').is(':checked')) {
-                //         extrasAmountInput = parseFloat($('#extras_amount').val()) || 0;
-                //     }
-
-                //     var totalPaidWithExtras = totalPaidWithExtrasPrevious + currentInstallment + extrasAmountInput;
-                //     var dueWithExtras = parseFloat(response.due_amount_with_extras) - extrasAmountInput;
-                //     var remainingDueWithExtras = parseFloat(response.remaining_due_amount_with_extras) - extrasAmountInput;
-
-                //     $('input[name="total_paid_amount"]').val(totalPaid).prop('readonly', true);
-                //     $('input[name="total_paid_amount_with_extras"]').val(totalPaidWithExtras).prop('readonly', true);
-                //     $('input[name="due_amount_with_extras"]').val(dueWithExtras).prop('readonly', true);
-                //     $('input[name="remaining_due_amount_with_extras"]').val(remainingDueWithExtras).prop('readonly', true);
-                // }
-
-                //Initial update
-                // updateTotals();
-
-                // Live update when current_installment_amount changes
-                // $currentInstallmentInput.on('input keyup change', function() {
-                //     updateTotals();
-                // });
 
                 // Extras handling
                 if(response.extras_amount > 0){

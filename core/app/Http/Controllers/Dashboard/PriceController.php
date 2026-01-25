@@ -41,6 +41,18 @@ class PriceController extends Controller
 
     }
 
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
+
+        $path = $basePath . $subFolder . '/';
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -81,8 +93,8 @@ class PriceController extends Controller
             'booking_amount' => 'required|string',
             'downpayment_amount' => 'required|string',
             'due_amount' => 'required|string',
-            // 'emi_count' => 'required|string',
-            // 'emi_start_date' => 'required|string',
+            'emi_count' => 'nullable|string',
+            'emi_start_date' => 'nullable|string',
             'is_applicable_govt_gas' => 'nullable|boolean',
             'is_govt_gas_connection_paid' => 'nullable|boolean',
             'govt_gas_connection_payment_scheme' => 'nullable|string',
@@ -106,21 +118,22 @@ class PriceController extends Controller
 
         // Handle multiple documents
         if ($request->has('document_type_id') && $request->hasFile('document')) {
-            $folder = public_path('flat_document');
-            if (!file_exists($folder)) {
-                mkdir($folder, 0755, true);
-            }
+
+
+            $path = $this->getUploadPath('flat_documents_client');
 
             foreach ($request->document_type_id as $index => $docTypeId) {
                 if ($docTypeId && isset($request->document[$index])) {
                     $file = $request->file('document')[$index];
-                    $filename = time() . '_' . $file->getClientOriginalName();
-                    $file->move($folder, $filename);
+                    $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $fileName);
+                    Helper::imageResize($path . $fileName);
+                    Helper::imageOptimize($path . $fileName);
 
                     FlatDocuments::create([
                         'price_id' => $price->id,
                         'document_type_id' => $docTypeId,
-                        'file_path' => 'flat_document/' . $filename,
+                        'file_path' => 'flat_documents_client/' . $fileName,
                     ]);
                 }
             }
@@ -421,9 +434,12 @@ class PriceController extends Controller
         if ($price) {
             $documents = FlatDocuments::where('price_id', $price->id)->get();
             foreach ($documents as $doc) {
-                $filePath = public_path($doc->file_path);
-                if (file_exists($filePath)) {
-                    unlink($filePath); 
+                // $filePath = public_path($doc->file_path);
+                $relativePath = $doc->file_path;
+                $fullPath = base_path('../uploads/' . $relativePath);
+                 
+                if (file_exists($fullPath)) {
+                    unlink($fullPath); 
                 }
                 $doc->delete();
             }

@@ -9,6 +9,7 @@ use App\Models\WebmasterSection;
 use App\Models\ApplicationFeedback;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use App\Services\SMSService;
 
 class ApplicationListController extends Controller
@@ -23,7 +24,6 @@ class ApplicationListController extends Controller
     {
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
         $applications = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator', 'attachments', 'project', 'flat'])->findOrFail($id);
-        // dd($applications);
         return view('dashboard.application-list.application-view', compact('applications', 'GeneralWebmasterSections'));
     }
     public function approveReject(Request $request, $id)
@@ -98,9 +98,29 @@ class ApplicationListController extends Controller
 
     public function destroy($id)
     {
-        $application = CentralApplication::findOrFail($id);
-        $application->delete();
+        DB::transaction(function () use ($id) {
 
-        return redirect()->route('application-list')->with('success', 'Application deleted successfully!');
+            $application = CentralApplication::with('attachments')->findOrFail($id);
+
+            foreach ($application->attachments as $attachment) {
+
+                 $relativePath = $attachment->file_path;
+                 $fullPath = base_path('../uploads/' . $relativePath);
+
+                if ($relativePath && File::exists($fullPath)) {
+
+                    if (!File::delete($fullPath)) {
+                        throw new \Exception('File delete failed: ' . $fullPath);
+                    }
+                }
+            }
+
+            $application->attachments()->delete();
+            $application->delete();
+        });
+
+        return redirect()
+            ->route('application-list')
+            ->with('success', 'Application and files deleted successfully!');
     }
 }

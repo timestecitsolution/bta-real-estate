@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
+use App\Helpers\Helper;
 use App\Models\PriceModel;
 use App\Models\EmiPayment;
 use App\Models\Contact;
@@ -18,7 +21,19 @@ class EmiController extends Controller
         $all = Session::all();
         return view('booking.form', compact('all'));
     }
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
 
+        $path = $basePath . $subFolder . '/';
+
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
+    }
     public function storeEmi(Request $request)
     {
         $request->validate([
@@ -49,7 +64,6 @@ class EmiController extends Controller
             $payment_category = 'extras';
             $extras_amount = $request->extras_amount;
             $emi_amount = null;
-            // $remaining_emi_count = $request->remaining_emi_count;
         }else{
             $request->validate([
                 'current_installment_amount' => 'required|numeric|min:1',
@@ -57,27 +71,19 @@ class EmiController extends Controller
             $payment_category = 'emi';
             $extras_amount = null;
             $emi_amount = $request->current_installment_amount;
-            // $remaining_emi_count = $lastEmi ? $lastEmi->remaining_emi_count - 1 : $request->remaining_emi_count - 1;
         }
-        // $remaining_due = $lastEmi ? $lastEmi->remaining_due - $request->current_installment_amount : $request->due_amount - $request->current_installment_amount;
-        // $remaining_due_with_extras = $lastEmi ? $lastEmi->remaining_due_amount_with_extras - $request->current_installment_amount : $request->remaining_due_amount_with_extras - $request->current_installment_amount;
-        // $number_format_remaining_due = number_format((float)$remaining_due, 2, '.', '');
         $number_format_current_installment_amount = number_format((float)$request->current_installment_amount, 2, '.', '');
         $next_emi_date = Carbon::parse($request->emi_due_date)->addMonth()->format('Y-m-d');
-        // $total_paid_amount = $request->total_paid_amount + $request->current_installment_amount;
-
-        // $total_paid_amount_with_extras = $request->total_paid_amount_with_extras + $request->current_installment_amount;
 
         // Handle file upload
         $documentPath = null;
         if ($request->hasFile('check_ds_image')) {
-            $folder = public_path('emi_payment_document');
-            if (!file_exists($folder)) {
-                mkdir($folder, 0777, true); 
-            }
+            $path = $this->getUploadPath('emi_payment_document');
             $file = $request->file('check_ds_image');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move($folder, $fileName);
+            $file->move($path, $fileName);
+            Helper::imageResize($path . $fileName);
+            Helper::imageOptimize($path . $fileName);
             $documentPath = 'emi_payment_document/' . $fileName;
         }
 
@@ -95,11 +101,6 @@ class EmiController extends Controller
             'emi_due_date' => $request->emi_due_date,
             'emi_paid_date' => $request->emi_paying_date,
             'status' => $status,
-            // 'remaining_due' => $remaining_due,
-            // 'remaining_due_amount_with_extras' => $remaining_due_with_extras,
-            // 'total_paid_amount' => $request->total_paid_amount,
-            // 'total_paid_amount_with_extras' => $request->total_paid_amount_with_extras,
-            // 'remaining_emi_count' => $remaining_emi_count,
             'payment_method' => $request->payment_method,
             'trx_no' => $request->transaction_no,
             'document_path' => $documentPath,
@@ -323,20 +324,23 @@ class EmiController extends Controller
         $documentPath = $oldFile;
 
         if ($request->hasFile('check_ds_image_edit')) {
-            $folder = public_path('emi_payment_document');
-            if (!file_exists($folder)) {
-                mkdir($folder, 0777, true);
-            }
+
+            $path = $this->getUploadPath('emi_payment_document');
 
             // delete old file if exists
-            if ($oldFile && file_exists(public_path($oldFile))) {
-                unlink(public_path($oldFile));
+            if ($oldFile) {
+                $oldFullPath = base_path('../uploads/' . $oldFile); 
+                if (file_exists($oldFullPath)) {
+                    @unlink($oldFullPath);
+                }
             }
 
             // upload new one
             $file = $request->file('check_ds_image_edit');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move($folder, $fileName);
+            $file->move($path, $fileName);
+            Helper::imageResize($path . $fileName);
+            Helper::imageOptimize($path . $fileName);
             $documentPath = 'emi_payment_document/' . $fileName;
         }
 
@@ -356,9 +360,24 @@ class EmiController extends Controller
 
     public function destroy($id)
     {
-        $emi = EmiPayment::findOrFail($id);
-        Invoices::where('emi_id', $id)->delete();
-        $emi->delete();
+        DB::transaction(function () use ($id) {
+
+            $emi = EmiPayment::findOrFail($id);
+
+            if ($emi->document_path) {
+                $oldFullPath = base_path('../uploads/' . $emi->document_path);
+                if (file_exists($oldFullPath)) {
+                    if (!@unlink($oldFullPath)) {
+                        throw new \Exception("Could not delete file: {$oldFullPath}");
+                    }
+                }
+            }
+
+            Invoices::where('emi_id', $id)->delete();
+
+            $emi->delete();
+
+        });
 
         return redirect()->back()->with('success', 'EMI deleted successfully.');
     }

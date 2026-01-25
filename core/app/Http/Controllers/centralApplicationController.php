@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CentralApplication;
+use Illuminate\Support\Facades\File;
+use App\Helpers\Helper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\CentralApplicationAttachment;
@@ -10,6 +12,19 @@ use Illuminate\Support\Facades\Storage;
 
 class centralApplicationController extends Controller
 {
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
+
+        $path = $basePath . $subFolder . '/';
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -23,7 +38,6 @@ class centralApplicationController extends Controller
         ]);
 
         $user = Auth::guard('user')->user();
-
         DB::beginTransaction();
 
         try {
@@ -40,20 +54,21 @@ class centralApplicationController extends Controller
             // Save attachments (if any)
             if ($request->hasFile('attachments')) {
 
-                $storagePath = 'central_applications';
-                if (!Storage::disk('public')->exists($storagePath)) {
-                    Storage::disk('public')->makeDirectory($storagePath);
-                }
-
                 foreach ($request->file('attachments') as $file) {
 
-                    $path = $file->store('central_applications', 'public');
+                    $path = $this->getUploadPath('central_applications');
+                    $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+
+                    $fileSize = $file->getSize();
+                    $file->move($path, $fileName);
+                    Helper::imageResize($path . $fileName);
+                    Helper::imageOptimize($path . $fileName);
 
                     CentralApplicationAttachment::create([
                         'central_application_id' => $application->id,
-                        'file_path' => $path,
-                        'file_name' => $file->getClientOriginalName(),
-                        'file_size' => $file->getSize(),
+                        'file_path' => 'central_applications/'.$fileName,
+                        'file_name' => $fileName,
+                        'file_size' => $fileSize,
                     ]);
                 }
             }

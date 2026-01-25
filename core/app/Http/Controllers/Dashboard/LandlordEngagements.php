@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Dashboard;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PriceModel;
@@ -16,6 +18,7 @@ use App\Models\EngagementProjectDocument;;
 use App\Models\EngagementFlatDocument;
 use App\Models\EngagementMaterial;
 use App\Models\Topic;
+use App\Models\LandlordFacilities;
 use Auth;
 
 class LandlordEngagements extends Controller
@@ -48,6 +51,19 @@ class LandlordEngagements extends Controller
         return view("dashboard.landlord-engagements.create", compact("GeneralWebmasterSections", "contacts", "documentTypes", "materialTypes"));
     }
 
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
+        $path = $basePath . $subFolder . '/';
+
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -75,6 +91,12 @@ class LandlordEngagements extends Controller
 
         DB::transaction(function () use ($request) {
 
+            LandlordFacilities::create([
+                'project_id'        => $request->project_id,
+                'number_of_parking'  => $request->number_of_parking ?? 0,
+                'number_of_gas_connection' => $request->number_of_gas_connection ?? 0,
+                'number_of_utility' => $request->number_of_utility ?? 0,
+            ]);
             /* ===============================
             0️⃣ Project Documents
             =============================== */
@@ -82,18 +104,25 @@ class LandlordEngagements extends Controller
 
                 foreach ($request->project_document_type_id as $index => $docTypeId) {
 
-                    if (!$docTypeId) continue;
+                    if (!$docTypeId) {
+                        continue;
+                    }
 
                     $file = $request->file("project_document.$index");
-                    if (!$file) continue;
+
+                    if (!$file) {
+                        continue;
+                    }
+
+                    $path = $this->getUploadPath('project_documents_landlord');
+
+                    $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $fileName);
 
                     EngagementProjectDocument::create([
                         'project_id'        => $request->project_id,
                         'document_type_id'  => $docTypeId,
-                        'file_path'  => $file->store(
-                            'uploads/project_documents',
-                            'public'
-                        ),
+                        'file_path'         => 'project_documents_landlord/' . $fileName,
                     ]);
                 }
             }
@@ -117,7 +146,7 @@ class LandlordEngagements extends Controller
                     'flat_id'     => $flatId,
                 ]);
 
-                // 🔑 flat_id => engagement_id
+                //  flat_id => engagement_id
                 $engagementMap[$flatId] = $engagement->id;
             }
 
@@ -136,18 +165,28 @@ class LandlordEngagements extends Controller
 
                     foreach ($docTypes as $index => $docTypeId) {
 
-                        if (!$docTypeId) continue;
+                        if (!$docTypeId) {
+                            continue;
+                        }
 
                         $file = $request->file("flat_document.$flatId.$index");
-                        if (!$file) continue;
+
+                        if (!$file) {
+                            continue;
+                        }
+
+                        $path = $this->getUploadPath('flat_documents_landlord');
+
+                        $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                        $file->move($path, $fileName);
+
+                        Helper::imageResize($path . $fileName);
+                        Helper::imageOptimize($path . $fileName);
 
                         EngagementFlatDocument::create([
                             'engagement_id'    => $engagementId,
                             'document_type_id' => $docTypeId,
-                            'file_path'    => $file->store(
-                                'uploads/flat_documents',
-                                'public'
-                            ),
+                            'file_path'        => 'flat_documents_landlord/' . $fileName,
                         ]);
                     }
                 }
@@ -168,17 +207,31 @@ class LandlordEngagements extends Controller
 
                     foreach ($materials as $index => $materialTypeId) {
 
-                        if (!$materialTypeId) continue;
-
                         $file = $request->file("material_document.$flatId.$index");
 
+                        // skip if no material type
+                        if (!$materialTypeId) {
+                            continue;
+                        }
+
+                        $fileName = null;
+
+                        if ($file) {
+                            $path = $this->getUploadPath('material_documents_landlord');
+
+                            $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                            $file->move($path, $fileName);
+
+                            // optional image processing
+                            Helper::imageResize($path . $fileName);
+                            Helper::imageOptimize($path . $fileName);
+                        }
+
                         EngagementMaterial::create([
-                            'engagement_id'     => $engagementId,
-                            'material_type_id'  => $materialTypeId,
-                            'material_details'  => $request->material_details[$flatId][$index] ?? null,
-                            'material_documents' => $file
-                                ? $file->store('uploads/material_documents', 'public')
-                                : null,
+                            'engagement_id'      => $engagementId,
+                            'material_type_id'   => $materialTypeId,
+                            'material_details'   => $request->material_details[$flatId][$index] ?? null,
+                            'material_documents' => 'material_documents_landlord/' . $fileName,
                         ]);
                     }
                 }
@@ -242,25 +295,10 @@ class LandlordEngagements extends Controller
             /* ===============================
              DELETE REMOVED ITEMS
             =============================== */
-            EngagementProjectDocument::whereIn(
-                'id',
-                $request->removed_project_docs ?? []
-            )->delete();
-
-            EngagementFlatDocument::whereIn(
-                'id',
-                $request->removed_flat_docs ?? []
-            )->delete();
-
-            EngagementMaterial::whereIn(
-                'id',
-                $request->removed_materials ?? []
-            )->delete();
-
-            LandlordEngagement::whereIn(
-                'id',
-                $request->removed_engagements ?? []
-            )->delete();
+            EngagementProjectDocument::whereIn('id', $request->removed_project_docs ?? [])->delete();
+            EngagementFlatDocument::whereIn('id', $request->removed_flat_docs ?? [])->delete();
+            EngagementMaterial::whereIn('id', $request->removed_materials ?? [])->delete();
+            LandlordEngagement::whereIn('id', $request->removed_engagements ?? [])->delete();
 
             /* ===============================
             1️⃣ PROJECT DOCUMENTS (UPDATE / CREATE)
@@ -277,13 +315,23 @@ class LandlordEngagements extends Controller
                 }
 
                 $file = $request->file("project_document.$i");
+                if (!$file) {
+                    continue;
+                }
+
+                $path = $this->getUploadPath('project_documents_landlord');
+
+                $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $fileName);
 
                 EngagementProjectDocument::updateOrCreate(
                     [
                         'project_id'       => $projectId,
                         'document_type_id' => $typeId,
-                        'file_path'        => $file
-                            ? $file->store('uploads/project_documents', 'public')
+                    ],
+                    [
+                        'file_path' => $file
+                            ? 'project_documents_landlord/' . $fileName
                             : $request->old_project_document[$i] ?? null
                     ]
                 );
@@ -315,7 +363,7 @@ class LandlordEngagements extends Controller
 
 
             /* ===============================
-            3️⃣ FLAT DOCUMENTS
+             FLAT DOCUMENTS
             =============================== */
             foreach ($request->flat_document_type_id ?? [] as $flatId => $types) {
 
@@ -327,6 +375,15 @@ class LandlordEngagements extends Controller
 
                     $file = $request->file("flat_document.$flatId.$idx");
 
+                    if (!$file) {
+                        continue;
+                    }
+
+                    $path = $this->getUploadPath('flat_documents_landlord');
+
+                    $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $fileName);
+
                     EngagementFlatDocument::updateOrCreate(
                         [
                             'engagement_id'    => $engagementMap[$flatId],
@@ -334,7 +391,7 @@ class LandlordEngagements extends Controller
                         ],
                         [
                             'file_path' => $file
-                                ? $file->store('uploads/flat_documents', 'public')
+                                ? 'flat_documents_landlord/' . $fileName
                                 : $request->old_flat_document[$flatId][$idx] ?? null
                         ]
                     );
@@ -355,6 +412,14 @@ class LandlordEngagements extends Controller
                     if (!$typeId) continue;
 
                     $file = $request->file("material_document.$flatId.$idx");
+                    if (!$file) {
+                        continue;
+                    }
+
+                    $path = $this->getUploadPath('material_documents_landlord');
+
+                    $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $fileName);
 
                     EngagementMaterial::updateOrCreate(
                         [
@@ -364,7 +429,7 @@ class LandlordEngagements extends Controller
                         [
                             'material_details'   => $request->material_details[$flatId][$idx] ?? null,
                             'material_documents' => $file
-                                ? $file->store('uploads/material_documents', 'public')
+                                ? 'material_documents_landlord/' . $fileName
                                 : $request->old_material_document[$flatId][$idx] ?? null
                         ]
                     );
@@ -385,56 +450,78 @@ class LandlordEngagements extends Controller
      */
     public function destroy($projectId)
     {
-        DB::transaction(function () use ($projectId) {
+        // ===============================
+        // 1️⃣ Collect all file paths first
+        // ===============================
+        $filesToDelete = [];
 
-            // ===============================
-            // PROJECT DOCUMENTS
-            // ===============================
-            $projectDocs = EngagementProjectDocument::where('project_id', $projectId)->get();
+        $projectDocs = EngagementProjectDocument::where('project_id', $projectId)->get();
+        foreach ($projectDocs as $doc) {
+            if ($doc->file_path) {
+                $filesToDelete[] = $doc->file_path;
+            }
+        }
 
-            foreach ($projectDocs as $doc) {
-                if ($doc->file_path && Storage::disk('public')->exists($doc->file_path)) {
-                    Storage::disk('public')->delete($doc->file_path);
+        $engagements = LandlordEngagement::with(['flatDocuments', 'materials'])
+            ->where('project_id', $projectId)
+            ->get();
+
+        foreach ($engagements as $eng) {
+
+            foreach ($eng->flatDocuments as $flatDoc) {
+                if ($flatDoc->file_path) {
+                    $filesToDelete[] = $flatDoc->file_path;
                 }
             }
 
+            foreach ($eng->materials as $material) {
+                if ($material->material_documents) {
+                    $filesToDelete[] = $material->material_documents;
+                }
+            }
+        }
+        // ===============================
+        //  DB Transaction
+        // ===============================
+        DB::beginTransaction();
+
+        try {
+
+            LandlordFacilities::where('project_id', $projectId)->delete();
             EngagementProjectDocument::where('project_id', $projectId)->delete();
 
-            // ===============================
-            // ENGAGEMENTS
-            // ===============================
-            $engagements = LandlordEngagement::where('project_id', $projectId)->get();
-
             foreach ($engagements as $eng) {
-
-                // ---------- Flat Documents ----------
-                foreach ($eng->flatDocuments as $flatDoc) {
-                    if ($flatDoc->file_path && Storage::disk('public')->exists($flatDoc->file_path)) {
-                        Storage::disk('public')->delete($flatDoc->file_path);
-                    }
-                }
-                EngagementFlatDocument::where('engagement_id', $eng->id)->delete();
-
-                // ---------- Materials ----------
-                foreach ($eng->materials as $material) {
-                    if (
-                        $material->material_documents &&
-                        Storage::disk('public')->exists($material->material_documents)
-                    ) {
-                        Storage::disk('public')->delete($material->material_documents);
-                    }
-                }
-                EngagementMaterial::where('engagement_id', $eng->id)->delete();
+                $eng->flatDocuments()->delete();
+                $eng->materials()->delete();
             }
 
-            // ===============================
-            // DELETE ENGAGEMENTS
-            // ===============================
             LandlordEngagement::where('project_id', $projectId)->delete();
-        });
+
+            DB::commit();
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            \Log::error('Project delete failed', [
+                'project_id' => $projectId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors(['error' => 'Delete failed.']);
+        }
+
+        // ===============================
+        // 3️⃣ Delete files AFTER DB commit
+        // ===============================
+        foreach ($filesToDelete as $file) {
+            $fullPath = base_path('../uploads/' . $file);
+
+            if (file_exists($fullPath)) {
+                @unlink($fullPath);
+            }
+        }
 
         return back()->with('success', 'Project, engagements & all files deleted successfully');
     }
-
-
 }

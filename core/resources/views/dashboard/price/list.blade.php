@@ -123,7 +123,7 @@
                                                    target="_blank"><i
                                                         class="material-icons">&#xe8f4;</i> {{ __('backend.preview') }}
                                                 </a>
-                                                @if(@Auth::user()->permissionsGroup->edit_status && !$price->is_cancelled)
+                                                @if(@Auth::user()->permissionsGroup->edit_status && !$price->is_cancelled && app()->environment('local'))
                                                     <a class="dropdown-item"
                                                        href="{{ route('price.edit', ['id'=>$price->id]) }}"><i
                                                             class="material-icons">&#xe3c9;</i> {{ __('backend.edit') }}

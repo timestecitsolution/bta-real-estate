@@ -41,7 +41,7 @@
                         @if($emi->document_path)
                             <div class="mt-2">
                                 <p>Current Document:</p>
-                                <a href="{{ route('emi.document.show', $emi->id) }}" target="_blank" class="btn btn-sm btn-info">
+                                <a href="{{ asset('uploads/' . $emi->document_path) }}" target="_blank" class="btn btn-sm btn-info">
                                     Preview
                                 </a>
                             </div>

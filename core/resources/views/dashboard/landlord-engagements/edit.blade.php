@@ -73,7 +73,7 @@
                             {{-- FILE --}}
                             <div class="col-sm-4">
                                 <div class="file-preview mb-1">
-                                    <a href="{{ asset('storage/'.$doc->file_path) }}"
+                                    <a href="{{ asset('uploads/'.$doc->file_path) }}"
                                     target="_blank"
                                     class="btn btn-sm btn-info">
                                         View
@@ -196,10 +196,14 @@
                         </div>
 
                         <div class="col-sm-4">
-                            <input type="file" name="flat_document[{{ $engagement->flat->id }}][]" class="form-control">
-                            <div class="file-preview">
-                                <small class="text-muted">Existing: {{ basename($doc->file_path) }}</small>
+                            <div class="file-preview mb-1">
+                                <a href="{{ asset('uploads/'.$doc->file_path) }}"
+                                target="_blank"
+                                class="btn btn-sm btn-info">
+                                    View
+                                </a>
                             </div>
+                            <input type="file" name="flat_document[{{ $engagement->flat->id }}][]" class="form-control">
                         </div>
 
                         <div class="col-sm-2">
@@ -262,12 +266,16 @@
                         </div>
 
                         <div class="col-sm-2">
-                            <input type="file" name="material_document[{{ $engagement->flat->id }}][]" class="form-control">
                             @if($m->material_documents)
-                            <div class="file-preview">
-                                <small>{{ basename($m->material_documents) }}</small>
+                            <div class="file-preview mb-1">
+                                <a href="{{ asset('uploads/'.$m->material_documents) }}"
+                                target="_blank"
+                                class="btn btn-sm btn-info">
+                                    View
+                                </a>
                             </div>
                             @endif
+                            <input type="file" name="material_document[{{ $engagement->flat->id }}][]" class="form-control">
                         </div>
 
                         <div class="col-sm-2">

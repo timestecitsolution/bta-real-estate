@@ -77,15 +77,9 @@
                             @endphp
 
                             <li>
-                                @if($isImage)
-                                    <a href="#" class="attachment-preview" data-url="{{ $fileUrl }}" data-name="{{ $attachment->file_name }}">
-                                        {{ $attachment->file_name }}
-                                    </a>
-                                @else
-                                    <a href="{{ $fileUrl }}" target="_blank" download>
-                                        {{ $attachment->file_name }}
-                                    </a>
-                                @endif
+                                <a href="{{ asset('uploads/'.$attachment->file_path) }}" target="_blank">
+                                    {{ $attachment->file_name }}
+                                </a>
                             </li>
                         @endforeach
                     </ul>

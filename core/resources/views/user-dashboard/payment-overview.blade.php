@@ -118,13 +118,8 @@
                             @if($emi->document_path)
                                 <div>
                                     {{-- Preview Button --}}
-                                    <a href="{{ route('emi.document.show', $emi->id) }}" target="_blank" class="btn btn-sm btn-info">
+                                    <a href="{{ asset('uploads/' . $emi->document_path) }}" target="_blank" class="btn btn-sm btn-info">
                                         Preview
-                                    </a>
-
-                                    {{-- Download Button --}}
-                                    <a href="{{ route('emi.document.download', $emi->id) }}" class="btn btn-sm btn-success">
-                                        Download
                                     </a>
                                 </div>
                             @else

@@ -128,9 +128,8 @@
                                             @forelse($engagement->flatDocuments as $fd)
                                                 <div class="mb-1">
                                                     <strong>{{ $fd->documentType->name ?? 'Document' }}</strong><br>
-                                                    <a href="{{ asset($fd->file_path) }}"
-                                                    class="btn btn-xs btn-info"
-                                                    download>
+                                                    <a href="{{ asset('uploads/' . $fd->file_path) }}"
+                                                    class="btn btn-xs btn-info" target="_blank">
                                                         Download
                                                     </a>
                                                 </div>
@@ -148,9 +147,8 @@
                                                     Note: {{ $m->material_details ?? '' }}<br>
 
                                                     @if($m->material_documents)
-                                                        <a href="{{ asset('storage/' . $m->material_documents) }}"
-                                                        class="btn btn-xs btn-warning"
-                                                        download>
+                                                        <a href="{{ asset('uploads/' . $m->material_documents) }}"
+                                                        class="btn btn-xs btn-warning" target="_blank">
                                                             Download
                                                         </a>
                                                     @endif
@@ -170,11 +168,12 @@
                                                     </button>
 
                                                     <div class="dropdown-menu pull-right">
-                                                        <a class="dropdown-item"
-                                                        href="{{ route('landlord-engagements.edit', $projectId) }}">
-                                                            <i class="material-icons">&#xe3c9;</i> Edit
-                                                        </a>
-
+                                                        @if(@Auth::user()->permissionsGroup->edit_status && app()->environment('local'))
+                                                            <a class="dropdown-item"
+                                                            href="{{ route('landlord-engagements.edit', $projectId) }}">
+                                                                <i class="material-icons">&#xe3c9;</i> Edit
+                                                            </a>
+                                                        @endif
                                                         <a class="dropdown-item text-danger"
                                                         onclick="DeleteProjectEng('{{ $projectId }}')">
                                                             <i class="material-icons">&#xe872;</i> Delete
