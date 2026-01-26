@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Models\BookingQuery;
 use App\Models\WebmasterSection;
@@ -22,6 +23,18 @@ class ClientVisitRequestController extends Controller
         return view('dashboard.client-visit-requests.list', compact('requests', 'GeneralWebmasterSections'));
     }
 
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
+        $path = $basePath . $subFolder . '/';
+
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -73,20 +86,29 @@ class ClientVisitRequestController extends Controller
      */
     public function destroy(string $id)
     {
+
         DB::beginTransaction();
 
         try {
             $booking = BookingQuery::findOrFail($id);
+            if($booking->nid_front_pic){
+                $filePath = $this->getUploadPath('') . $booking->nid_front_pic;
 
-            //  Delete files if exist
-            if ($booking->nid_front_pic && Storage::disk('public')->exists($booking->nid_front_pic)) {
-                Storage::disk('public')->delete($booking->nid_front_pic);
+                if (!empty($filePath) && file_exists($filePath) && is_file($filePath)) {
+                    if (is_writable($filePath)) {
+                        unlink($filePath);
+                    }
+                }
             }
+            if($booking->nid_back_pic){
+                $filePath = $this->getUploadPath('') . $booking->nid_back_pic;
 
-            if ($booking->nid_back_pic && Storage::disk('public')->exists($booking->nid_back_pic)) {
-                Storage::disk('public')->delete($booking->nid_back_pic);
+                if (!empty($filePath) && file_exists($filePath) && is_file($filePath)) {
+                    if (is_writable($filePath)) {
+                        unlink($filePath);
+                    }
+                }
             }
-
             //  Delete DB row
             $booking->delete();
 

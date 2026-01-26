@@ -53,15 +53,6 @@ class LandQueryController extends Controller
 
         if ($request->$formFileName) {
             foreach ($request->file($formFileName) as $file) {
-                // $fileFinalName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
-
-                // $uploadPath = base_path('../uploads/land_query');
-
-                // if (!file_exists($uploadPath)) {
-                //     mkdir($uploadPath, 0777, true);
-                // }
-
-                // $file->move($uploadPath, $fileFinalName);
 
                 if (!$file) {
                     continue;
@@ -111,7 +102,7 @@ class LandQueryController extends Controller
             // Delete attachments
             if (!empty($landquery->attachments)) {
                 foreach ($landquery->attachments as $fileName) {
-                    $filePath = base_path('../uploads/land_query/' . $fileName);
+                    $filePath = $this->getUploadPath('land_query') . $fileName;
                     if (!empty($filePath) && file_exists($filePath) && is_file($filePath)) {
                         if (is_writable($filePath)) {
                             unlink($filePath);
