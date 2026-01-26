@@ -125,7 +125,7 @@ class PriceController extends Controller
             foreach ($request->document_type_id as $index => $docTypeId) {
                 if ($docTypeId && isset($request->document[$index])) {
                     $file = $request->file('document')[$index];
-                    $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                    $fileName = time().'_'.$file->getClientOriginalName();;
                     $file->move($path, $fileName);
                     Helper::imageResize($path . $fileName);
                     Helper::imageOptimize($path . $fileName);
@@ -274,6 +274,150 @@ class PriceController extends Controller
      * Update the specified resource in storage.
      */
 
+    // public function update(Request $request, string $id)
+    // {
+    //     $request->validate([
+    //         'project_id' => 'required|max:255',
+    //         'flat_id' => 'required|numeric',
+    //         'flat_size' => 'required|numeric',
+    //         'customer_id' => 'required|string',
+    //         'is_negotiable_total_price' => 'nullable|in:0,1',
+    //         'price_per_sqft' => [
+    //             'nullable',
+    //             'numeric',
+    //             function ($attribute, $value, $fail) use ($request) {
+    //                 if ($request->input('is_negotiable_total_price') == 0 && empty($value)) {
+    //                     $fail('The '.$attribute.' field is required when negotiation is not selected.');
+    //                 }
+    //             }
+    //         ],
+    //         'price' => 'required|numeric',
+    //         'emi' => 'required|string',
+    //         'booking_amount' => 'required|string',
+    //         'downpayment_amount' => 'required|string',
+    //         'due_amount' => 'required|string',
+    //         'emi_count' => 'required|string',
+    //         'emi_start_date' => 'required|string',
+    //         'is_applicable_govt_gas' => 'nullable|boolean',
+    //         'is_govt_gas_connection_paid' => 'nullable|boolean',
+    //         'govt_gas_connection_payment_scheme' => 'nullable|string',
+    //         'gas_amount' => 'nullable|numeric',
+    //         'is_applicable_parking' => 'nullable|boolean',
+    //         'is_parking_paid' => 'nullable|boolean',
+    //         'parking_payment_scheme' => 'nullable|string',
+    //         'parking_amount' => 'nullable|numeric',
+    //         'is_utility_included' => 'nullable|boolean',
+    //         'utility_payment_scheme' => 'nullable|string',
+    //         'utility_amount' => 'nullable|numeric',
+    //         'extras_amount' => 'nullable|numeric',
+    //         'is_discount_applicable' => 'nullable|boolean',
+    //         'discount_amount' => 'nullable|numeric',
+    //         'document_type_id.*' => 'nullable|exists:document_types,id',
+    //         'document.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240|required_with:document_type_id.*',
+    //         'material_type_id.*' => 'nullable|exists:material_types,id',
+    //         'material_details.*' => 'nullable|required_with:material_type_id.*',
+    //     ]);
+    //     $price = PriceModel::findOrFail($id);
+    //     $price->update($request->except([
+    //         'document','document_type_id','document_ids',
+    //         'material_type_id','material_details','material_ids'
+    //     ]));
+
+    //     $existingDocs = FlatDocuments::where('price_id',$price->id)->get()->keyBy('id');
+    //     $submittedIds = $request->input('document_ids', []);
+
+    //     $toDelete = $existingDocs->keys()->diff(array_filter($submittedIds));
+    //     foreach($toDelete as $docId) {
+    //         $doc = $existingDocs[$docId];
+
+    //         $filePath = $this->getUploadPath('') . $doc->file_path;
+
+    //         if (!empty($filePath) && file_exists($filePath) && is_file($filePath)) {
+    //             if (is_writable($filePath)) {
+    //                 unlink($filePath);
+    //             }
+    //         }
+    //         $doc->delete();
+    //     }
+
+    //     if($request->has('document_type_id')){
+    //         foreach($request->document_type_id as $i => $docTypeId){
+    //             if(!$docTypeId) continue;
+    //             $filePath = null;
+    //             if($request->hasFile("document.$i")){
+    //                 $file = $request->file("document.$i");
+    //                 $fileName = time().'_'.$file->getClientOriginalName();
+    //                 $filePath = $this->getUploadPath('flat_documents_client') . $fileName;
+    //                 $path = $this->getUploadPath('flat_documents_client');
+    //                 $file->move($path, $fileName);
+    //             }
+
+    //             $docId = $submittedIds[$i] ?? null;
+
+    //             if($docId && isset($existingDocs[$docId])){
+    //                 $doc = $existingDocs[$docId];
+    //                 $oldFilePath = $this->getUploadPath('') . $doc->file_path;
+    //                 $doc->document_type_id = $docTypeId;
+    //                     if(!empty($oldFilePath) && file_exists($oldFilePath) && is_file($oldFilePath)){
+    //                         if (is_writable($oldFilePath)) {
+    //                             unlink($oldFilePath);
+    //                         }
+    //                         $doc->file_path = 'flat_documents_client/' . $fileName;
+    //                     }
+    //                 $doc->save();
+    //             } else {
+    //                 if($filePath){
+    //                     FlatDocuments::create([
+    //                         'price_id' => $price->id,
+    //                         'document_type_id' => $docTypeId,
+    //                         'file_path' => 'flat_documents_client/' . $fileName,
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     /*---------------------------------------------------
+    //     | MATERIAL UPDATE LOGIC  
+    //     ----------------------------------------------------*/
+    //     $existingMaterials = MaterialDetails::where('price_id', $price->id)->get()->keyBy('id');
+    //     $submittedMaterialIds = $request->input('material_ids', []);
+
+    //     // Delete removed material rows
+    //     $materialsToDelete = $existingMaterials->keys()->diff(array_filter($submittedMaterialIds));
+    //     foreach($materialsToDelete as $matId){
+    //         $existingMaterials[$matId]->delete();
+    //     }
+
+    //     // Add or update materials
+    //     if($request->has('material_type_id')){
+    //         foreach($request->material_type_id as $i => $matTypeId){
+    //             $details = $request->material_details[$i] ?? null;
+    //             $matId = $submittedMaterialIds[$i] ?? null;
+
+    //             // skip empty rows
+    //             if(!$matTypeId && !$details) continue;
+
+    //             // update existing
+    //             if($matId && isset($existingMaterials[$matId])){
+    //                 $mat = $existingMaterials[$matId];
+    //                 $mat->material_type_id = $matTypeId;
+    //                 $mat->details = $details;
+    //                 $mat->save();
+    //             }
+    //             // create new
+    //             else {
+    //                 MaterialDetails::create([
+    //                     'price_id' => $price->id,
+    //                     'material_type_id' => $matTypeId,
+    //                     'details' => $details
+    //                 ]);
+    //             }
+    //         }
+    //     }
+    //     return redirect()->route('price')->with('success', 'Price and documents updated successfully!');
+    // }
+
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -298,118 +442,132 @@ class PriceController extends Controller
             'due_amount' => 'required|string',
             'emi_count' => 'required|string',
             'emi_start_date' => 'required|string',
-            'is_applicable_govt_gas' => 'nullable|boolean',
-            'is_govt_gas_connection_paid' => 'nullable|boolean',
-            'govt_gas_connection_payment_scheme' => 'nullable|string',
-            'gas_amount' => 'nullable|numeric',
-            'is_applicable_parking' => 'nullable|boolean',
-            'is_parking_paid' => 'nullable|boolean',
-            'parking_payment_scheme' => 'nullable|string',
-            'parking_amount' => 'nullable|numeric',
-            'is_utility_included' => 'nullable|boolean',
-            'utility_payment_scheme' => 'nullable|string',
-            'utility_amount' => 'nullable|numeric',
-            'extras_amount' => 'nullable|numeric',
-            'is_discount_applicable' => 'nullable|boolean',
-            'discount_amount' => 'nullable|numeric',
+
             'document_type_id.*' => 'nullable|exists:document_types,id',
             'document.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240|required_with:document_type_id.*',
+
             'material_type_id.*' => 'nullable|exists:material_types,id',
             'material_details.*' => 'nullable|required_with:material_type_id.*',
         ]);
+
+        /*----------------------------------
+        | UPDATE PRICE
+        ----------------------------------*/
         $price = PriceModel::findOrFail($id);
         $price->update($request->except([
-            'document','document_type_id','document_ids',
-            'material_type_id','material_details','material_ids'
+            'document', 'document_type_id', 'document_ids',
+            'material_type_id', 'material_details', 'material_ids'
         ]));
 
-        $existingDocs = FlatDocuments::where('price_id',$price->id)->get()->keyBy('id');
+        /*----------------------------------
+        | DOCUMENT UPDATE
+        ----------------------------------*/
+        $existingDocs = FlatDocuments::where('price_id', $price->id)->get()->keyBy('id');
         $submittedIds = $request->input('document_ids', []);
 
+        // DELETE REMOVED DOCUMENTS
         $toDelete = $existingDocs->keys()->diff(array_filter($submittedIds));
-        foreach($toDelete as $docId) {
+        foreach ($toDelete as $docId) {
             $doc = $existingDocs[$docId];
-            if($doc->file_path && \Storage::disk('public')->exists($doc->file_path)) {
-                \Storage::disk('public')->delete($doc->file_path);
+
+            $oldPath = $this->getUploadPath('') . $doc->file_path;
+            if (file_exists($oldPath) && is_file($oldPath)) {
+                @unlink($oldPath);
             }
+
             $doc->delete();
         }
 
-        if($request->has('document_type_id')){
-            foreach($request->document_type_id as $i => $docTypeId){
-                if(!$docTypeId) continue;
-                $filePath = null;
-                if($request->hasFile("document.$i")){
-                    $file = $request->file("document.$i");
-                    $fileName = time().'_'.$file->getClientOriginalName();
-                    $filePath = $file->storeAs('uploads/flat_documents', $fileName,'public');
-                }
+        // ADD / UPDATE DOCUMENTS
+        if ($request->has('document_type_id')) {
+            foreach ($request->document_type_id as $i => $docTypeId) {
+
+                if (!$docTypeId) continue;
 
                 $docId = $submittedIds[$i] ?? null;
 
-                if($docId && isset($existingDocs[$docId])){
+                // UPDATE EXISTING
+                if ($docId && isset($existingDocs[$docId])) {
+
                     $doc = $existingDocs[$docId];
                     $doc->document_type_id = $docTypeId;
-                    if($filePath){
-                        if($doc->file_path && \Storage::disk('public')->exists($doc->file_path)){
-                            \Storage::disk('public')->delete($doc->file_path);
+
+                    // NEW FILE UPLOADED?
+                    if ($request->hasFile("document.$i")) {
+
+                        // DELETE OLD FILE
+                        $oldPath = $this->getUploadPath('') . $doc->file_path;
+                        if (file_exists($oldPath) && is_file($oldPath)) {
+                            @unlink($oldPath);
                         }
-                        $doc->file_path = $filePath;
+
+                        // UPLOAD NEW FILE
+                        $file = $request->file("document.$i");
+                        $fileName = time().'_'.$file->getClientOriginalName();
+                        $path = $this->getUploadPath('flat_documents_client');
+                        $file->move($path, $fileName);
+
+                        $doc->file_path = 'flat_documents_client/' . $fileName;
                     }
+
                     $doc->save();
-                } else {
-                    if($filePath){
+                }
+                // CREATE NEW
+                else {
+                    if ($request->hasFile("document.$i")) {
+
+                        $file = $request->file("document.$i");
+                        $fileName = time().'_'.$file->getClientOriginalName();
+                        $path = $this->getUploadPath('flat_documents_client');
+                        $file->move($path, $fileName);
+
                         FlatDocuments::create([
                             'price_id' => $price->id,
                             'document_type_id' => $docTypeId,
-                            'file_path' => $filePath,
+                            'file_path' => 'flat_documents_client/' . $fileName,
                         ]);
                     }
                 }
             }
         }
 
-        /*---------------------------------------------------
-        | MATERIAL UPDATE LOGIC  
-        ----------------------------------------------------*/
+        /*----------------------------------
+        | MATERIAL UPDATE
+        ----------------------------------*/
         $existingMaterials = MaterialDetails::where('price_id', $price->id)->get()->keyBy('id');
         $submittedMaterialIds = $request->input('material_ids', []);
 
-        // Delete removed material rows
-        $materialsToDelete = $existingMaterials->keys()->diff(array_filter($submittedMaterialIds));
-        foreach($materialsToDelete as $matId){
+        $toDeleteMaterials = $existingMaterials->keys()->diff(array_filter($submittedMaterialIds));
+        foreach ($toDeleteMaterials as $matId) {
             $existingMaterials[$matId]->delete();
         }
 
-        // Add or update materials
-        if($request->has('material_type_id')){
-            foreach($request->material_type_id as $i => $matTypeId){
+        if ($request->has('material_type_id')) {
+            foreach ($request->material_type_id as $i => $matTypeId) {
+
                 $details = $request->material_details[$i] ?? null;
                 $matId = $submittedMaterialIds[$i] ?? null;
 
-                // skip empty rows
-                if(!$matTypeId && !$details) continue;
+                if (!$matTypeId && !$details) continue;
 
-                // update existing
-                if($matId && isset($existingMaterials[$matId])){
+                if ($matId && isset($existingMaterials[$matId])) {
                     $mat = $existingMaterials[$matId];
                     $mat->material_type_id = $matTypeId;
                     $mat->details = $details;
                     $mat->save();
-                }
-                // create new
-                else {
+                } else {
                     MaterialDetails::create([
                         'price_id' => $price->id,
                         'material_type_id' => $matTypeId,
-                        'details' => $details
+                        'details' => $details,
                     ]);
                 }
             }
         }
-        return redirect()->route('price')->with('success', 'Price and documents updated successfully!');
-    }
 
+        return redirect()->route('price')
+            ->with('success', 'Price, documents and materials updated successfully!');
+    }
 
     public function downloadDocument($id)
     {
@@ -427,30 +585,74 @@ class PriceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    // public function destroy(string $id)
+    // {
+    //     $price = PriceModel::find($id);
+
+    //     if ($price) {
+    //         $documents = FlatDocuments::where('price_id', $price->id)->get();
+    //         foreach ($documents as $doc) {
+    //             // $filePath = public_path($doc->file_path);
+    //             $relativePath = $doc->file_path;
+    //             $fullPath = base_path('../uploads/' . $relativePath);
+                 
+    //             if (file_exists($fullPath)) {
+    //                 unlink($fullPath); 
+    //             }
+    //             $doc->delete();
+    //         }
+    //         EmiPayment::where('price_id', $id)->delete();
+    //         Invoices::where('price_id', $id)->delete();
+    //         $price->delete();
+
+    //         return redirect()->route('price')->with('success', 'Price and related documents deleted successfully!');
+    //     } else {
+    //         return redirect()->back()->with('error', 'Price not found.');
+    //     }
+    // }
+
     public function destroy(string $id)
     {
         $price = PriceModel::find($id);
 
-        if ($price) {
-            $documents = FlatDocuments::where('price_id', $price->id)->get();
-            foreach ($documents as $doc) {
-                // $filePath = public_path($doc->file_path);
-                $relativePath = $doc->file_path;
-                $fullPath = base_path('../uploads/' . $relativePath);
-                 
-                if (file_exists($fullPath)) {
-                    unlink($fullPath); 
-                }
-                $doc->delete();
-            }
-            EmiPayment::where('price_id', $id)->delete();
-            Invoices::where('price_id', $id)->delete();
-            $price->delete();
-
-            return redirect()->route('price')->with('success', 'Price and related documents deleted successfully!');
-        } else {
+        if (!$price) {
             return redirect()->back()->with('error', 'Price not found.');
         }
+
+        /*----------------------------------
+        | DELETE DOCUMENT FILES + RECORDS
+        ----------------------------------*/
+        $documents = FlatDocuments::where('price_id', $price->id)->get();
+
+        foreach ($documents as $doc) {
+
+            if ($doc->file_path) {
+
+                // full physical path
+                $fullPath = $this->getUploadPath('') . $doc->file_path;
+
+                if (file_exists($fullPath) && is_file($fullPath)) {
+                    @unlink($fullPath);
+                }
+            }
+
+            $doc->delete();
+        }
+
+        /*----------------------------------
+        | DELETE RELATED DATA
+        ----------------------------------*/
+        EmiPayment::where('price_id', $price->id)->delete();
+        Invoices::where('price_id', $price->id)->delete();
+
+        /*----------------------------------
+        | DELETE PRICE
+        ----------------------------------*/
+        $price->delete();
+
+        return redirect()
+            ->route('price')
+            ->with('success', 'Price and all related data deleted successfully!');
     }
 
     public function cancelDeal(Request $request)

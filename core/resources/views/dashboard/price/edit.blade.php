@@ -339,7 +339,7 @@
                         <div class="col-sm-4">
                             @if($doc->file_path)
                                 <span class="previous-file">
-                                    Previous: <a href="{{ route('price.downloadDocument', $doc->id) }}" download>{{ basename($doc->file_path) }}</a>
+                                    Previous: <a href="{{ asset('uploads/' . $doc->file_path) }}" target="_blank">{{ basename($doc->file_path) }}</a>
                                 </span>
                             @endif
                             {!! Form::file('document[]', ['class' => 'form-control','accept' => 'application/pdf,image/*']) !!}

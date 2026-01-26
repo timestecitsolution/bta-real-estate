@@ -90,10 +90,8 @@
                                     </td>
                                 </tr>
                             @endforeach
-
                             </tbody>
                         </table>
-
                     </div>
                     <footer class="dker p-a">
                         <div class="row">
