@@ -206,7 +206,7 @@
                         res.attachments.forEach(function (file) {
                             if (file) {
                                 $('#attachment_preview').append(`
-                                    <img src="/${file}" class="img-thumbnail mr-2 mb-2" width="120">
+                                    <img src="/uploads/land_query/${file}" class="img-thumbnail mr-2 mb-2" width="120">
                                 `);
                             }
                         });

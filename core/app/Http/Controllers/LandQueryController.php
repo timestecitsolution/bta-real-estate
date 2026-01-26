@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LandQuery;
+use Illuminate\Support\Facades\File;
 use App\Models\WebmasterSection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -17,6 +18,19 @@ class LandQueryController extends Controller
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
         $landQueries = LandQuery::orderBy('id', 'DESC')->get();
         return view('dashboard.land-query.list', compact('landQueries', 'GeneralWebmasterSections'));
+    }
+
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
+        $path = $basePath . $subFolder . '/';
+
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
     }
 
     public function submit(Request $request)
@@ -39,15 +53,24 @@ class LandQueryController extends Controller
 
         if ($request->$formFileName) {
             foreach ($request->file($formFileName) as $file) {
-                $fileFinalName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                // $fileFinalName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
 
-                $uploadPath = base_path('../uploads/land_query');
+                // $uploadPath = base_path('../uploads/land_query');
 
-                if (!file_exists($uploadPath)) {
-                    mkdir($uploadPath, 0777, true);
+                // if (!file_exists($uploadPath)) {
+                //     mkdir($uploadPath, 0777, true);
+                // }
+
+                // $file->move($uploadPath, $fileFinalName);
+
+                if (!$file) {
+                    continue;
                 }
 
-                $file->move($uploadPath, $fileFinalName);
+                $path = $this->getUploadPath('land_query');
+
+                $fileFinalName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $fileFinalName);
 
                 $filePaths[] =  $fileFinalName;
             }

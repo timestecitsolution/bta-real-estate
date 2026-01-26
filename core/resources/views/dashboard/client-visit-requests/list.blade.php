@@ -207,13 +207,13 @@
                     $('#message').text(res.message ?? '—');
 
                     if (res.nid_front_pic) {
-                        $('#nid_front_pic').attr('src', '/storage/' + res.nid_front_pic).show();
+                        $('#nid_front_pic').attr('src', '/uploads/' + res.nid_front_pic).show();
                     } else {
                         $('#nid_front_pic').hide();
                     }
 
                     if (res.nid_back_pic) {
-                        $('#nid_back_pic').attr('src', '/storage/' + res.nid_back_pic).show();
+                        $('#nid_back_pic').attr('src', '/uploads/' + res.nid_back_pic).show();
                     } else {
                         $('#nid_back_pic').hide();
                     }

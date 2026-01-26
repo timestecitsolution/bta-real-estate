@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BookingQuery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,19 @@ class BookingController extends Controller
     {
         $projects = Project::all();
         return view('booking.form', compact('projects'));
+    }
+
+    public function getUploadPath(string $subFolder = null)
+    {
+        $subFolder = $subFolder ?? 'misc';
+        $basePath = base_path('../uploads/');
+        $path = $basePath . $subFolder . '/';
+
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        return $path;
     }
 
     public function store(Request $request)
@@ -58,22 +72,32 @@ class BookingController extends Controller
         ]
         );
 
-        // Ensure folder exists
-        $uploadPath = storage_path('app/public/uploads/nid_pics');
-        if (!file_exists($uploadPath)) {
-            mkdir($uploadPath, 0755, true); 
-        }
-
         // Store files
         $nidFrontPath = null;
         $nidBackPath = null;
 
+        // ---------- NID FRONT ----------
         if ($request->hasFile('nid_front_pic')) {
-            $nidFrontPath = $request->file('nid_front_pic')->store('uploads/nid_pics', 'public');
+
+            $file = $request->file('nid_front_pic');
+            $path = $this->getUploadPath('visit_nid');
+
+            $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+
+            $nidFrontPath = 'visit_nid/' . $fileName;
         }
 
+        // ---------- NID BACK ----------
         if ($request->hasFile('nid_back_pic')) {
-            $nidBackPath = $request->file('nid_back_pic')->store('uploads/nid_pics', 'public');
+
+            $file = $request->file('nid_back_pic');
+            $path = $this->getUploadPath('visit_nid');
+
+            $fileName = time() . rand(1111, 9999) . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+
+            $nidBackPath = 'visit_nid/' . $fileName;
         }
 
         $validated['nid_front_pic'] = $nidFrontPath;
