@@ -120,7 +120,7 @@
 
                                         {{-- Flat --}}
                                         <td>
-                                            {{ $engagement->flat->title ?? 'No Flat' }}
+                                            {{ $engagement->flat->flat_name ?? 'No Flat' }}
                                         </td>
 
                                         {{-- Flat Documents --}}

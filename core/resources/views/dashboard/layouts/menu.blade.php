@@ -216,6 +216,32 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                         </a>
                     </li>
                     @endif
+                    @if(app()->environment('local'))
+                    <?php
+                        $currentFolder = "flat-booking"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('flat-booking') }}">
+                            <span class="nav-icon">
+                            <i class="material-icons">&#xe873;</i>
+                            </span>
+                            <span class="nav-text">Flat Booking</span>
+                        </a>
+                    </li>
+                    @endif
+                    <?php
+                        $currentFolder = "flats"; 
+                        $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
+                    ?>
+                    <li {{ ($PathCurrentFolder==$currentFolder) ? 'class=active' : '' }}>
+                        <a href="{{ route('flats') }}">
+                            <span class="nav-icon">
+                            <i class="material-icons">&#xe873;</i>
+                            </span>
+                            <span class="nav-text">Flats</span>
+                        </a>
+                    </li>
                     @if(@Auth::user()->permissionsGroup->document_type)
                     <?php
                         $currentFolder = "document-type"; 

@@ -132,7 +132,7 @@
                         data.forEach(function (flat) {
                             flatDropdown += `<option value="${flat.id}" 
                                 ${selectedFlat == flat.id ? 'selected' : ''}>
-                                ${flat.title}
+                                ${flat.flat_name}
                             </option>`;
                         });
                     }

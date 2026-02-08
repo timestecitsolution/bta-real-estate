@@ -1,24 +1,24 @@
+@php
+    $customers_from_allocated = $allocated_flats->pluck('customer');
+    $customers_from_prices    = $all_prices_details->pluck('customer');
+
+    $customers = $customers_from_allocated
+        ->merge($customers_from_prices)
+        ->unique('id')
+        ->values();
+@endphp
 <form id="resetDefaultForm">
     @csrf
 
     <div class="form-group">
         <label>Client</label>
         <select name="customer_id_select" id="customer_id_select" class="custom-select form-control" required>
-            @if($Contact->status == '2')
-                <option value="">Select Client</option>
-                @foreach($allocated_flats->pluck('customer')->unique('id') as $customer)
-                    <option value="{{ $customer->id }}">
-                        {{ $customer->first_name }} {{ $customer->last_name }}
-                    </option>
-                @endforeach
-            @else
-                <option value="">Select Client</option>
-                @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
-                    <option value="{{ $customer->id }}">
-                        {{ $customer->first_name }} {{ $customer->last_name }}
-                    </option>
-                @endforeach
-            @endif
+            <option value="">Select Client</option>
+            @foreach($customers as $customer)
+                <option value="{{ $customer->id }}">
+                    {{ $customer->first_name }} {{ $customer->last_name }}
+                </option>
+            @endforeach
         </select>
         @error('customer_id_select')
             <div class="invalid-feedback">{{ $message }}</div>

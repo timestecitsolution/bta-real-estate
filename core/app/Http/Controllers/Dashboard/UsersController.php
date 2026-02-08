@@ -37,14 +37,34 @@ class UsersController extends Controller
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
         // General END
 
+        // if (@Auth::user()->permissionsGroup->view_status) {
+        //     $Users = User::where('created_by', '=', Auth::user()->id)->orwhere('id', '=', Auth::user()->id)->orderby('id',
+        //         'asc')->paginate(config('smartend.backend_pagination'));
+        //     $Permissions = Permissions::where('created_by', '=', Auth::user()->id)->orderby('id', 'asc')->get();
+        // } else {
+        //     $Users = User::orderby('id', 'asc')->paginate(config('smartend.backend_pagination'));
+        //     $Permissions = Permissions::orderby('id', 'asc')->get();
+        // }
+        $query = User::where('permissions_id', '!=', 0);
+
         if (@Auth::user()->permissionsGroup->view_status) {
-            $Users = User::where('created_by', '=', Auth::user()->id)->orwhere('id', '=', Auth::user()->id)->orderby('id',
-                'asc')->paginate(config('smartend.backend_pagination'));
-            $Permissions = Permissions::where('created_by', '=', Auth::user()->id)->orderby('id', 'asc')->get();
+
+            $query->where(function ($q) {
+                $q->where('created_by', Auth::user()->id)
+                ->orWhere('id', Auth::user()->id);
+            });
+
+            $Permissions = Permissions::where('created_by', Auth::user()->id)
+                ->orderBy('id', 'asc')
+                ->get();
+
         } else {
-            $Users = User::orderby('id', 'asc')->paginate(config('smartend.backend_pagination'));
-            $Permissions = Permissions::orderby('id', 'asc')->get();
+
+            $Permissions = Permissions::orderBy('id', 'asc')->get();
         }
+
+        $Users = $query->orderBy('id', 'asc')->paginate(config('smartend.backend_pagination'));
+
         return view("dashboard.users.list", compact("Users", "Permissions", "GeneralWebmasterSections"));
     }
 

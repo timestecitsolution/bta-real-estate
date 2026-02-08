@@ -13,6 +13,8 @@ use App\Http\Controllers\Dashboard\TopicsController;
 use App\Http\Controllers\Dashboard\ContactsController;
 use App\Http\Controllers\Dashboard\LandlordEngagements;
 use App\Http\Controllers\Dashboard\PriceController;
+use App\Http\Controllers\Dashboard\FlatBookingController;
+use App\Http\Controllers\Dashboard\FlatController;
 use App\Http\Controllers\Dashboard\DocumentTypeController;
 use App\Http\Controllers\Dashboard\MaterialTypeController;
 use App\Http\Controllers\Dashboard\WebmailsController;
@@ -231,6 +233,18 @@ Route::get('/price/destroy/{id}', [PriceController::class, 'destroy'])->name('pr
 Route::get('/price/document/download/{id}', [PriceController::class, 'downloadDocument'])->name('price.downloadDocument');
 Route::post('/deal-cancel', [PriceController::class, 'cancelDeal'])->name('deal.cancel');
 Route::post('/deal-reopen', [PriceController::class, 'reopenDeal'])->name('deal.reopen');
+
+//Flat booking
+Route::get('/flat-booking', [FlatBookingController::class, 'index'])->name('flat-booking');
+Route::get('/flat-booking/create', [FlatBookingController::class, 'create'])->name('flat-booking.create');
+
+//Flat crud
+Route::get('/flats', [FlatController::class, 'index'])->name('flats');
+Route::get('/flats/create', [FlatController::class, 'create'])->name('flats.create');
+Route::post('/flats/store', [FlatController::class, 'store'])->name('flats.store');
+Route::get('/flats/{id}/edit', [FlatController::class, 'edit'])->name('flats.edit');
+Route::post('/flats/{id}/update', [FlatController::class, 'update'])->name('flats.update');
+Route::get('/flats/{id}', [FlatController::class, 'destroy'])->name('flats.destroy');
 
 // Document Type
 Route::get('/document-type', [DocumentTypeController::class, 'index'])->name('document-type');

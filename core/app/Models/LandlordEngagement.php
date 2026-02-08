@@ -27,7 +27,7 @@ class LandlordEngagement extends Model
 
     public function flat()
     {
-        return $this->belongsTo(Tags::class, 'flat_id');
+        return $this->belongsTo(FlatDetailsModel::class, 'flat_id');
     }
 
     public function customer()
@@ -43,5 +43,10 @@ class LandlordEngagement extends Model
     public function materials()
     {
         return $this->hasMany(EngagementMaterial::class, 'engagement_id');
+    }
+
+    public function facilities()
+    {
+        return $this->hasMany(LandlordFacilities::class, 'project_id');
     }
 }

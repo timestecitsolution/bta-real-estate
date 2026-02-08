@@ -7,6 +7,7 @@ use App\Models\ClientApplicationSubject;
 use App\Models\WebmasterSection;
 use Illuminate\Http\Request;
 use App\Models\ClientNotice;
+use App\Models\ClientNoticeFeedback;
 use App\Models\Contact;
 use Illuminate\Support\Facades\Auth;
 
@@ -112,16 +113,23 @@ class ClientNoticeController extends Controller
     public function action(Request $request){
         $user = auth()->user();
         dd($user);
+
         $request->validate([
-            'notice_id' => 'required|exists:client_notices,id',
+            'notice_id' => 'required|exists:client_notice,id',
             'status' => 'required|in:0,1,2',
             'feedback' => 'nullable|string',
         ]);
 
-        $clientNotice = ClientNotice::findOrFail($request->notice_id);
-        $clientNotice->update([
-            'status' => $request->status,
-            'feedback' => $request->feedback,
+        ClientNoticeFeedback::create([
+            'notice_id' => $request->notice_id,
+            'reviewer_status' => $request->feedback,
+            'reviewer_feedback' => $request->feedback,
+            's_admin_status' => $request->feedback,
+            's_admin_feedback' => $request->feedback,
+            'reviewed_by' => $request->feedback,
+            's_admin_actioned_by' => $request->feedback,
+            'reviewed_at' => $request->feedback,
+            's_admin_actioned_at' => $request->feedback,
         ]);
 
         return redirect()->route('client-notice')->with('success', 'Client Notice status updated successfully!');

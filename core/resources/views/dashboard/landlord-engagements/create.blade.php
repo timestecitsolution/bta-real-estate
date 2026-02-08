@@ -143,7 +143,7 @@ $projects = Helper::Topics(8);
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group row" id="flat_section" style="display: none;">
+                            <div class="form-group row" id="flat_section">
                                 <label for="flat_id" class="col-sm-2 form-control-label">Flat *</label>
                                 <div class="col-sm-10">
                                     <select class="form-control c-select flat-select" id="flat_id" name="flat_id[]" required>
@@ -351,17 +351,16 @@ $projects = Helper::Topics(8);
                     },
                     success: function (response) {
                         let options = '<option selected disabled>Select Flat</option>';
-
-                        if (response.tags.length > 0) {
-                            response.tags.forEach(tag => {
-                                options += `<option value="${tag.id}">${tag.title}</option>`;
+                        if (response.flats.length > 0) {
+                            response.flats.forEach(flat => {
+                                options += `<option value="${flat.id}">${flat.flat_name}</option>`;
                             });
 
                             $('#flat_id').html(options);
-                            $('#flat_section').show();
+                            // $('#flat_section').show();
                         } else {
-                            $('#flat_id').html('<option>No tags found</option>');
-                            $('#flat_section').hide();
+                            $('#flat_id').html('<option>No flats found</option>');
+                            // $('#flat_section').hide();
                         }
                     }
                 });
@@ -595,9 +594,9 @@ $projects = Helper::Topics(8);
                     data: { _token: '{{ csrf_token() }}', project_id: projectId },
                     success: function (response) {
                         let options = '<option value="">-- Select Flat --</option>';
-                        response.tags.forEach(tag => {
-                            let alreadyUsed = usedPairs.some(pair => pair.split("-")[1] == tag.id);
-                            if (!alreadyUsed) options += `<option value="${tag.id}">${tag.title}</option>`;
+                        response.flats.forEach(flat => {
+                            let alreadyUsed = usedPairs.some(pair => pair.split("-")[1] == flat.id);
+                            if (!alreadyUsed) options += `<option value="${flat.id}">${flat.flat_name}</option>`;
                         });
                         flatSelect.html(options);
                         flatSelect.closest(".flat-row").show();

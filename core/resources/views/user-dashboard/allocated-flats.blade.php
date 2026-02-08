@@ -51,7 +51,7 @@
                 <tr class="{{ $allocated_flat->is_cancelled ? 'table-danger' : '' }}">
                     <td data-label="SL">{{ $loop->iteration }}</td>
                     <td data-label="Landlord">{{ $allocated_flat->customer->first_name ?? 'N/A' }} {{ $allocated_flat->customer->last_name ?? '' }}</td>
-                    <td data-label="Flat">{{ $allocated_flat->flat->title ?? 'N/A' }}</td>
+                    <td data-label="Flat">{{ $allocated_flat->flat->flat_name ?? 'N/A' }}</td>
                     <td data-label="Project">{{ $allocated_flat->project->title_en ?? 'N/A' }}</td>
                     <td data-label="View Documents">
                         @if($existingDocuments->isNotEmpty())

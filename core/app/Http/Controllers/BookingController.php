@@ -112,6 +112,34 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Your visit booking request is submitted successfully!');
     }
 
+    public function getFlats_old(Request $request)
+    {
+        $priceFlatIds = DB::table('price')
+            ->pluck('flat_id')
+            ->toArray();
+
+        $engagedFlatIds = DB::table('landlord_engagements')
+            ->pluck('flat_id')
+            ->toArray();
+
+        $excludedFlatIds = array_unique(array_merge(
+            $priceFlatIds,
+            $engagedFlatIds
+        ));
+
+        $tags = DB::table('topic_tags')
+            ->join('tags', 'topic_tags.tag_id', '=', 'tags.id')
+            ->where('topic_tags.topic_id', $request->project_id)
+            ->when(!empty($excludedFlatIds), function ($q) use ($excludedFlatIds) {
+                $q->whereNotIn('tags.id', $excludedFlatIds);
+            })
+            ->select('tags.id', 'tags.title')
+            ->get();
+        return response()->json([
+            'tags' => $tags
+        ]);
+    }
+
     public function getFlats(Request $request)
     {
         $priceFlatIds = DB::table('price')
@@ -126,16 +154,19 @@ class BookingController extends Controller
             $priceFlatIds,
             $engagedFlatIds
         ));
-        $tags = DB::table('topic_tags')
-            ->join('tags', 'topic_tags.tag_id', '=', 'tags.id')
-            ->where('topic_tags.topic_id', $request->project_id)
+        $flats = DB::table('flat_details')
+            ->where('flat_details.project_id', $request->project_id)
+            // ->when(!empty($excludedFlatIds), function ($q) use ($excludedFlatIds) {
+            //     $q->whereNotIn('tags.id', $excludedFlatIds);
+            // })
+            // ->select('tags.id', 'tags.title')
             ->when(!empty($excludedFlatIds), function ($q) use ($excludedFlatIds) {
-                $q->whereNotIn('tags.id', $excludedFlatIds);
+                $q->whereNotIn('flat_details.id', $excludedFlatIds);
             })
-            ->select('tags.id', 'tags.title')
+            ->select('flat_details.id', 'flat_details.flat_name', 'flat_details.flat_size')
             ->get();
         return response()->json([
-            'tags' => $tags
+            'flats' => $flats
         ]);
     }
 

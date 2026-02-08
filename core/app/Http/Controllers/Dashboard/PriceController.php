@@ -58,7 +58,6 @@ class PriceController extends Controller
      */
     public function create($webmasterId = 8)
     {
-        // $contacts = Contact::all();
         $contacts = Contact::where('status', 1)->get();
         $documentTypes = DocumentType::all();
         $materialTypes = MaterialType::all();

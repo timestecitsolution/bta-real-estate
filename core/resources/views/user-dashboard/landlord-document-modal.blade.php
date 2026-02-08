@@ -14,7 +14,7 @@
                     @foreach($existingDocuments as $doc)
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             {{ $doc->documentType->document_type ?? 'Unknown' }}
-                            <a href="{{ asset($doc->file_path) }}" class="btn btn-sm btn-success" download>Download</a>
+                            <a href="{{ asset('uploads/'.$doc->file_path) }}" class="btn btn-sm btn-success" target="_blank">Download</a>
                         </li>
                     @endforeach
                 </ul>

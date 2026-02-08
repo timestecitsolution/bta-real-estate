@@ -29,9 +29,9 @@
                                 </td>
                                 <td>
                                     @if($material->material_documents)
-                                        <a href="{{ asset($material->material_documents) }}"
+                                        <a href="{{ asset('uploads/'.$material->material_documents) }}"
                                         class="btn btn-sm btn-success"
-                                        download>
+                                        target="_blank">
                                             Download
                                         </a>
                                     @else

@@ -33,6 +33,7 @@ class LandlordEngagements extends Controller
         // General for all pages
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
         $engagements = LandlordEngagement::with(['project','flat','customer', 'flatDocuments','materials'])->orderBy('id','DESC')->get();
+        // dd($engagements);
         // General END
         return view("dashboard.landlord-engagements.list", compact("GeneralWebmasterSections", "engagements"));
     }

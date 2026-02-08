@@ -52,45 +52,71 @@ class ContactsController extends Controller
         //List of Countries
         $Countries = Country::orderby('title_' . @Helper::currentLanguage()->code, 'asc')->get();
 
+        // if (@Auth::user()->permissionsGroup->view_status) {
+        //     if ($group_id > 0) {
+        //         //List of group contacts
+        //         $Contacts = Contact::where('created_by', '=', Auth::user()->id)->where('group_id', '=',
+        //             $group_id)->orderby('id',
+        //             'desc')->paginate(config('smartend.backend_pagination'));
+        //     } elseif ($group_id == "wait") {
+        //         //List waiting activation Contacts
+        //         $Contacts = Contact::where('created_by', '=', Auth::user()->id)->where('status', '=',
+        //             '0')->orderby('id',
+        //             'desc')->paginate(config('smartend.backend_pagination'));
+        //     } elseif ($group_id == "blocked") {
+        //         //List waiting activation Contacts
+        //         $Contacts = Contact::where('created_by', '=', Auth::user()->id)->where('status', '=',
+        //             '2')->orderby('id',
+        //             'desc')->paginate(config('smartend.backend_pagination'));
+        //     } else {
+        //         //List of all contacts
+        //         $Contacts = Contact::where('created_by', '=', Auth::user()->id)->orderby('id',
+        //             'desc')->paginate(config('smartend.backend_pagination'));
+        //     }
+        // } else {
+        //     if ($group_id > 0) {
+        //         //List of group contacts
+        //         $Contacts = Contact::where('group_id', '=', (int)$group_id)->orderby('id',
+        //             'desc')->paginate(config('smartend.backend_pagination'));
+        //     } elseif ($group_id == "wait") {
+        //         //List waiting activation Contacts
+        //         $Contacts = Contact::where('status', '=', '0')->orderby('id',
+        //             'desc')->paginate(config('smartend.backend_pagination'));
+        //     } elseif ($group_id == "blocked") {
+        //         //List waiting activation Contacts
+        //         $Contacts = Contact::where('status', '=', '2')->orderby('id',
+        //             'desc')->paginate(config('smartend.backend_pagination'));
+        //     } else {
+        //         //List of all contacts
+        //         $Contacts = Contact::orderby('id', 'desc')->paginate(config('smartend.backend_pagination'));
+        //     }
+        // }
+
+        $query = Contact::join('users', 'users.contact_id', '=', 'contacts.id')->where('users.permissions_id', 0)->select('contacts.*');
+
         if (@Auth::user()->permissionsGroup->view_status) {
+
+            $query->where('created_by', Auth::user()->id);
+
             if ($group_id > 0) {
-                //List of group contacts
-                $Contacts = Contact::where('created_by', '=', Auth::user()->id)->where('group_id', '=',
-                    $group_id)->orderby('id',
-                    'desc')->paginate(config('smartend.backend_pagination'));
-            } elseif ($group_id == "wait") {
-                //List waiting activation Contacts
-                $Contacts = Contact::where('created_by', '=', Auth::user()->id)->where('status', '=',
-                    '0')->orderby('id',
-                    'desc')->paginate(config('smartend.backend_pagination'));
-            } elseif ($group_id == "blocked") {
-                //List waiting activation Contacts
-                $Contacts = Contact::where('created_by', '=', Auth::user()->id)->where('status', '=',
-                    '2')->orderby('id',
-                    'desc')->paginate(config('smartend.backend_pagination'));
-            } else {
-                //List of all contacts
-                $Contacts = Contact::where('created_by', '=', Auth::user()->id)->orderby('id',
-                    'desc')->paginate(config('smartend.backend_pagination'));
+                $query->where('group_id', (int) $group_id);
+            } elseif ($group_id === "wait") {
+                $query->where('status', 0);
+            } elseif ($group_id === "blocked") {
+                $query->where('status', 2);
             }
+
         } else {
+
             if ($group_id > 0) {
-                //List of group contacts
-                $Contacts = Contact::where('group_id', '=', (int)$group_id)->orderby('id',
-                    'desc')->paginate(config('smartend.backend_pagination'));
-            } elseif ($group_id == "wait") {
-                //List waiting activation Contacts
-                $Contacts = Contact::where('status', '=', '0')->orderby('id',
-                    'desc')->paginate(config('smartend.backend_pagination'));
-            } elseif ($group_id == "blocked") {
-                //List waiting activation Contacts
-                $Contacts = Contact::where('status', '=', '2')->orderby('id',
-                    'desc')->paginate(config('smartend.backend_pagination'));
-            } else {
-                //List of all contacts
-                $Contacts = Contact::orderby('id', 'desc')->paginate(config('smartend.backend_pagination'));
+                $query->where('group_id', (int) $group_id);
+            } elseif ($group_id === "wait") {
+                $query->where('status', 0);
+            } elseif ($group_id === "blocked") {
+                $query->where('status', 2);
             }
         }
+        $Contacts = $query->orderBy('id', 'desc')->paginate(config('smartend.backend_pagination'));
 
         if (@Auth::user()->permissionsGroup->view_status) {
             //Count of waiting activation Contacts
@@ -299,7 +325,7 @@ class ContactsController extends Controller
             'name' => trim($Contact->first_name . ' ' . $Contact->last_name),
             'email' => $Contact->email,
             'password' => Hash::make('123456'),
-            'permissions_id' => 1,
+            'permissions_id' => 0,
             'contact_id' => $Contact->id,
         ]);
 
@@ -542,6 +568,7 @@ class ContactsController extends Controller
             if ($user) {
                 $user->name = trim($Contact->first_name . ' ' . $Contact->last_name);
                 $user->email = $Contact->email;
+                $user->permissions_id = 0;
                 $user->save();
             }
 
