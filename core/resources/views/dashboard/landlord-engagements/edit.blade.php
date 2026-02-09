@@ -180,6 +180,7 @@
                     </div>
 
                     {{-- FLAT --}}
+                    @if($engagement->flat != null)
                     <div class="form-group row">
                         <label class="col-sm-2 form-control-label">Flat *</label>
                         <div class="col-sm-10">
@@ -190,7 +191,7 @@
                             </select>
                         </div>
                     </div>
-
+                    @endif
                     {{-- ================= FLAT DOCUMENTS ================= --}}
                     <div class="document-wrapper flat-doc-wrapper">
                     @forelse($engagement->flatDocuments as $dIndex => $doc)
