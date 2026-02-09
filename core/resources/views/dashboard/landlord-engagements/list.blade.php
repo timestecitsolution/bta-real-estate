@@ -168,7 +168,7 @@
                                                     </button>
 
                                                     <div class="dropdown-menu pull-right">
-                                                        @if(@Auth::user()->permissionsGroup->edit_status && app()->environment('local'))
+                                                        @if(@Auth::user()->permissionsGroup->edit_status)
                                                             <a class="dropdown-item"
                                                             href="{{ route('landlord-engagements.edit', $projectId) }}">
                                                                 <i class="material-icons">&#xe3c9;</i> Edit
