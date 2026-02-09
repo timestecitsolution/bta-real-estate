@@ -44,9 +44,4 @@ class LandlordEngagement extends Model
     {
         return $this->hasMany(EngagementMaterial::class, 'engagement_id');
     }
-
-    public function facilities()
-    {
-        return $this->hasMany(LandlordFacilities::class, 'project_id');
-    }
 }

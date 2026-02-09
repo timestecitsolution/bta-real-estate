@@ -396,7 +396,23 @@ $projects = Helper::Topics(8);
 
             });
 
+            function toggleAddButton(wrapper) {
+                let select = wrapper.find("select").first();
+                let totalOptions = select.find("option").not("[value='']").length;
 
+                let selectedValues = [];
+                wrapper.find("select").each(function () {
+                    if ($(this).val()) {
+                        selectedValues.push($(this).val());
+                    }
+                });
+
+                if (selectedValues.length >= totalOptions) {
+                    wrapper.find(".add-doc").hide();
+                } else {
+                    wrapper.find(".add-doc").show();
+                }
+            }
 
             /* ------------------ DOCUMENT LOGIC ------------------ */
             function updateDocumentTypeOptions(wrapper) {
@@ -430,6 +446,8 @@ $projects = Helper::Topics(8);
                     let fileInput = $(this).closest(".document-item").find("input[type='file']");
                     fileInput.prop("required", !!currentVal);
                 });
+
+                toggleAddButton(wrapper);
             }
 
 
@@ -482,17 +500,37 @@ $projects = Helper::Topics(8);
 
 
             // ON CHANGE UPDATE
-            $(document).on("change", "select[name='document_type_id[]']", function () {
-                let wrapper = $(this).closest(".document-wrapper");
-                updateDocumentTypeOptions(wrapper);
-            });
-
+            $(document).on(
+                "change",
+                "select[name^='project_document_type_id'], select[name^='flat_document_type_id']",
+                function () {
+                    let wrapper = $(this).closest(".document-wrapper");
+                    updateDocumentTypeOptions(wrapper);
+                }
+            );
 
             // INITIAL UPDATE
             $(".document-wrapper").each(function () {
                 updateDocumentTypeOptions($(this));
             });
 
+            function toggleMaterialAddButton(wrapper) {
+                let totalOptions = wrapper.find("select.material-type:first option")
+                    .not('[value=""]').length;
+
+                let selectedCount = wrapper.find("select.material-type")
+                    .filter(function () {
+                        return $(this).val() !== "";
+                    }).length;
+
+                let addBtn = wrapper.find(".add-material");
+
+                if (selectedCount >= totalOptions) {
+                    addBtn.hide();
+                } else {
+                    addBtn.show();
+                }
+            }
 
             /* ------------------ MATERIAL LOGIC ------------------ */
             function updateMaterialOptions(wrapper) {
@@ -515,6 +553,7 @@ $projects = Helper::Topics(8);
                     let detailsInput = $(this).closest(".material-item").find("input[name='material_details[][]']");
                     detailsInput.prop("required", !!$(this).val());
                 });
+                toggleMaterialAddButton(wrapper);
             }
 
             $(document).on("click", ".add-material", function () {
@@ -571,7 +610,6 @@ $projects = Helper::Topics(8);
                 $(".material-item").each(function () {
                     let type = $(this).find("select.material-type").val();
                     let details = $(this).find("input[name^='material_details']").val();
-                    console.log("Type:", type, "Details:", details);
                     if ((type && !details) || (!type && details)) {
                         valid = false;
                         return false;

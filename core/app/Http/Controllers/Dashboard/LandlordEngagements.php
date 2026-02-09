@@ -33,7 +33,6 @@ class LandlordEngagements extends Controller
         // General for all pages
         $GeneralWebmasterSections = WebmasterSection::where('status', '=', '1')->orderby('row_no', 'asc')->get();
         $engagements = LandlordEngagement::with(['project','flat','customer', 'flatDocuments','materials'])->orderBy('id','DESC')->get();
-        // dd($engagements);
         // General END
         return view("dashboard.landlord-engagements.list", compact("GeneralWebmasterSections", "engagements"));
     }
@@ -264,6 +263,8 @@ class LandlordEngagements extends Controller
         $engagements = LandlordEngagement::with(['project','flat','customer', 'flatDocuments','materials'])
         ->where('project_id', $projectId)
         ->get();
+        $facilties = LandlordFacilities::where('project_id', $projectId)->first();
+        $contacts = Contact::where('status', '2')->get();
 
         $project_documents = Topic::with('projectDocuments')->findOrFail($projectId);
 
@@ -276,7 +277,8 @@ class LandlordEngagements extends Controller
         return view("dashboard.landlord-engagements.edit", [
             'project'        => $engagements->first()->project,
             'engagements'    => $engagements,
-            'contacts'       => Contact::all(),
+            'facilities'     => $facilties,
+            'contacts'       => $contacts,
             'materials'      => MaterialType::all(),
             'materialTypes'  => MaterialType::all(),
             'documentTypes'  => DocumentType::all(),
@@ -337,6 +339,15 @@ class LandlordEngagements extends Controller
                     ]
                 );
             }
+
+            LandlordFacilities::updateOrCreate(
+                ['project_id' => $projectId],
+                [
+                    'number_of_parking' => $request->number_of_parking ?? 0,
+                    'number_of_gas_connection' => $request->number_of_gas_connection ?? 0,
+                    'number_of_utility' => $request->number_of_utility ?? 0,
+                ]
+            );
 
             /* ===============================
             2️⃣ ENGAGEMENTS (UPDATE / CREATE)

@@ -26,8 +26,7 @@
                             <div class="row-body scrollable hover">
                                 <div class="row-inner">
                                     <div class="list inset">
-
-                                        @foreach($Contacts as $Contact)
+                                     @foreach($Contacts as $Contact)
 
                                             <?php
                                             $active_cls = "";
@@ -43,16 +42,16 @@
                                             <div class="list-item pointer {{$active_cls}}"
                                                  onclick="javascript: location.href='{{ route("contactsEdit",["id"=>$Contact->id]) }}'">
                                                 <div class="list-left">
-                    <span class="w-40 avatar">
-                        <a href="{{ route("contactsEdit",["id"=>$Contact->id]) }}">
-                            @if($Contact->photo!="")
-                                <img src="{{ asset('uploads/contacts/'.$Contact->photo) }}" class="img-circle">
-                            @else
-                                <img src="{{ asset('uploads/contacts/profile.jpg') }}" class="img-circle"
-                                     style="opacity: 0.5">
-                            @endif
-                        </a>
-                    </span>
+                                                    <span class="w-40 avatar">
+                                                        <a href="{{ route("contactsEdit",["id"=>$Contact->id]) }}">
+                                                            @if($Contact->photo!="")
+                                                                <img src="{{ asset('uploads/contacts/'.$Contact->photo) }}" class="img-circle">
+                                                            @else
+                                                                <img src="{{ asset('uploads/contacts/profile.jpg') }}" class="img-circle"
+                                                                    style="opacity: 0.5">
+                                                            @endif
+                                                        </a>
+                                                    </span>
                                                 </div>
                                                 <div class="list-body">
                                                     <a href="{{ route("contactsEdit",["id"=>$Contact->id]) }}">

@@ -116,6 +116,7 @@ class ContactsController extends Controller
                 $query->where('status', 2);
             }
         }
+
         $Contacts = $query->orderBy('id', 'desc')->paginate(config('smartend.backend_pagination'));
 
         if (@Auth::user()->permissionsGroup->view_status) {
@@ -142,7 +143,6 @@ class ContactsController extends Controller
 
 
         $search_word = "";
-
         return view("dashboard.contacts.list",
             compact("Contacts", "GeneralWebmasterSections", "ContactsGroups", "Countries", "WaitContactsCount",
                 "BlockedContactsCount", "AllContactsCount", "group_id", "search_word"));

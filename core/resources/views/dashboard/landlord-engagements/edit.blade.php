@@ -143,15 +143,15 @@
                     </div>
                     <div class="col-sm-3">
                         <label for="number_of_parking" class="form-control-label">Number of parking </label>
-                        <input type="number" name="number_of_parking" id="number_of_parking" class="form-control" value="{{ old('number_of_parking') }}" min="0">
+                        <input type="number" name="number_of_parking" id="number_of_parking" class="form-control" value="{{ $facilities->number_of_parking ?? old('number_of_parking') }}" min="0">
                     </div>
                     <div class="col-sm-3">
                         <label for="no_of_gas_connection" class="form-control-label">Number of Gas Connection </label>
-                        <input type="number" name="number_of_gas_connection" id="number_of_gas_connection" class="form-control" value="{{ old('number_of_gas_connection') }}" min="0">
+                        <input type="number" name="number_of_gas_connection" id="number_of_gas_connection" class="form-control" value="{{ $facilities->number_of_gas_connection ?? old('number_of_gas_connection') }}" min="0">
                     </div>
                     <div class="col-sm-3">
                         <label for="no_of_utility" class="form-control-label">Number of Utility </label>
-                        <input type="number" name="number_of_utility" id="number_of_utility" class="form-control" value="{{ old('number_of_utility') }}" min="0">
+                        <input type="number" name="number_of_utility" id="number_of_utility" class="form-control" value="{{ $facilities->number_of_utility ?? old('number_of_utility') }}" min="0">
                     </div>
                 </div> 
 
@@ -161,7 +161,7 @@
                 @foreach($engagements as $eIndex => $engagement)
                 <div class="engagement-set card flat-section" style="padding: 20px;">
 
-                    <input type="hidden" name="engagement_id[{{ $eIndex }}]" value="{{ $engagement->id }}">
+                    <input type="hidden" name="engagement_id[{{ $eIndex }}]" class="engagement-id" value="{{ $engagement->id }}">
 
                     {{-- LANDLORD --}}
                     <div class="form-group row">
@@ -185,7 +185,7 @@
                         <div class="col-sm-10">
                             <select name="flats[{{ $eIndex }}][flat_id]" class="form-control flat-select">
                                 <option value="{{ $engagement->flat->id }}" selected>
-                                    {{ $engagement->flat->title }}
+                                    {{ $engagement->flat->flat_name }}
                                 </option>
                             </select>
                         </div>
@@ -366,89 +366,116 @@
 <script>
 $(document).ready(function () {
 
-    $(document).on('change', '.flat-select', function () {
-
-        let flatId = $(this).val();
-        if (!flatId) return;
-        // closest flat section
-        let $section = $(this).closest('.flat-section');
-
-        // Flat Documents (only inside this section)
-        $section.find('.flat-doc-wrapper')
-            .find('select[name], input[type="file"][name]')
-            .each(function () {
-
-                let name = $(this).attr('name');
-                name = name.replace(/\[\d+\]/g, '[' + flatId + ']');
-                $(this).attr('name', name);
-            });
-
-        // Materials (only inside this section)
-        $section.find('.material-wrapper')
-            .find('select[name], input[name]')
-            .each(function () {
-
-                let name = $(this).attr('name');
-                name = name.replace(/\[\d+\]/g, '[' + flatId + ']');
-                $(this).attr('name', name);
-            });
-
-    });
-
-    /* ===============================
-        FLAT DUPLICATE PREVENT
-    =============================== */
+    // -------------------
+    // Rebuild used flat pairs to prevent duplicate selection
+    // -------------------
     function rebuildUsedPairs() {
         let arr = [];
         $(".flat-select").each(function () {
             let flatId = $(this).val();
-            let index = $(this).closest('.engagement-set').index();
+            let index = $(this).closest('.flat-details-wrapper').index();
             if (flatId) arr.push(index + "-" + flatId);
         });
         return arr;
     }
 
-    let projectId = $('#project_id').val();
-    let usedPairs = rebuildUsedPairs();
-
-    $(".flat-select").each(function () {
-        updateFlatOptions($(this), projectId);
-    });
-
-    function updateFlatOptions(flatSelect, projectId) {
-
+    // -------------------
+    // AJAX function to update flat options
+    // -------------------
+    function updateFlatOptions(flatSelect, projectId, engagementId) {
         let currentFlat = flatSelect.val();
+        let currentText = flatSelect.find('option:selected').text();
+        let usedPairs = rebuildUsedPairs();
 
         $.ajax({
             url: "{{ route('get.project.flats') }}",
             type: "POST",
             data: {
                 _token: '{{ csrf_token() }}',
-                project_id: projectId
+                project_id: projectId,
+                engagement_id: engagementId
             },
             success: function (response) {
 
                 let options = '<option value="">-- Select Flat --</option>';
+                let currentFound = false;
 
-                response.tags.forEach(tag => {
+                response.flats.forEach(flat => {
 
                     let usedElsewhere = usedPairs.some(pair => {
                         let [, fId] = pair.split("-");
-                        return fId == tag.id && tag.id != currentFlat;
+                        return fId == flat.id && flat.id != currentFlat;
                     });
 
                     if (!usedElsewhere) {
+                        if (flat.id == currentFlat) currentFound = true;
+
                         options += `
-                            <option value="${tag.id}" ${tag.id == currentFlat ? 'selected' : ''}>
-                                ${tag.title}
+                            <option value="${flat.id}" ${flat.id == currentFlat ? 'selected' : ''}>
+                                ${flat.flat_name}
                             </option>`;
                     }
                 });
+
+                // 🔥 IMPORTANT: current flat backend থেকে না এলে manually add করো
+                if (currentFlat && !currentFound) {
+                    options += `
+                        <option value="${currentFlat}" selected>
+                            ${currentText}
+                        </option>`;
+                }
 
                 flatSelect.html(options);
             }
         });
     }
+
+
+    $('.flat-select').each(function () {
+        let flatSelect = $(this);
+        let currentFlat = flatSelect.val();
+        let currentText = flatSelect.find('option:selected').text() || '-- Select Flat --';
+
+        if (!currentFlat) return;
+
+        // Show only current flat until AJAX loads all flats
+        flatSelect.html(`<option value="${currentFlat}" selected>${currentText}</option>`);
+
+        // Fire AJAX to load all available flats including current
+        let wrapper = flatSelect.closest('.flat-details-wrapper');
+        let projectId = $('#project_id').val();
+        let engagementId = wrapper.find('.engagement-id').val();
+
+        updateFlatOptions(flatSelect, projectId, engagementId);
+    });
+
+
+    // -------------------
+    // On change: remap names + update flats
+    // -------------------
+    $(document).on('change', '.flat-select', function () {
+        let flatSelect = $(this);
+        let flatId = flatSelect.val();
+        if (!flatId) return;
+
+        let wrapper = flatSelect.closest('.flat-details-wrapper');
+
+        // Remap flat-doc and material inputs
+        wrapper.find('.flat-doc-wrapper select[name], .flat-doc-wrapper input[type="file"][name]').each(function () {
+            let name = $(this).attr('name');
+            $(this).attr('name', name.replace(/\[\d+\]/g, '[' + flatId + ']'));
+        });
+
+        wrapper.find('.material-wrapper select[name], .material-wrapper input[name]').each(function () {
+            let name = $(this).attr('name');
+            $(this).attr('name', name.replace(/\[\d+\]/g, '[' + flatId + ']'));
+        });
+
+        let projectId = $('#project_id').val();
+        let engagementId = wrapper.find('.engagement-id').val();
+
+        updateFlatOptions(flatSelect, projectId, engagementId);
+    });
 
     /* ===============================
         DOCUMENT ADD / REMOVE

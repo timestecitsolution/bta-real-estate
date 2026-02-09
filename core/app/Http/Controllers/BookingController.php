@@ -142,6 +142,8 @@ class BookingController extends Controller
 
     public function getFlats(Request $request)
     {
+        $currentFlatId = $request->current_flat_id;
+        
         $priceFlatIds = DB::table('price')
             ->pluck('flat_id')
             ->toArray();
@@ -154,6 +156,11 @@ class BookingController extends Controller
             $priceFlatIds,
             $engagedFlatIds
         ));
+
+        if ($currentFlatId) {
+            $excludedFlatIds = array_diff($excludedFlatIds, [$currentFlatId]);
+        }
+
         $flats = DB::table('flat_details')
             ->where('flat_details.project_id', $request->project_id)
             // ->when(!empty($excludedFlatIds), function ($q) use ($excludedFlatIds) {
