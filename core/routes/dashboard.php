@@ -237,6 +237,11 @@ Route::post('/deal-reopen', [PriceController::class, 'reopenDeal'])->name('deal.
 //Flat booking
 Route::get('/flat-booking', [FlatBookingController::class, 'index'])->name('flat-booking');
 Route::get('/flat-booking/create', [FlatBookingController::class, 'create'])->name('flat-booking.create');
+Route::post('/flat-booking/store', [FlatBookingController::class, 'store'])->name('flat-booking.store');
+Route::get('/flat-booking/{id}/edit', [FlatBookingController::class, 'edit'])->name('flat-booking.edit');
+Route::post('/flat-booking/{id}/update', [FlatBookingController::class, 'update'])->name('flat-booking.update');
+Route::get('/flat-booking/{id}', [FlatBookingController::class, 'show'])->name('flat-booking.show');
+Route::get('/flat-booking/destroy/{id}', [FlatBookingController::class, 'destroy'])->name('flat-booking.destroy');
 
 //Flat crud
 Route::get('/flats', [FlatController::class, 'index'])->name('flats');

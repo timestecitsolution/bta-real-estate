@@ -18,7 +18,7 @@ class MaterialDetailsController extends Controller
         ]);
 
         $material = MaterialDetails::findOrFail($id);
-        $price = PriceModel::findOrFail($material->price_id);
+        $price = PriceModel::findOrFail($material->booking_id);
         $contact = Contact::findOrFail($price->customer_id);
 
         $material->change_details = $request->change_details;
@@ -39,7 +39,7 @@ class MaterialDetailsController extends Controller
         ]);
 
         $material = MaterialDetails::findOrFail($id);
-        $price = PriceModel::findOrFail($material->price_id);
+        $price = PriceModel::findOrFail($material->booking_id);
         $contact = Contact::findOrFail($price->customer_id);
 
         $material->status = $request->admin_status;

@@ -67,12 +67,12 @@ class PriceModel extends Model
 
     public function documents()
     {
-        return $this->hasMany(FlatDocuments::class, 'price_id');
+        return $this->hasMany(FlatDocuments::class, 'booking_id');
     }
 
     public function invoices()
     {
-        return $this->hasOne(Invoices::class, 'price_id');
+        return $this->hasOne(Invoices::class, 'booking_id');
     }
 
 }

@@ -11,7 +11,10 @@ class FlatDocuments extends Model
 
 
     protected $fillable = [
-        'price_id',
+        'booking_id',
+        'booked_flat_id',
+        'project_id',
+        'flat_id',
         'document_type_id',
         'file_path'
     ];

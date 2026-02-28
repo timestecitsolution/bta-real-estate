@@ -148,12 +148,17 @@ class BookingController extends Controller
             ->pluck('flat_id')
             ->toArray();
 
+        $bookedFlatIds = DB::table('booked_flat_info')
+            ->pluck('flat_id')
+            ->toArray();
+
         $engagedFlatIds = DB::table('landlord_engagements')
             ->pluck('flat_id')
             ->toArray();
 
         $excludedFlatIds = array_unique(array_merge(
             $priceFlatIds,
+            $bookedFlatIds,
             $engagedFlatIds
         ));
 
@@ -163,10 +168,6 @@ class BookingController extends Controller
 
         $flats = DB::table('flat_details')
             ->where('flat_details.project_id', $request->project_id)
-            // ->when(!empty($excludedFlatIds), function ($q) use ($excludedFlatIds) {
-            //     $q->whereNotIn('tags.id', $excludedFlatIds);
-            // })
-            // ->select('tags.id', 'tags.title')
             ->when(!empty($excludedFlatIds), function ($q) use ($excludedFlatIds) {
                 $q->whereNotIn('flat_details.id', $excludedFlatIds);
             })
@@ -302,7 +303,7 @@ class BookingController extends Controller
 
                 $emi_details = $calculatedEmis;
 
-                $material_details = MaterialDetails::whereIn('price_id', $price_ids)
+                $material_details = MaterialDetails::whereIn('booking_id', $price_ids)
                     ->join('material_types', 'material_details.material_type_id', '=', 'material_types.id')
                     ->select('material_details.*', 'material_types.material_type')
                     ->get();

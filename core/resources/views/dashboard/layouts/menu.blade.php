@@ -216,7 +216,6 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                         </a>
                     </li>
                     @endif
-                    @if(app()->environment('local'))
                     <?php
                         $currentFolder = "flat-booking"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));
@@ -229,7 +228,6 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                             <span class="nav-text">Flat Booking</span>
                         </a>
                     </li>
-                    @endif
                     <?php
                         $currentFolder = "flats"; 
                         $PathCurrentFolder = substr($urlAfterRoot, 0, strlen($currentFolder));

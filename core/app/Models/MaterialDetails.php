@@ -10,8 +10,12 @@ class MaterialDetails extends Model
     use HasFactory;
 
     protected $fillable = [
-        'price_id',
+        'booking_id',
+        'booked_flat_id',
+        'project_id',
+        'flat_id',
         'material_type_id',
+        'material_document',
         'details',
         'change_details',
         'admin_note',

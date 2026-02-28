@@ -146,7 +146,6 @@ class LandlordEngagements extends Controller
                     'flat_id'     => $flatId,
                 ]);
 
-                //  flat_id => engagement_id
                 $engagementMap[$flatId] = $engagement->id;
             }
 

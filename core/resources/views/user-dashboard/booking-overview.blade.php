@@ -49,7 +49,7 @@
                 @foreach($prices_details as $key => $price)
                 @php
                     $customer = $price->customer;
-                    $existingDocuments = App\Models\FlatDocuments::where('price_id', $price->id)->get();
+                    $existingDocuments = App\Models\FlatDocuments::where('booking_id', $price->id)->get();
                 @endphp
                 <tr class="{{ $price->is_cancelled ? 'table-danger' : '' }}">
                     <td data-label="SL">{{ $loop->iteration }}</td>
