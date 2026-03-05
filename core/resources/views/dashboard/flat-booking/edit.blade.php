@@ -1,866 +1,1004 @@
+<?php
+$projects = Helper::Topics(8);
+?>
 @extends('dashboard.layouts.master')
-@section('title', "Edit Price")
-
+@section('title', "Flat Booking")
 @push("after-styles")
-<link href="{{ asset("assets/dashboard/js/iconpicker/fontawesome-iconpicker.min.css") }}" rel="stylesheet">
+    <link href="{{ asset("assets/dashboard/js/iconpicker/fontawesome-iconpicker.min.css") }}" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 @endpush
-
 @section('content')
-<div class="padding">
-    <div class="box">
-        <div class="box-header dker">
-            <h3><i class="material-icons">&#xe3c9;</i> Edit Price</h3>
-            <small>
-                <a href="{{ route('adminHome') }}">{{ __('backend.home') }}</a> /
-                <a>Edit Price</a>
-            </small>
-        </div>
-        <div class="box-tool">
-            <ul class="nav">
-                <li class="nav-item inline">
-                    <a class="nav-link" href="{{ route('price') }}">
-                        <i class="material-icons md-18">×</i>
-                    </a>
-                </li>
-            </ul>
-        </div>
+    <div class="padding">
+        <div class="box">
+            <div class="box-header dker">
+                <h3><i class="material-icons">&#xe02e;</i> Edit Booking</h3>
+                <small>
+                    <a href="{{ route('adminHome') }}">{{ __('backend.home') }}</a> /
+                    <a>Edit Booking</a> /
+                    <a>List of Bookings</a>
+                </small>
+            </div>
+            <div class="box-tool">
+                <ul class="nav">
+                    <li class="nav-item inline">
+                        <a class="nav-link" href="{{ route('price') }}">
+                            <i class="material-icons md-18">×</i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="box-body p-a-2">
+                {{Form::open(['route'=>['flat-booking.update', $booking->id],'method'=>'POST','files'=>true])}}
+                    <div class="form-group row">
+                        <label for="customer_id" class="col-sm-2 form-control-label">Customer *</label>
+                        <div class="col-sm-10">
+                            <select name="customer_id" id="customer_id" class="form-control c-select" required>
+                                <option value="0">- - Select Customer - -</option>
+                                @foreach ($contacts as $contact)
+                                    <option value="{{ $contact->id  }}" {{ $booking->client_id == $contact->id ? 'selected' : '' }}>{{ $contact->first_name . ' ' . $contact->last_name . ' (' . $contact->phone  . ')' }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div id="flat-wrapper">
+                        @foreach($booking->flatBookingDetails as $flatIndex => $flat)
+                                <div class="flat-details-wrapper card" style="border: 1px solid #ccc;  border-radius: 5px; padding: 20px;">
+                                    <h5 class="flat-title mb-3">Flat Details {{ $flatIndex + 1 }}: </h5>
+                                    <div class="form-group row">
+                                        <label for="project_id" class="col-sm-2 form-control-label">Project * </label>
+                                        <div class="col-sm-10">
+                                            <select name="project_id[]" id="project_id" class="form-control c-select project_id" required>
+                                                <option value="">- - Select Project - -</option>
+                                                @foreach($projects as $project)
+                                                    <option value="{{ $project->id }}" data-project_id="{{ $project->id }}"
+                                                        {{ $flat->project_id == $project->id ? 'selected' : '' }}>
+                                                        {{ $project->title_en }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="flat_section">
+                                        <label for="flat_id" class="col-sm-2 form-control-label">Flat *</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control flat-select c-select" name="flat_id[]" data-old="{{ $flat->flats->id }}" required>
+                                                <option value="{{ $flat->flats->id }}" selected>
+                                                    {{ $flat->flats->flat_name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        @error('flat_id')
+                                            <small class="text-white">{{ $message }}</small>   
+                                        @enderror
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Flat Size *</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('flat_size[]', $flat->flat_size, [
+                                                'id' => 'flat_size',
+                                                'placeholder' => 'Enter Flat Size (Per Sq.ft)',
+                                                'class' => 'form-control flat_size',
+                                                'required' => true
+                                            ]) !!}
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Is Negotiate Total Price?</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::Checkbox('is_negotiable_total_price[]', 1, $flat->is_negotiate_total_price,
+                                                [
+                                                    'class' => 'is_negotiate_total_price'
+                                                ]) !!}
+                                        </div>
+                                    </div>
 
-        <div class="box-body p-a-2">
-            {{ Form::model($prices, ['route' => ['price.update', $prices->id], 'method' => 'POST', 'files' => true, 'id'=>'priceForm']) }}
+                                    <div class="form-group row price_per_sqft_group">
+                                        <label class="col-sm-2 form-control-label">Price Per Sq.ft *</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('price_per_sqft[]', $flat->price_per_sqft, [
+                                                'placeholder' => 'Price Per Sq.ft',
+                                                'class' => 'form-control price_per_sqft',
+                                                'required' => true
+                                            ]) !!}
+                                        </div>
+                                    </div>
 
-            {{-- Project --}}
-            <div class="form-group row">
-                <label for="project_id" class="col-sm-2 form-control-label">Project</label>
-                <div class="col-sm-10">
-                    <select name="project_id" id="project_id" class="form-control c-select">
-                        <option value="0">-- Select Project --</option>
-                        @foreach ($projects as $project)
-                        <option value="{{ $project->id }}" {{ $project->id == old('project_id', $prices->project_id) ? 'selected' : '' }}>
-                            {{ $project->title_en }}
-                        </option>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Is Govt Gas Included?</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::checkbox('is_govt_gas_included[]', 1, $flat->is_govt_gas_included, [
+                                                'class' => 'is_govt_gas_included'
+                                            ]) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row is_govt_gas_connection_paid_group" id="is_govt_gas_connection_paid_group">
+                                        <label class="col-sm-2 form-control-label">Is Govt Gas Connection Paid?</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::Checkbox('is_govt_gas_connection_paid[]', 1, $flat->is_govt_gas_connection_paid,
+                                                [
+                                                    'id' => 'is_govt_gas_connection_paid',
+                                                    'class' => 'is_govt_gas_connection_paid'
+                                                ]) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row gas_pay_scheme" id="gas_pay_scheme">
+                                        <label class="col-sm-2 form-control-label">Select Payment Scheme For Gas *</label>
+                                        <div class="col-sm-10">
+                                            <div class="form-check">
+                                                {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'downpayment', $flat->govt_gas_payment_scheme == 'downpayment', ['id' => 'gas_downpayment', 'class' => 'form-check-input gas_downpayment govt_gas_connection_payment_scheme']) !!}
+                                                <label class="form-check-label" for="gas_downpayment">Including with Downpayment</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'emi', $flat->govt_gas_payment_scheme == 'emi', ['id' => 'gas_emi', 'class' => 'form-check-input gas_emi govt_gas_connection_payment_scheme']) !!}
+                                                <label class="form-check-label" for="gas_emi">Including with EMI</label>
+                                            </div>
+                                            <div class="form-check">
+                                                {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'handover', $flat->govt_gas_payment_scheme == 'handover', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input gas_pay_scheme_others govt_gas_connection_payment_scheme']) !!}
+                                                <label class="form-check-label" for="gas_pay_scheme_others">Others</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row gas_amount_group" id="gas_amount_group">
+                                        <label class="col-sm-2 form-control-label">Gas Connection Fee *</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('gas_amount[]', $flat->gas_connection_fee, [
+                                                'id' => 'gas_amount',
+                                                'placeholder' => 'Gas Connection Fee',
+                                                'class' => 'form-control gas_amount'
+                                            ]) !!}
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Is Parking Included?</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::Checkbox('is_parking_included[]', 1, $flat->is_parking_included, 
+                                                ['id' => 'is_parking_included', 'class' => 'is_parking_included']) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row is_parking_paid_group" id="is_parking_paid_group">
+                                        <label class="col-sm-2 form-control-label">Is Parking Paid?</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::Checkbox('is_parking_paid[]', 1, $flat->is_parking_paid, 
+                                                ['id' => 'is_parking_paid', 'class' => 'is_parking_paid']) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row parking_pay_scheme" id="parking_pay_scheme">
+                                        <label class="col-sm-2 form-control-label">Select Payment Scheme For Parking *</label>
+                                        <div class="col-sm-10">
+                                            <div class="form-check">
+                                                {!! Form::radio("parking_payment_scheme[$flatIndex]", 'downpayment', $flat->parking_payment_scheme == 'downpayment', ['id' => 'parking_downpayment', 'class' => 'form-check-input parking_payment_scheme']) !!}
+                                                <label class="form-check-label" for="parking_downpayment">Including with Downpayment</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                {!! Form::radio("parking_payment_scheme[$flatIndex]", 'emi', $flat->parking_payment_scheme == 'emi', ['id' => 'parking_emi', 'class' => 'form-check-input parking_payment_scheme']) !!}
+                                                <label class="form-check-label" for="parking_emi">Including with EMI</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                {!! Form::radio("parking_payment_scheme[$flatIndex]", 'others', $flat->parking_payment_scheme == 'others', ['id' => 'parking_others', 'class' => 'form-check-input parking_payment_scheme']) !!}
+                                                <label class="form-check-label" for="parking_others">Others</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row parking_fee_group" id="parking_fee_group">
+                                        <label class="col-sm-2 form-control-label">Parking Fee *</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('parking_amount[]', $flat->parking_fee, [
+                                                'id' => 'parking_amount',
+                                                'placeholder' => 'Parking Fee',
+                                                'class' => 'form-control parking_amount'
+                                            ]) !!}
+                                        </div>
+                                    </div>
+                                    
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Is Utility Included?</label>
+                                            <div class="col-sm-10">
+                                                {!! Form::Checkbox('is_utility_included[]', 1, $flat->is_utility_included, 
+                                                ['id' => 'is_utility_included', 'class' => 'is_utility_included']) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row utility_pay_scheme" id="utility_pay_scheme">
+                                        <label class="col-sm-2 form-control-label">Select Payment Scheme For Utility *</label>
+                                        <div class="col-sm-10">
+                                            <div class="form-check">
+                                                {!! Form::radio("utility_payment_scheme[$flatIndex]", 'downpayment', $flat->utility_payment_scheme == 'downpayment', ['id' => 'utility_downpayment', 'class' => 'form-check-input utility_payment_scheme']) !!}
+                                                <label class="form-check-label" for="utility_downpayment">Including with Downpayment</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                {!! Form::radio("utility_payment_scheme[$flatIndex]", 'emi', $flat->utility_payment_scheme == 'emi', ['id' => 'utility_emi', 'class' => 'form-check-input utility_payment_scheme']) !!}
+                                                <label class="form-check-label" for="utility_emi">Including with EMI</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                {!! Form::radio("utility_payment_scheme[$flatIndex]", 'others', $flat->utility_payment_scheme == 'others', ['id' => 'utility_others', 'class' => 'form-check-input utility_payment_scheme']) !!}
+                                                <label class="form-check-label" for="utility_others">Others</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row utility_amount_group" id="utility_amount_group">
+                                        <label class="col-sm-2 form-control-label">Utility Fee *</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('utility_amount[]', $flat->utility_fee, [
+                                                'id' => 'utility_amount',
+                                                'placeholder' => 'Utility Fee',
+                                                'class' => 'form-control utility_amount'
+                                            ]) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row extras_group" id="extras" style="display: none;">
+                                        <label class="col-sm-2 form-control-label">Extras (Auto Calculate)</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('extras_amount[]', $flat->extras_amount, [
+                                                'id' => 'extras_amount',
+                                                'placeholder' => 'Extra Amount(Gas, Utility, Parking, Others)',
+                                                'class' => 'form-control extras_amount',
+                                                'readonly' => true
+                                            ]) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Is Applicable Discount?</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::Checkbox('is_discount_applicable[]', 1, $flat->is_applicable_discount, 
+                                                ['id' => 'is_discount_applicable', 'class' => 'is_discount_applicable']) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row discount_amount_group" id="discount_amount_group" style="display: none;">
+                                        <label class="col-sm-2 form-control-label">Discounted Amount</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('discount_amount[]', $flat->discounted_amount, [
+                                                'id' => 'discount_amount',
+                                                'placeholder' => 'Discounted Amount',
+                                                'class' => 'form-control discount_amount'
+                                            ]) !!}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Total Price (Flat) *</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('total_price_flat[]', $flat->total_price_flat, [
+                                                'placeholder' => 'Total Price',
+                                                'class' => 'form-control total_price_flat'
+                                            ]) !!}
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">EMI Amount (Per Month)</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::number('emi_amount_flat[]', $flat->emi_amount_flat, 
+                                                array(
+                                                    'placeholder' => 'Enter EMI Amount (Per Month)',
+                                                    'class' => 'form-control emi_amount_flat',
+                                                    'dir'=>@$ActiveLanguage->direction
+                                                )) !!}
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">EMI Start Date</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::date('emi_start_date_flat[]', $flat->emi_start_date_flat, array('id' => '', 'placeholder' => 'Enter EMI Start Date','class' => 'form-control emi_start_date_flat', 'dir'=>@$ActiveLanguage->direction)) !!}
+                                        </div>
+                                    </div>
+                                    <div class="document-wrapper">
+                                    @if($flat->flatDocuments->isNotEmpty())
+                                        @foreach($flat->flatDocuments as $docIndex => $doc)
+                                            <div class="form-group row document-item">
+                                                @if($docIndex == 0)
+                                                    <label class="col-sm-2 form-control-label">Documents(Max 10MB- pdf,jpg,jpeg,png)</label>
+                                                @else
+                                                    <label class="col-sm-2 form-control-label">&nbsp;</label>
+                                                @endif
+
+                                                <div class="col-sm-4">
+                                                    <select name="document_type_id[{{ $flat->flat_id }}][{{ $docIndex }}]" class="form-control c-select document-type">
+                                                        <option value="">- - Select Document Type - -</option>
+                                                        @foreach($documentTypes as $type)
+                                                            <option value="{{ $type->id }}"
+                                                                {{ $type->id == $doc->document_type_id ? 'selected' : '' }}>
+                                                                {{ $type->document_type }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <input type="hidden" name="document_id[{{ $flat->flat_id }}][{{ $docIndex }}]" value="{{ $doc->id }}">
+                                                    <a href="{{ asset('uploads/' . $doc->file_path) }}" target="_blank">View File</a>
+                                                    <input class="form-control" type="file" name="document[{{ $flat->flat_id }}][{{ $docIndex }}]">
+                                                </div>
+
+                                                <div class="col-sm-2">
+                                                    @if($docIndex == 0)
+                                                        <button type="button" class="btn btn-success add-doc">+</button>
+                                                    @else
+                                                        <button type="button" class="btn btn-danger remove-doc">-</button>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                    <!-- Default first row if no old input -->
+                                    <div class="form-group row document-item">
+                                        <label class="col-sm-2 form-control-label">Documents(Max 10MB- pdf,jpg,jpeg,png)</label>
+                                        <div class="col-sm-4">
+                                            <select name="document_type_id[{{ $flat->flat_id }}][]" class="form-control c-select document-type">
+                                                <option value="">-- Select Document Type --</option>
+                                                @foreach($documentTypes as $documentType)
+                                                    <option value="{{ $documentType->id }}">{{ $documentType->document_type }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            {!! Form::file("document[$flat->flat_id][]", [
+                                                'class' => 'form-control',
+                                                'accept' => 'application/pdf,image/*'
+                                            ]) !!}
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-success add-doc">+</button>
+                                        </div>
+                                    </div>
+                                    @endif  
+                                    </div>
+
+                                    <div class="material-wrapper">
+                                        @if($flat->materialDocuments->isNotEmpty())
+                                            @foreach($flat->materialDocuments as $matIndex => $materialdoc)
+                                                <div class="form-group row material-item">
+
+                                                    @if($matIndex == 0)
+                                                        <label class="col-sm-2 form-control-label">Materials</label>
+                                                    @else
+                                                        <label class="col-sm-2 form-control-label">&nbsp;</label>
+                                                    @endif
+
+                                                    <div class="col-sm-4">
+                                                        <select name="material_type_id[{{ $flat->flat_id }}][{{ $matIndex }}]" class="form-control material-type">
+                                                            <option value="">-- Select Material --</option>
+                                                            @foreach($materialTypes as $material)
+                                                                <option value="{{ $material->id }}"
+                                                                    {{ $material->id == $materialdoc->material_type_id ? 'selected' : '' }}>
+                                                                    {{ $material->material_type }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-sm-2">
+                                                        <input type="text" 
+                                                            name="material_details[{{ $flat->flat_id }}][{{ $matIndex }}]" 
+                                                            class="form-control material_details"
+                                                            placeholder="Material Details"
+                                                            value="{{ $materialdoc->details }}">
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <input type="hidden" name="material_id[{{ $flat->flat_id }}][{{ $matIndex }}]" value="{{ $materialdoc->id }}">
+                                                        <a href="{{ asset('uploads/' . $materialdoc->material_document) }}" target="_blank">View File</a>
+                                                        <input class="form-control" type="file" name="material_document[{{ $flat->flat_id }}][{{ $matIndex }}]" placeholder="Material Document">
+                                                    </div>
+
+                                                    <div class="col-sm-2">
+                                                        @if($matIndex == 0)
+                                                            <button type="button" class="btn btn-success add-material">+</button>
+                                                        @else
+                                                            <button type="button" class="btn btn-danger remove-material">-</button>
+                                                        @endif
+                                                    </div>
+
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <!-- Default first row -->
+                                            <div class="form-group row material-item">
+                                                <label class="col-sm-2 form-control-label">Materials</label>
+
+                                                <div class="col-sm-4">
+                                                    <select name="material_type_id[{{ $flat->flat_id }}][]" class="form-control material-type">
+                                                        <option value="">-- Select Material --</option>
+                                                        @foreach($materialTypes as $material)
+                                                            <option value="{{ $material->id }}">{{ $material->material_type }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-sm-2">
+                                                    <input type="text" 
+                                                        name="material_details[{{ $flat->flat_id }}][]" 
+                                                        class="form-control material_details"
+                                                        placeholder="Material Details">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <input type="file" 
+                                                        name="material_document[{{ $flat->flat_id }}][]" 
+                                                        class="form-control"
+                                                        placeholder="Material Document">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button type="button" class="btn btn-success add-material">+</button>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
                         @endforeach
-                    </select>
-                </div>
-            </div>
-
-            {{-- Flat --}}
-            <div class="form-group row" id="flat_section">
-                <label for="flat_id" class="col-sm-2 form-control-label">Flat </label>
-                <div class="col-sm-10">
-                    <select class="form-control c-select" id="flat_id" name="flat_id" required>
-                        <option selected disabled>Select Flat</option>
-                        @if($prices->flat)
-                        <option value="{{ $prices->flat->id }}" selected>{{ $prices->flat->title }}</option>
-                        @endif
-                    </select>
-                </div>
-            </div>
-
-            
-            {{-- Flat Size --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Flat Size</label>
-                <div class="col-sm-10">
-                    {!! Form::number('flat_size', old('flat_size', $prices->flat_size), ['id'=>'flat_size','class'=>'form-control']) !!}
-                </div>
-            </div>
-
-            {{-- Customer --}}
-            <div class="form-group row">
-                <label for="customer_id" class="col-sm-2 form-control-label">Customer </label>
-                <div class="col-sm-10">
-                    <select name="customer_id" id="customer_id" class="form-control c-select">
-                        <option value="0">-- Select Customer --</option>
-                        @foreach ($contacts as $contact)
-                        <option value="{{ $contact->id }}" {{ $contact->id == old('customer_id', $prices->customer_id) ? 'selected' : '' }}>
-                            {{ $contact->first_name . ' ' . $contact->last_name . ' (' . $contact->phone . ')' }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            {{-- Price Per Sqft --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Is Negotiate Total Price?</label>
-                <div class="col-sm-10">
-                    <input type="hidden" name="is_negotiable_total_price" value="0">
-                    {!! Form::checkbox('is_negotiable_total_price', 1, old('is_negotiable_total_price', $prices->is_negotiable_total_price), ['id'=>'is_negotiate_total_price']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="price_per_sqft_group">
-                <label class="col-sm-2 form-control-label">Price Per Sq.ft</label>
-                <div class="col-sm-10">
-                    {!! Form::number('price_per_sqft', old('price_per_sqft', $prices->price_per_sqft), ['id'=>'price_per_sqft','class'=>'form-control']) !!}
-                </div>
-            </div>
-
-
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Is Applicable for Govt Gas?</label>
-                <div class="col-sm-10">
-                    {!! Form::checkbox('is_applicable_govt_gas', 1, old('is_applicable_govt_gas', $prices->is_applicable_govt_gas), ['id' => 'is_applicable_govt_gas']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="is_govt_gas_connection_paid_group">
-                <label class="col-sm-2 form-control-label">Is Govt Gas Connection Paid?</label>
-                <div class="col-sm-10">
-                    {!! Form::Checkbox('is_govt_gas_connection_paid', 1, old('is_govt_gas_connection_paid', $prices->is_govt_gas_connection_paid),
-                        ['id' => 'is_govt_gas_connection_paid']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="gas_pay_scheme">
-                <label class="col-sm-2 form-control-label">Select Payment Scheme For Gas *</label>
-                <div class="col-sm-10">
-                    <div class="form-check">
-                        {!! Form::radio('govt_gas_connection_payment_scheme', 'downpayment', old('govt_gas_connection_payment_scheme', $prices->govt_gas_connection_payment_scheme) == 'downpayment', ['id' => 'gas_downpayment', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="gas_downpayment">Including with Downpayment</label>
                     </div>
-
-                    <div class="form-check">
-                        {!! Form::radio('govt_gas_connection_payment_scheme', 'emi', old('govt_gas_connection_payment_scheme', $prices->govt_gas_connection_payment_scheme) == 'emi', ['id' => 'gas_emi', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="gas_emi">Including with EMI</label>
+                    <div class="text-right mt-3">
+                        <button type="button" id="add-flat" class="btn btn-success">
+                            + Add More Flat
+                        </button>
                     </div>
-                    <div class="form-check">
-                        {!! Form::radio('govt_gas_connection_payment_scheme', 'handover', old('govt_gas_connection_payment_scheme', $prices->govt_gas_connection_payment_scheme) == 'handover', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="gas_pay_scheme_others">Others</label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group row" id="gas_amount_group">
-                <label class="col-sm-2 form-control-label">Gas Connection Fee *</label>
-                <div class="col-sm-10">
-                    {!! Form::number('gas_amount', old('gas_amount', $prices->gas_amount), [
-                        'id' => 'gas_amount',
-                        'placeholder' => 'Gas Connection Fee',
-                        'class' => 'form-control'
-                    ]) !!}
-                </div>
-            </div>
-
-
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Is Applicable for Parking?</label>
-                <div class="col-sm-10">
-                    {!! Form::Checkbox('is_applicable_parking', 1, old('is_applicable_parking', $prices->is_applicable_parking), 
-                        ['id' => 'is_applicable_parking']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="is_parking_paid_group">
-                <label class="col-sm-2 form-control-label">Is Parking Paid?</label>
-                <div class="col-sm-10">
-                    {!! Form::Checkbox('is_parking_paid', 1, old('is_parking_paid', $prices->is_parking_paid), 
-                        ['id' => 'is_parking_paid']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="parking_pay_scheme">
-                <label class="col-sm-2 form-control-label">Select Payment Scheme For Parking *</label>
-                <div class="col-sm-10">
-                    <div class="form-check">
-                        {!! Form::radio('parking_payment_scheme', 'downpayment', old('parking_payment_scheme', $prices->parking_payment_scheme) == 'downpayment', false, ['id' => 'parking_downpayment', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="parking_downpayment">Including with Downpayment</label>
-                    </div>
-
-                    <div class="form-check">
-                        {!! Form::radio('parking_payment_scheme', 'emi', old('parking_payment_scheme', $prices->parking_payment_scheme) == 'emi', false, ['id' => 'parking_emi', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="parking_emi">Including with EMI</label>
-                    </div>
-
-                    <div class="form-check">
-                        {!! Form::radio('parking_payment_scheme', 'others', old('parking_payment_scheme', $prices->parking_payment_scheme) == 'others', false, ['id' => 'parking_others', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="parking_others">Others</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group row" id="parking_fee_group">
-                <label class="col-sm-2 form-control-label">Parking Fee *</label>
-                <div class="col-sm-10">
-                    {!! Form::number('parking_amount', old('parking_amount', $prices->parking_amount), [
-                        'id' => 'parking_amount',
-                        'placeholder' => 'Parking Fee',
-                        'class' => 'form-control'
-                    ]) !!}
-                </div>
-            </div>
-            
-
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Is Utility Included?</label>
-                <div class="col-sm-10">
-                    {!! Form::Checkbox('is_utility_included', 1, old('is_utility_included', $prices->is_utility_included), 
-                        ['id' => 'is_utility_included']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="utility_pay_scheme">
-                <label class="col-sm-2 form-control-label">Select Payment Scheme For Utility *</label>
-                <div class="col-sm-10">
-                    <div class="form-check">
-                        {!! Form::radio('utility_payment_scheme', 'downpayment', old('utility_payment_scheme', $prices->utility_payment_scheme) == 'downpayment', ['id' => 'utility_downpayment', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="utility_downpayment">Including with Downpayment</label>
-                    </div>
-
-                    <div class="form-check">
-                        {!! Form::radio('utility_payment_scheme', 'emi', old('utility_payment_scheme', $prices->utility_payment_scheme) == 'emi', ['id' => 'utility_emi', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="utility_emi">Including with EMI</label>
-                    </div>
-
-                    <div class="form-check">
-                        {!! Form::radio('utility_payment_scheme', 'others', old('utility_payment_scheme', $prices->utility_payment_scheme) == 'others', ['id' => 'utility_others', 'class' => 'form-check-input']) !!}
-                        <label class="form-check-label" for="utility_others">Others</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group row" id="utility_amount_group">
-                <label class="col-sm-2 form-control-label">Utility Fee *</label>
-                <div class="col-sm-10">
-                    {!! Form::number('utility_amount', old('utility_amount', $prices->utility_amount), [
-                        'id' => 'utility_amount',
-                        'placeholder' => 'Utility Fee',
-                        'class' => 'form-control'
-                    ]) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="extras" style="display: none;">
-                <label class="col-sm-2 form-control-label">Extras (Auto Calculate)</label>
-                <div class="col-sm-10">
-                    {!! Form::number('extras_amount', old('extras_amount', $prices->extras_amount), [
-                        'id' => 'extras_amount',
-                        'placeholder' => 'Extra Amount(Gas, Utility, Parking, Others)',
-                        'class' => 'form-control',
-                        'readonly' => true
-                    ]) !!}
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Is Application Discount?</label>
-                <div class="col-sm-10">
-                    {!! Form::Checkbox('is_discount_applicable', 1, old('is_discount_applicable', $prices->is_discount_applicable), 
-                        ['id' => 'is_discount_applicable']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row" id="discount_amount_group" style="display: none;">
-                <label class="col-sm-2 form-control-label">Discounted Amount *</label>
-                <div class="col-sm-10">
-                    {!! Form::number('discount_amount', old('discount_amount', $prices->discount_amount), [
-                        'id' => 'discount_amount',
-                        'placeholder' => 'Discounted Amount',
-                        'class' => 'form-control'
-                    ]) !!}
-                </div>
-            </div>
-
-
-            {{-- Total Price --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Total Price</label>
-                <div class="col-sm-10">
-                    {!! Form::number('price', old('price', $prices->price), ['id'=>'total_price','class'=>'form-control']) !!}
-                </div>
-            </div>
-
-            {{-- Booking --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Booking Amount</label>
-                <div class="col-sm-10">
-                    {!! Form::number('booking_amount', old('booking_amount', $prices->booking_amount), ['id'=>'booking_amount','class'=>'form-control']) !!}
-                </div>
-            </div>
-
-            {{-- Downpayment --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Downpayment Amount</label>
-                <div class="col-sm-10">
-                    {!! Form::number('downpayment_amount', old('downpayment_amount', $prices->downpayment_amount), ['id'=>'downpayment_amount','class'=>'form-control']) !!}
-                </div>
-            </div>
-
-            {{-- Due Amount --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">Due Amount</label>
-                <div class="col-sm-10">
-                    {!! Form::number('due_amount', old('due_amount', $prices->due_amount), ['id'=>'due_amount','class'=>'form-control','readonly']) !!}
-                </div>
-            </div>
-
-            {{-- EMI --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">EMI Amount (Per Month)</label>
-                <div class="col-sm-10">
-                    {!! Form::number('emi', old('emi', $prices->emi), ['id'=>'emi_amount','class'=>'form-control']) !!}
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">EMI Count</label>
-                <div class="col-sm-10">
-                    {!! Form::number('emi_count', old('emi_count', $prices->emi_count), ['id'=>'emi_count','class'=>'form-control','readonly']) !!}
-                </div>
-            </div>
-
-            {{-- EMI Start Date --}}
-            <div class="form-group row">
-                <label class="col-sm-2 form-control-label">EMI Start Date</label>
-                <div class="col-sm-10">
-                    {!! Form::date('emi_start_date', old('emi_start_date', $prices->emi_start_date), ['class'=>'form-control']) !!}
-                </div>
-            </div>
-
-            <div id="document-wrapper">
-                @forelse($existingDocuments as $i => $doc)
-                    <div class="form-group row document-item">
-                        <label class="col-sm-2 form-control-label">
-                            @if($i == 0)
-                                Documents
-                            @endif
-                        </label>
-                        <div class="col-sm-4">
-                            <select name="document_type_id[]" class="form-control c-select">
-                                <option value="">- - Select Document Type - -</option>
-                                @foreach($allDocumentTypes as $documentType)
-                                    <option value="{{ $documentType->id }}"
-                                        {{ $doc->document_type_id == $documentType->id ? 'selected' : '' }}>
-                                        {{ $documentType->document_type }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-4">
-                            @if($doc->file_path)
-                                <span class="previous-file">
-                                    Previous: <a href="{{ asset('uploads/' . $doc->file_path) }}" target="_blank">{{ basename($doc->file_path) }}</a>
-                                </span>
-                            @endif
-                            {!! Form::file('document[]', ['class' => 'form-control','accept' => 'application/pdf,image/*']) !!}
-                        </div>
-
-                        <div class="col-sm-2">
-                            @if($i == 0)
-                                <button type="button" class="btn btn-success add-doc">+</button>
-                            @else
-                                <button type="button" class="btn btn-danger remove-doc">-</button>
-                            @endif
-                            <input type="hidden" name="document_ids[]" value="{{ $doc->id }}">
+                    <div class="form-group row mt-3">
+                        <label class="col-sm-2 form-control-label">Is Applicable Discount on Total?</label>
+                        <div class="col-sm-10">
+                            {!! Form::Checkbox('is_discount_applicable_total', 1, $booking->is_discount_applicable_total, 
+                                ['id' => 'is_discount_applicable_total', 'class' => 'is_discount_applicable_total']) !!}
                         </div>
                     </div>
-                @empty
-                    <div class="form-group row document-item">
-                        <label class="col-sm-2 form-control-label">Documents</label>
-                        <div class="col-sm-4">
-                            <select name="document_type_id[]" class="form-control c-select">
-                                <option value="">- - Select Document Type - -</option>
-                                @foreach($allDocumentTypes as $documentType)
-                                    <option value="{{ $documentType->id }}">{{ $documentType->document_type }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-sm-4">
-                            {!! Form::file('document[]', ['class' => 'form-control','accept' => 'application/pdf,image/*','required']) !!}
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-success add-doc">+</button>
-                            <input type="hidden" name="document_ids[]" value="">
+
+                    <div class="form-group row" id="discount_amount_group_total">
+                        <label class="col-sm-2 form-control-label">Discounted Amount *</label>
+                        <div class="col-sm-10">
+                            {!! Form::number('discount_amount_total', $booking->discount_amount_total, [
+                                'id' => 'discount_amount_total',
+                                'placeholder' => 'Discounted Amount on Total Price',
+                                'class' => 'form-control discount_amount_total'
+                            ]) !!}
                         </div>
                     </div>
-                @endforelse
-            </div>
-            <div id="material-wrapper">
-                @forelse($existingMaterials as $i => $material)
-                    <div class="form-group row material-item">
-                        <label class="col-sm-2 form-control-label">
-                            @if($i == 0)
-                                Materials
-                            @endif
-                        </label>
-
-                        <!-- Material Type Dropdown -->
-                        <div class="col-sm-4">
-                            <select name="material_type_id[]" class="form-control c-select">
-                                <option value="">- - Select Material Type - -</option>
-                                @foreach($allMaterialTypes as $materialType)
-                                    <option value="{{ $materialType->id }}"
-                                        {{ $material->material_type_id == $materialType->id ? 'selected' : '' }}>
-                                        {{ $materialType->material_type }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Material Details input -->
-                        <div class="col-sm-4">
-                            <input type="text" name="material_details[]" class="form-control"
-                                value="{{ $material->details }}" placeholder="Enter material details">
-                        </div>
-
-                        <div class="col-sm-2">
-                            @if($i == 0)
-                                <button type="button" class="btn btn-success add-material">+</button>
-                            @else
-                                <button type="button" class="btn btn-danger remove-material">-</button>
-                            @endif
-
-                            <input type="hidden" name="material_ids[]" value="{{ $material->id }}">
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Total Price (Auto Calculate) *</label>
+                        <div class="col-sm-10">
+                            {!! Form::number('total_price', $booking->total_price, [
+                                'id' => 'total_price',
+                                'placeholder' => 'Total Price',
+                                'class' => 'form-control total_price'
+                            ]) !!}
                         </div>
                     </div>
-                @empty
-                    <div class="form-group row material-item">
-                        <label class="col-sm-2 form-control-label">Materials</label>
-
-                        <div class="col-sm-4">
-                            <select name="material_type_id[]" class="form-control c-select">
-                                <option value="">- - Select Material Type - -</option>
-                                @foreach($allMaterialTypes as $materialType)
-                                    <option value="{{ $materialType->id }}">{{ $materialType->material_type }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <input type="text" name="material_details[]" class="form-control"
-                                placeholder="Enter material details">
-                        </div>
-
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-success add-material">+</button>
-                            <input type="hidden" name="material_ids[]" value="">
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Booking Amount *</label>
+                        <div class="col-sm-10">
+                            {!! Form::number(
+                                'booking_amount', 
+                                $booking->booking_amount, 
+                                [
+                                    'id' => 'booking_amount',
+                                    'placeholder' => 'Enter Booking Amount',
+                                    'class' => 'form-control booking_amount',
+                                    'required',
+                                    'dir' => isset($ActiveLanguage) ? $ActiveLanguage->direction : 'ltr'
+                                ]
+                            ) !!}
                         </div>
                     </div>
-                @endforelse
-            </div>
 
-            <div class="form-group row m-t-md">
-                <div class="offset-sm-2 col-sm-10">
-                    <button type="submit" class="btn btn-lg btn-primary m-t">
-                        <i class="material-icons">&#xe3c9;</i> Update
-                    </button>
-                    <a href="{{ route('price') }}" class="btn btn-lg btn-default m-t">
-                        <i class="material-icons">&#xe5cd;</i> Cancel
-                    </a>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Downpayment Amount *</label>
+                        <div class="col-sm-10">
+                            {!! Form::number(
+                                'downpayment_amount', $booking->downpayment_amount, 
+                                [
+                                    'id' => 'downpayment_amount',
+                                    'placeholder' => 'Enter Downpayment Amount',
+                                    'class' => 'form-control downpayment_amount',
+                                    'required',
+                                    'dir' => @$ActiveLanguage->direction
+                                ]
+                            ) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row extras_group" id="extras">
+                        <label class="col-sm-2 form-control-label">Extras Total (Auto Calculate)</label>
+                        <div class="col-sm-10">
+                            {!! Form::number('extras_amount_total', $booking->extras_total, [
+                                'id' => 'extras_amount_total',
+                                'placeholder' => 'Extra Amount Total(Gas, Utility, Parking, Others)',
+                                'class' => 'form-control extras_amount_total',
+                                'readonly' => true
+                            ]) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Due Amount Total(Auto Calculate)</label>
+                        <div class="col-sm-10">
+                            {!! Form::number('due_amount', $booking->due_amount_total, 
+                                array('id' => 'due_amount', 
+                                'placeholder' => 'Enter Due Amount',
+                                'class' => 'form-control due_amount',
+                                'required',
+                                'dir' => @$ActiveLanguage->direction,
+                                'readonly')) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Total EMI Amount (Per Month) *</label>
+                        <div class="col-sm-10">
+                            {!! Form::number('emi_amount', $booking->total_emi_amount,
+                                array(
+                                    'id' => 'emi_amount', 
+                                    'placeholder' => 'Enter EMI Amount (Per Month)',
+                                    'class' => 'form-control emi_amount',
+                                    'required',
+                                    'dir'=>@$ActiveLanguage->direction
+                                )) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">EMI Count (Auto Calculate) *</label>
+                        <div class="col-sm-10">
+                            {!! Form::number('emi_count', $booking->emi_count, array('id' => 'emi_count', 'placeholder' => 'Enter EMI Count','class' => 'form-control emi_count','required'=>'','maxlength'=>2, 'dir'=>@$ActiveLanguage->direction,'readonly')) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label class="col-sm-2 form-control-label">Is EMI Date Combined?</label>
+                        <div class="col-sm-10">
+                            {!! Form::Checkbox('is_emi_date_combined', 1, $booking->is_emi_date_combined, 
+                                ['class' => 'is_emi_date_combined']) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row emi_start_date_group">
+                        <label class="col-sm-2 form-control-label">EMI Start Date *</label>
+                        <div class="col-sm-10">
+                            {!! Form::date('emi_start_date', $booking->emi_start_date, [
+                                'id'=>'emi_start_date', 
+                                'class'=>'form-control emi_start_date', 
+                                'required'=>'true'
+                            ]) !!}
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div class="form-group row m-t-md">
+                    <div class="offset-sm-2 col-sm-10">
+                        <button type="submit" class="btn btn-lg btn-primary m-t"><i class="material-icons">
+                                &#xe31b;</i> {!! __('backend.add') !!}</button>
+                        <a href="{{ route('price') }}"
+                           class="btn btn-lg btn-default m-t"><i class="material-icons">
+                                &#xe5cd;</i> {!! __('backend.cancel') !!}</a>
+                    </div>
+                </div>
 
-            {{ Form::close() }}
+                {{Form::close()}}
+            </div>
         </div>
     </div>
-</div>
 @endsection
-
 @push("after-scripts")
-<script src="{{ asset("assets/dashboard/js/iconpicker/fontawesome-iconpicker.js") }}"></script>
-<script>
-$(function () {
+    <script src="{{ asset("assets/dashboard/js/iconpicker/fontawesome-iconpicker.js") }}"></script>
+    <script>
+        $(function () {
             $('.icp-auto').iconpicker({placement: '{{ (@Helper::currentLanguage()->direction=="rtl")?"topLeft":"topRight" }}'});
         });
 
-        function updateExtras() {
-                let extras = 0;
-                let extrasVisible = false;
+        function rebuildUsedFlats(exceptSelect) {
+            let used = [];
+            $('.flat-select').each(function () {
+                if (this === exceptSelect) return;
+                let val = $(this).val();
+                if (val) used.push(val.toString());
+            });
+            return used;
+        }
 
-                if ($("#gas_pay_scheme input[type='radio']:checked").val() === "handover") {
-                    let gasAmount = parseFloat($("#gas_amount").val()) || 0;
-                    extras += gasAmount;
-                    extrasVisible = true;
-                }
+        function updateFlatSelectOptions() {
+            $('.flat-details-wrapper').each(function () {
+                let $section = $(this);
+                let flats = $section.data('flats') || [];
+                let $flatSelect = $section.find('.flat-select');
 
-                if ($("#parking_pay_scheme input[type='radio']:checked").val() === "others") {
-                    let parkingAmount = parseFloat($("#parking_amount").val()) || 0;
-                    extras += parkingAmount;
-                    extrasVisible = true;
-                }
+                let currentVal = $flatSelect.val() ? $flatSelect.val().toString() : '';
+                let usedFlats = rebuildUsedFlats($flatSelect[0]);
 
-                if ($("#utility_pay_scheme input[type='radio']:checked").val() === "others") {
-                    let utilityAmount = parseFloat($("#utility_amount").val()) || 0;
-                    extras += utilityAmount;
-                    extrasVisible = true;
-                }
-                if (extrasVisible) {
-                    $("#extras").show();
-                    $("#extras_amount").val(extras);
-                } else {
-                    $("#extras").hide();
-                    $("#extras_amount").val("");
-                }
-            }
+                let options = '<option value="" disabled>Select Flat</option>';
 
-        $(document).ready(function () {
-            $('#project_id').on('change', function () {
-                let projectId = $(this).find('option:selected').data('project_id');
-                $.ajax({
-                    url: "{{ route('get.project.flats') }}",
-                    type: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        project_id: projectId
-                    },
-                    success: function (response) {
-                        let options = '<option selected disabled>Select Flat</option>';
-
-                        if (response.tags.length > 0) {
-                            response.tags.forEach(function (tag) {
-                                options += `<option value="${tag.id}">${tag.title}</option>`;
-                            });
-
-                            $('#flat_id').html(options);
-                            $('#flat_section').show();
-                        } else {
-                            $('#flat_id').html('<option>No tags found</option>');
-                            $('#flat_section').hide();
-                        }
+                flats.forEach(f => {
+                    let fId = f.id.toString();
+                    let selected = (currentVal && fId === currentVal) ? 'selected' : '';
+                    if (!usedFlats.includes(fId) || fId === currentVal) {
+                        options += `<option value="${fId}" ${selected}>${f.flat_name}</option>`;
                     }
                 });
+
+                $flatSelect.html(options);
+
+                if (!currentVal) $flatSelect.val('');
+            });
+        }
+
+        function loadFlats($wrapper, projectId, oldFlatId = null) {
+            if (!projectId) return;
+            $.ajax({
+                url: "{{ route('get.project.flats') }}",
+                type: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    project_id: projectId,
+                    current_flat_id: oldFlatId
+                },
+                success: function(response) {
+
+                    let flats = response.flats || [];
+                    $wrapper.data('flats', flats);
+
+                    let $flatSelect = $wrapper.find('.flat-select');
+                    let initialFlat = oldFlatId || $flatSelect.data('old') || '';
+
+                    let options = '<option value="" disabled selected>Select Flat</option>';
+
+                    flats.forEach(f => {
+                        options += `<option value="${f.id}">${f.flat_name}</option>`;
+                    });
+
+                    $flatSelect.html(options);
+
+                    if (initialFlat) {
+                        $flatSelect.val(initialFlat.toString());
+                    }
+
+                    updateFlatSelectOptions();
+                }
+            });
+        }
+
+        let isInitialLoad = true;
+
+        $(document).ready(function () {
+
+            $('.flat-details-wrapper').each(function() {
+                let $wrapper = $(this);
+                let projectId = $wrapper.find('.project_id').val();
+                let oldFlatId = $wrapper.find('.flat-select').data('old');
+                loadFlats($wrapper, projectId, oldFlatId);
+            });
+
+            let flat_wrapper = $('#flat-wrapper .flat-details-wrapper');
+
+            flat_wrapper.each(function (index) {
+
+                if (index > 0) {
+
+                    if ($(this).find('.flat-remove-btn').length === 0) {
+
+                        $(this).append(`
+                            <div class="text-right mt-3 flat-remove-btn">
+                                <button type="button" class="btn btn-danger remove-flat">
+                                    Remove Flat
+                                </button>
+                            </div>
+                        `);
+                    }
+                }
+            });
+
+            // When project changes
+            $(document).on('change', '.project_id', function() {
+                let $wrapper = $(this).closest('.flat-details-wrapper');
+                let projectId = $(this).val();
+
+                // Reset old flat when project changes
+                $wrapper.find('.flat-select').data('old', null).val('');
+                loadFlats($wrapper, projectId);
+            });
+
+            // Flat select change
+            $(document).on('change', '.flat-select', function () {
+
+                let $section = $(this).closest('.flat-details-wrapper');
+                let selectedFlatId = $(this).val();
+
+                let flats = $section.data('flats') || [];
+                let flatData = flats.find(f => f.id.toString() === selectedFlatId);
+
+                if (flatData) {
+                    $section.find('.flat_size').val(flatData.flat_size);
+                }
+                // ------------------------
+                // Documents
+                // ------------------------
+                $section.find('.document-wrapper .document-item').each(function (docIndex) {
+                    $(this).find('select[name^="document_type_id"], input[name^="document"]').each(function () {
+                        let originalName = $(this).attr('name');
+                        if ($(this).is('select.document-type')) {
+                                $(this).attr('name', 'document_type_id[' + selectedFlatId + '][' + docIndex + ']');
+                            }
+
+                            if ($(this).is('input[type="file"]')) {
+                                $(this).attr('name', 'document[' + selectedFlatId + '][' + docIndex + ']');
+                            }
+
+                            $(this).find('input[type="hidden"][name^="document_id"]').attr(
+                                'name',
+                                'document_id[' + selectedFlatId + '][' + docIndex + ']'
+                            );
+                        });
+                });
+
+                // ------------------------
+                // Materials
+                // ------------------------
+                $section.find('.material-wrapper .material-item').each(function (matIndex) {
+                    $(this).find('select[name^="material_type_id"], input[name^="material_details"], input[name^="material_document"]').each(function () {
+                        let originalName = $(this).attr('name');
+
+                        if (originalName.includes('material_type_id')) {
+                            $(this).attr('name', 'material_type_id[' + selectedFlatId + ']['+ matIndex + ']');
+                        }
+                        if (originalName.includes('material_details')) {
+                            $(this).attr('name', 'material_details[' + selectedFlatId + ']['+ matIndex + ']');
+                        }
+                        if (originalName.includes('material_document')) {
+                            $(this).attr('name', 'material_document[' + selectedFlatId + ']['+ matIndex + ']');
+                        }
+                    });
+                });
+
+                updateFlatSelectOptions();
             });
 
 
-            function togglePriceField() {
-            if ($("#is_negotiate_total_price").is(":checked")) {
-                $("#price_per_sqft_group").hide();
-                $("#price_per_sqft").val("");
-                $("#booking_amount").val("");
-                $("#downpayment_amount").val("");
-                $("#due_amount").val("");
-                $("#emi_amount").val("");
-                $("#emi_count").val("");
+            $(document).on('change', '.is_negotiate_total_price', function () {
+
+                let $section = $(this).closest('.flat-details-wrapper');
+
+                if ($(this).is(':checked')) {
+                    $section.find('.price_per_sqft_group').hide();
+
+                    $section.find('.price_per_sqft')
+                        .prop('required', false)
+                        .val('');
+
+                    $section.find('.emi_count, .emi_start_date')
+                        .prop('required', false)
+                        .val('');
+
+                    $section.find('#booking_amount, #downpayment_amount, #due_amount, #emi_amount')
+                        .val('');
+
+                } else {
+
+                    $section.find('.price_per_sqft_group').show();
+                    $section.find('.price_per_sqft').prop('required', true);
+                }
+                calculateFlatTotalPrice($section);
+            });
+
+            function toggleGovtGasSection($checkbox) {
+                let $section = $checkbox.closest('.flat-details-wrapper');
+
+                if ($checkbox.is(':checked')) {
+                    $section.find('.is_govt_gas_connection_paid_group').show();
+                } else {
+                    $section.find('.is_govt_gas_connection_paid_group').hide();
+
+                    $section.find('.is_govt_gas_connection_paid')
+                        .prop('checked', false)
+                        .prop('required', false);
+
+                    $section.find('.govt_gas_connection_payment_scheme')
+                        .prop('checked', false)
+                        .prop('required', false);
+                    $section.find(".gas_amount").val("").prop("required", false);
+
+                    $section.find('.gas_pay_scheme').hide();
+                    $section.find('.gas_amount_group').hide();
+                }
+                if (!isInitialLoad) {
+                    calculateFlatTotalPrice($checkbox);
+                    calculateTotal();
+                }
+            }
+
+
+        $(document).on('change', '.is_govt_gas_included', function () {
+            toggleGovtGasSection($(this));
+        });
+
+        $('.is_govt_gas_included').each(function () {
+            toggleGovtGasSection($(this));
+        });
+
+        function toggleGovtGaspayment($checkbox){
+            let $section = $checkbox.closest('.flat-details-wrapper');
+            if($checkbox.is(':checked')){
+                $section.find(".gas_pay_scheme").show();
+                $section.find(".gas_amount_group").show();
+
+                $section.find(".govt_gas_connection_payment_scheme").prop("required", true);
+                $section.find(".gas_amount").prop("required", true);
+            }else{
+                $section.find(".gas_pay_scheme").hide();
+                $section.find(".gas_amount_group").hide();
+                $section.find(".govt_gas_connection_payment_scheme").prop("checked", false).prop("required", false);
+                $section.find(".gas_amount").val("").prop("required", false);
+            }
+        }
+
+        $(document).on('change', '.is_govt_gas_connection_paid', function () {
+            toggleGovtGaspayment($(this))
+        });
+
+        $('.is_govt_gas_connection_paid').each(function () {
+            toggleGovtGaspayment($(this));
+        });
+
+        function toggleParkingSection($checkbox) {
+            let $section = $checkbox.closest('.flat-details-wrapper');
+
+            if ($checkbox.is(':checked')) {
+                $section.find('.is_parking_paid_group').show();
             } else {
-                $("#price_per_sqft_group").show();
-                // $("#price_per_sqft").val("");
-                // $("#booking_amount").val("");
-                // $("#downpayment_amount").val("");
-                // $("#due_amount").val("");
-                // $("#emi_amount").val("");
-                // $("#emi_count").val("");
+                $section.find('.is_parking_paid_group').hide();
+
+                $section.find(".is_parking_paid")
+                    .prop("checked", false)
+                    .prop("required", false);
+
+                $section.find(".parking_payment_scheme")
+                    .prop("checked", false)
+                    .prop("required", false);
+
+                $section.find(".parking_amount").val("").prop("required", false);
+                $section.find(".parking_pay_scheme").hide();
+                $section.find(".parking_fee_group").hide();
             }
-
-            updateExtras();
-        }
-
-        function toggleGasField() {
-            if ($("#is_applicable_govt_gas").is(":checked")) {
-                $("#is_govt_gas_connection_paid_group").show();
-            } else {    
-                $("#is_govt_gas_connection_paid_group").hide();
-                $("#gas_pay_scheme").hide();
-                $("#gas_amount_group").hide();
-                $("input[name='is_govt_gas_connection_paid']").prop("checked", false);
-                $("#gas_amount").val("");
+            if (!isInitialLoad) {
+                calculateFlatTotalPrice($checkbox);
+                calculateTotal();
             }
         }
 
-        function toggleParkingField() {
-            if ($("#is_applicable_parking").is(":checked")) {
-                $("#is_parking_paid_group").show();
-            } else {    
-                $("#is_parking_paid_group").hide();
-                $("#parking_pay_scheme").hide();
-                $("#parking_fee_group").hide();
-                $("input[name='is_parking_paid']").prop("checked", false);
-                $("#parking_amount").val("");
+        $(document).on('change', '.is_parking_included' , function () {
+            toggleParkingSection($(this));
+        });
+
+        $('.is_parking_included').each(function () {
+            toggleParkingSection($(this));
+        });
+
+        isInitialLoad = false;
+
+        function toggleParkingPayment($checkbox){
+            let $section = $checkbox.closest('.flat-details-wrapper');
+            if($checkbox.is(':checked')){
+                $section.find(".parking_pay_scheme").show();
+                $section.find(".parking_fee_group").show();
+                $section.find(".parking_payment_scheme").prop("required", true);
+                $section.find(".parking_amount").prop("required", true);
+            }else{
+                $section.find(".parking_pay_scheme").hide();
+                $section.find(".parking_fee_group").hide();
+                $section.find(".parking_payment_scheme").prop("checked", false).prop("required", false);
+                $section.find(".parking_amount").val("").prop("required", false);
             }
         }
 
-        function togglePaymentSchemeForGas() {
-            if ($("#is_govt_gas_connection_paid").is(":checked")) {
-                $("#gas_pay_scheme").show();
-                $("#gas_amount_group").show();
+        $(document).on('change', '.is_parking_paid' , function() {
+            toggleParkingPayment($(this));
+        });
 
-                $("input[name='govt_gas_connection_payment_scheme']").prop("required", true);
-                $("#gas_amount").prop("required", true);
-            } else {    
-                $("#gas_pay_scheme").hide();
-                $("#gas_amount_group").hide();
-
-                $("input[name='govt_gas_connection_payment_scheme']").prop("checked", false).prop("required", false);
-                $("#gas_amount").val("").prop("required", false);
-            }
-        }
+        $('.is_parking_paid').each(function () {
+            toggleParkingPayment($(this));
+        });
 
         
-        function togglePaymentSchemeForParking() {
-            if ($("#is_parking_paid").is(":checked")) {
-                $("#parking_pay_scheme").show();
-                $("#parking_fee_group").show();
+        function togglePaymentSchemeForUtility($checkbox) {
+            let $section = $checkbox.closest('.flat-details-wrapper');
+            if ($checkbox.is(":checked")) {
+                $section.find(".utility_pay_scheme").show();
+                $section.find(".utility_amount_group").show();
 
-                $("input[name='parking_payment_scheme']").prop("required", true);
-                $("#parking_amount").prop("required", true);
+                $section.find("input[name='utility_payment_scheme']").prop("required", true);
+                $section.find(".utility_amount").prop("required", true);
             } else {    
-                $("#parking_pay_scheme").hide();
-                $("#parking_fee_group").hide();
-
-                $("input[name='parking_payment_scheme']").prop("checked", false).prop("required", false);
-                $("#parking_amount").val("").prop("required", false);
-
-            }
-        }
-
-        function togglePaymentSchemeForUtility() {
-            if ($("#is_utility_included").is(":checked")) {
-                $("#utility_pay_scheme").show();
-                $("#utility_amount_group").show();
-
-                $("input[name='utility_payment_scheme']").prop("required", true);
-                $("#utility_amount").prop("required", true);
-            } else {    
-                $("#utility_pay_scheme").hide();
-                $("#utility_amount_group").hide();  
+                $section.find(".utility_pay_scheme").hide();
+                $section.find(".utility_amount_group").hide();  
                 
-                $("input[name='utility_payment_scheme']").prop("checked", false).prop("required", false);
-                $("#utility_amount").val("").prop("required", false);
+                $section.find(".utility_payment_scheme").prop("checked", false).prop("required", false);
+                $section.find(".utility_amount").val("").prop("required", false);
             }
         }
 
-        function toggleDiscountField() {
-            if ($("#is_discount_applicable").is(":checked")) {
-                $("#discount_amount_group").show();
-                $("#discount_amount").prop("required", true);
+        $(document).on("change", ".is_utility_included", function () {
+            togglePaymentSchemeForUtility($(this));
+        });
+
+        $('.is_utility_included').each(function () {
+            togglePaymentSchemeForUtility($(this));
+        });
+
+        function toggleDiscountField($checked) {
+            let $section = $checked.closest('.flat-details-wrapper');
+            if ($checked.is(":checked")) {
+                $section.find(".discount_amount_group").show();
+                $section.find(".discount_amount").prop("required", true);
             } else {    
-                $("#discount_amount_group").hide();
-                $("#discount_amount").val("").prop("required", false);
+                $section.find(".discount_amount_group").hide();
+                $section.find(".discount_amount").val("").prop("required", false);
+            }
+        }
+        $(document).on("change", ".is_discount_applicable", function () {
+            toggleDiscountField($(this));
+        });
+
+        $('.is_discount_applicable').each(function () {
+            toggleDiscountField($(this));
+        });
+
+        function toggleDiscountFieldTotal() {
+            if ($("#is_discount_applicable_total").is(":checked")) {
+                $("#discount_amount_group_total").show();
+                $("#discount_amount_total").prop("required", true);
+            } else {    
+                $("#discount_amount_group_total").hide();
+                $("#discount_amount_total").val("").prop("required", false);
             }
         }
 
-        function calculateTotalPrice() {
-            let flatSize = parseFloat($("#flat_size").val()) || 0;
-            let pricePerSqft = parseFloat($("#price_per_sqft").val()) || 0;
-            let gasAmount = parseFloat($("#gas_amount").val()) || 0;
-            let parkingAmount = parseFloat($("#parking_amount").val()) || 0;
-            let utilityAmount = parseFloat($("#utility_amount").val()) || 0;
-            let discountAmount = parseFloat($("#discount_amount").val()) || 0;
-
-            if (!$("#is_negotiate_total_price").is(":checked")) {
-                let total = flatSize * pricePerSqft;
-
-                if ($("input[name='govt_gas_connection_payment_scheme']:checked").length > 0 
-                    && $("#is_govt_gas_connection_paid").is(":checked")) {
-                    total += gasAmount;
-                }
-
-                if ($("input[name='parking_payment_scheme']:checked").length > 0 
-                    && $("#is_parking_paid").is(":checked")) {
-                    total += parkingAmount;
-                }
-
-                if ($("input[name='utility_payment_scheme']:checked").length > 0 
-                    && $("#is_utility_included").is(":checked")) {
-                    total += utilityAmount;
-                }
-
-                if ($("#is_discount_applicable").is(":checked")) {
-                    total -= discountAmount;
-                }
-
-
-                $("#total_price").val(total);
-            } else {
-                $("#total_price").val(""); 
-            }
-        }
-
-            togglePriceField();
-            toggleGasField();
-            toggleParkingField();
-            togglePaymentSchemeForGas();
-            togglePaymentSchemeForParking();
-            togglePaymentSchemeForUtility();
-            toggleDiscountField()
-            calculateTotalPrice();
-
-            $("#is_negotiate_total_price").change(function () {
-                togglePriceField();
-                calculateTotalPrice();
+            toggleDiscountFieldTotal();
+    
+            $("#is_discount_applicable_total").change(function () {
+                 toggleDiscountFieldTotal();
             });
-
-            $("#is_applicable_govt_gas").change(function () {
-                 toggleGasField();
-            });
-
-            $("#is_applicable_parking").change(function () {
-                 toggleParkingField();
-            });
-
-            $("#is_govt_gas_connection_paid").change(function () {
-                 togglePaymentSchemeForGas();
-            });
-
-            $("#is_parking_paid").change(function () {
-                 togglePaymentSchemeForParking();
-            });
-
-            $("#is_utility_included").change(function () {
-                 togglePaymentSchemeForUtility();
-            });
-
-            $("#is_discount_applicable").change(function () {
-                 toggleDiscountField();
-            });
-
-            $("#flat_size, #price_per_sqft").on("input", function () {
-                calculateTotalPrice();
-            });
-
-            // function updateExtras() {
-            //     let extras = 0;
-            //     let extrasVisible = false;
-
-            //     if ($("#gas_pay_scheme input[type='radio']:checked").val() === "handover") {
-            //         let gasAmount = parseFloat($("#gas_amount").val()) || 0;
-            //         extras += gasAmount;
-            //         extrasVisible = true;
-            //     }
-
-            //     if ($("#parking_pay_scheme input[type='radio']:checked").val() === "others") {
-            //         let parkingAmount = parseFloat($("#parking_amount").val()) || 0;
-            //         extras += parkingAmount;
-            //         extrasVisible = true;
-            //     }
-
-            //     if ($("#utility_pay_scheme input[type='radio']:checked").val() === "others") {
-            //         let utilityAmount = parseFloat($("#utility_amount").val()) || 0;
-            //         extras += utilityAmount;
-            //         extrasVisible = true;
-            //     }
-            //     if (extrasVisible) {
-            //         $("#extras").show();
-            //         $("#extras_amount").val(extras);
-            //     } else {
-            //         $("#extras").hide();
-            //         $("#extras_amount").val("");
-            //     }
-            // }
-
-            function calculateDueAmount() {
-                let totalPrice = parseFloat($("#total_price").val()) || 0;
-                let booking = parseFloat($("#booking_amount").val()) || 0;
-                let downpayment = parseFloat($("#downpayment_amount").val()) || 0;
-
-                let due = totalPrice - (booking + downpayment);
-                if ($("#gas_pay_scheme input[type='radio']:checked").val() === "handover") {
-                    let gasAmount = parseFloat($("#gas_amount").val()) || 0;
-                    due -= gasAmount;
-                }
-
-                if ($("#parking_pay_scheme input[type='radio']:checked").val() === "others") {
-                    let parkingAmount = parseFloat($("#parking_amount").val()) || 0;
-                    due -= parkingAmount;
-                }
-
-                if ($("#utility_pay_scheme input[type='radio']:checked").val() === "others") {
-                    let utilityAmount = parseFloat($("#utility_amount").val()) || 0;
-                    due -= utilityAmount;
-                }
-
-                $("#due_amount").val(due);
-            }
-
-            calculateDueAmount();
-
-            $(document).on("keyup input change", "#gas_amount, #parking_amount, #utility_amount, #gas_pay_scheme input[type='radio'], #parking_pay_scheme input[type='radio'], #utility_pay_scheme input[type='radio']", function() {
-                updateExtras();
-            });
-
-            $(document).on("keyup input change", 
-                "#flat_size, #price_per_sqft, #is_applicable_govt_gas, #gas_amount, #parking_amount, #utility_amount, input[name='govt_gas_connection_payment_scheme'], input[name='parking_payment_scheme'], input[name='is_applicable_parking'], input[name='utility_payment_scheme'], input[name='is_discount_applicable'], input[name='discount_amount'], #is_govt_gas_connection_paid, #is_parking_paid, input[name='is_utility_included']", 
-                function() {
-                    calculateTotalPrice();
-                }
-            );
-
-            $(document).on("keyup input change", "#total_price, #price_per_sqft, #flat_size, #booking_amount, #downpayment_amount, #discount_amount, #gas_amount, input[name='is_applicable_govt_gas'], input[name='is_parking_paid'], input[name='is_applicable_parking'], input[name='govt_gas_connection_payment_scheme'], input[name='parking_payment_scheme'], input[name='is_utility_included'], input[name='utility_payment_scheme'], #is_govt_gas_connection_paid, #parking_amount, #utility_amount, #gas_pay_scheme input[type='radio'], #parking_pay_scheme input[type='radio'], input[name='is_discount_applicable']", function() {
-                calculateDueAmount();
-            });
-
-            function calculateEMICount() {
-                let dueAmount = parseFloat($("#due_amount").val()) || 0;
-                let emiAmount = parseFloat($("#emi_amount").val()) || 0;
-                if (dueAmount > 0 && emiAmount > 0) {
-                    let emiCount = Math.ceil(dueAmount / emiAmount);
-                    $("#emi_count").val(emiCount);
+            function toggleEmiStartDate(){
+                if ($('.is_emi_date_combined').is(':checked')) {
+                    $('.emi_start_date_group').show();
+                    $('.emi_start_date').prop('required', true);
                 } else {
-                    // $("#emi_count").val("");
+                    $('.emi_start_date_group').hide();
+                    $('.emi_start_date').val('').prop('required', false);
                 }
             }
-
-            // Events
-            $(document).on("keyup input change", "#due_amount, #emi_amount, #discount_amount, #price_per_sqft, input[name='is_applicable_govt_gas'], input[name='is_applicable_parking'], input[name='is_parking_paid'], input[name='govt_gas_connection_payment_scheme'], input[name='parking_payment_scheme'], input[name='is_utility_included'], input[name='utility_payment_scheme'], #is_govt_gas_connection_paid, #flat_size, #gas_amount, #parking_amount, #utility_amount, input[name='is_discount_applicable']", function () {
-                calculateEMICount();
+            toggleEmiStartDate();
+            $('.is_emi_date_combined').change(function(){
+                toggleEmiStartDate();
             });
-
-            calculateEMICount();
-
-
             function validateAmounts() {
-                let totalPrice   = parseFloat($("#total_price").val()) || 0;
-                let booking      = parseFloat($("#booking_amount").val()) || 0;
-                let discount     = parseFloat($("#discount_amount").val()) || 0;
-                let gasAmount    = parseFloat($("#gas_amount").val()) || 0;
-                let parkingAmount = parseFloat($("#parking_amount").val()) || 0;
-                let utilityAmount = parseFloat($("#utility_amount").val()) || 0;
-                let downpayment  = parseFloat($("#downpayment_amount").val()) || 0;
-                let emiAmount    = parseFloat($("#emi_amount").val()) || 0;   
-                let emiCount     = parseFloat($("#emi_count").val()) || 0;
-                let emiTotal     = emiAmount * emiCount;
-                let totalPayable = booking + downpayment + emiTotal;
+                let $section = $(this).closest(".flat-details-wrapper");
 
-                if (booking > totalPrice) {
-                    alert("Booking Amount cannot be greater than Total Price!");
-                    $("#booking_amount").val("");   
-                    return false;
-                }
+                let totalPriceflat   = parseFloat($section.find(".total_price_flat").val()) || 0;
+                let gasAmount    = parseFloat($section.find(".gas_amount").val()) || 0;
+                let parkingAmount = parseFloat($section.find(".parking_amount").val()) || 0;
+                let utilityAmount = parseFloat($section.find(".utility_amount").val()) || 0;
 
-                if (discount > totalPrice) {
-                    alert("Discount Amount cannot be greater than Total Price!");
-                    $("#discount_amount").val("");   
-                    return false;
-                }
-
-                if (gasAmount > totalPrice) {
+                if (gasAmount > totalPriceflat) {
                     alert("Gas Amount cannot be greater than Total Price!");
                     $("#gas_amount").val("");   
                     return false;
                 }
-                if (utilityAmount > totalPrice) {
+                if (utilityAmount > totalPriceflat) {
                     alert("Utility Amount cannot be greater than Total Price!");
                     $("#utility_amount").val("");   
                     return false;
                 }
-                if (parkingAmount > totalPrice) {
+                if (parkingAmount > totalPriceflat) {
                     alert("Parking Amount cannot be greater than Total Price!");
                     $("#parking_amount").val("");   
                     return false;
                 }
 
-                if (downpayment > totalPrice) {
-                    alert("Downpayment Amount cannot be greater than Total Price!");
-                    $("#downpayment_amount").val(""); 
-                    return false;
-                }
-
-                if (emiAmount > totalPrice) {
-                    alert("EMI Amount cannot be greater than Total Price!");
-                    $("#emi_amount").val(""); 
-                    return false;
-                }
-
-                // if (emiTotal > totalPrice) {
-                //     console.log(emiTotal, totalPrice);
-                //     alert("Total EMI (EMI Amount x EMI Count) cannot be greater than Total Price!");
-                //     $("#emi_amount").val("");       
-                //     return false;
-                // }
-
                 return true;
             }
 
-            $("#total_price, #booking_amount, #downpayment_amount, #emi_amount, #emi_count, #discount_amount, #gas_amount, #parking_amount, #utility_amount").on("input", function () {
+            $(".total_price_flat, .gas_amount, .parking_amount, .utility_amount").on("input", function () {
                 validateAmounts();
             });
 
@@ -872,264 +1010,621 @@ $(function () {
 
         });
 
-
-    //    function updateDocumentTypeOptions() {
-    //         let selectedValues = [];
-
-    //         $("select[name='document_type_id[]']").each(function () {
-    //             let val = $(this).val();
-    //             if (val) selectedValues.push(val);
-    //         });
-
-    //         $("select[name='document_type_id[]']").each(function () {
-    //             let currentVal = $(this).val();
-    //             $(this).find("option").each(function () {
-    //                 if ($(this).val() === "") {
-    //                     $(this).show(); 
-    //                 } else if ($(this).val() === currentVal) {
-    //                     $(this).show(); 
-    //                 } else if (selectedValues.includes($(this).val())) {
-    //                     $(this).hide(); 
-    //                 } else {
-    //                     $(this).show();
-    //                 }
-    //             });
-
-    //             let fileInput = $(this).closest(".document-item").find("input[type='file']");
-    //             let hasOldFile = $(this).closest(".document-item").find(".previous-file").length > 0;
-
-    //             if ($(this).val() && !hasOldFile) {
-    //                 fileInput.prop("required", true);
-    //             } else {
-    //                 fileInput.prop("required", false);
-    //             }
-    //         });
-
-    //         let totalOptions = $("select[name='document_type_id[]']").first().find("option").length - 1; 
-    //         let selectedCount = $("select[name='document_type_id[]']").filter(function () {
-    //             return $(this).val() !== "";
-    //         }).length;
-
-    //         if (selectedCount >= totalOptions) {
-    //             $(".add-doc").hide();
-    //         } else {
-    //             $(".add-doc").show();
-    //         }
-    //     }
-
-    //     $(document).on("click", ".add-doc", function () {
-    //         let allSelected = true;
-    //         $("select[name='document_type_id[]']").each(function () {
-    //             if ($(this).val() === "") {
-    //                 allSelected = false;
-    //                 return false;
-    //             }
-    //         });
-
-    //         if (!allSelected) {
-    //             alert("Please select a document type in all rows before adding a new one.");
-    //             return;
-    //         }
-
-    //         let wrapper = $("#document-wrapper");
-    //         let item = $(this).closest(".document-item");
-    //         let clone = item.clone(false, false);
-
-    //         clone.find("select").val("");
-    //         clone.find("input[type='file']").val("");
-
-    //         clone.find("label").html("&nbsp;");
-
-    //         let btn = clone.find(".add-doc");
-    //         btn.removeClass("btn-success add-doc")
-    //         .addClass("btn-danger remove-doc")
-    //         .text("-");
-
-    //         wrapper.append(clone);
-
-    //         updateDocumentTypeOptions();
-    //     });
-
-    //     $(document).on("click", ".remove-doc", function () {
-    //         $(this).closest(".document-item").remove();
-    //         updateDocumentTypeOptions();
-    //     });
-
-    //     $(document).on("change", "select[name='document_type_id[]']", function () {
-    //         updateDocumentTypeOptions();
-    //     });
-
-    //     updateDocumentTypeOptions();
-
-    function updateDocumentTypeOptions() {
-        let selectedValues = [];
-
-        $("select[name='document_type_id[]']").each(function () {
-            let val = $(this).val();
-            if (val) selectedValues.push(val);
-        });
-
-        $("select[name='document_type_id[]']").each(function () {
-            let currentVal = $(this).val();
-            $(this).find("option").each(function () {
-                if ($(this).val() === "" || $(this).val() === currentVal || !selectedValues.includes($(this).val())) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
+        function calculateTotal(){
+            let total = 0;
+            $('.total_price_flat').each(function() {
+                let val = parseFloat($(this).val()) || 0;
+                if (!isNaN(val)) {
+                    total += val;
                 }
             });
+            let discount_total = $('.discount_amount_total').val() ? parseFloat($('.discount_amount_total').val()) : 0;
+            total = total - discount_total;
 
-            let fileInput = $(this).closest(".document-item").find("input[type='file']");
-            let hasOldFile = $(this).closest(".document-item").find(".previous-file").length > 0;
-
-            if ($(this).val() && !hasOldFile) {
-                fileInput.prop("required", true);
-            } else {
-                fileInput.prop("required", false);
-            }
-        });
-
-        let totalOptions = $("select[name='document_type_id[]']").first().find("option").length - 1;
-        let selectedCount = $("select[name='document_type_id[]']").filter(function () { return $(this).val() !== ""; }).length;
-
-        $(".add-doc").toggle(selectedCount < totalOptions);
-    }
-
-    $(document).on("click", ".add-doc", function () {
-        let allSelected = true;
-        $("select[name='document_type_id[]']").each(function () {
-            if ($(this).val() === "") { allSelected = false; return false; }
-        });
-
-        if (!allSelected) { alert("Please select a document type in all rows before adding a new one."); return; }
-
-        let wrapper = $("#document-wrapper");
-        let item = $(this).closest(".document-item");
-        let clone = item.clone(false, false);
-
-        clone.find("select").val("");
-        clone.find("input[type='file']").val("").prop("required", true);
-        clone.find(".previous-file").remove();
-        clone.find("label").html("&nbsp;");
-        clone.find(".add-doc").removeClass("btn-success add-doc").addClass("btn-danger remove-doc").text("-");
-        clone.find("input[name='document_ids[]']").val("");
-
-        wrapper.append(clone);
-        updateDocumentTypeOptions();
-    });
-
-    $(document).on("click", ".remove-doc", function () {
-        $(this).closest(".document-item").remove();
-        updateDocumentTypeOptions();
-    });
-
-    $(document).on("change", "select[name='document_type_id[]']", function () {
-        updateDocumentTypeOptions();
-    });
-
-    updateDocumentTypeOptions();
-
-
-
-
-
-    function updateMaterialOptions() {
-        let selectedValues = [];
-
-        // Collect selected material types
-        $("select[name='material_type_id[]']").each(function () {
-            let val = $(this).val();
-            if (val) selectedValues.push(val);
-        });
-
-        // Prevent duplicates
-        $("select[name='material_type_id[]']").each(function () {
-            let currentVal = $(this).val();
-
-            $(this).find("option").each(function () {
-                if ($(this).val() === "") {
-                    $(this).show();
-                } else if ($(this).val() === currentVal) {
-                    $(this).show();
-                } else if (selectedValues.includes($(this).val())) {
-                    $(this).hide();
-                } else {
-                    $(this).show();
-                }
-            });
-        });
-    }
-
-    // Add New Material Row
-    $(document).on("click", ".add-material", function () {
-        // Validate existing rows before adding new
-        let valid = true;
-        $(".material-item").each(function () {
-            let type = $(this).find("select[name='material_type_id[]']").val();
-            let details = $(this).find("input[name='material_details[]']").val();
-            if ((type && !details) || (!type && details)) {
-                valid = false;
-                return false; // break loop
-            }
-        });
-
-        if (!valid) {
-            alert("Please fill both Material Type and Details in all filled rows before adding a new one.");
-            return;
+            $('#total_price').val(total);
         }
 
-        let wrapper = $("#material-wrapper");
-        let item = $(this).closest(".material-item");
-        let clone = item.clone(false, false);
+        function calculateFlatTotalPrice($selector) {
+            let $section = $selector.closest('.flat-details-wrapper');
 
-        clone.find("select").val("");
-        clone.find("input").val("");
-        clone.find("label").html("&nbsp;");
+            let flatSize = parseFloat($section.find(".flat_size").val()) || 0;
+            let pricePerSqft = parseFloat($section.find(".price_per_sqft").val()) || 0;
+            let gasAmount = parseFloat($section.find(".gas_amount").val()) || 0;
+            let parkingAmount = parseFloat($section.find(".parking_amount").val()) || 0;
+            let utilityAmount = parseFloat($section.find(".utility_amount").val()) || 0;
+            let discountAmount = parseFloat($section.find(".discount_amount").val()) || 0;
+            if (!$section.find(".is_negotiate_total_price").is(":checked")) {
+                let total = flatSize * pricePerSqft;
 
-        clone.find(".add-material")
-            .removeClass("btn-success add-material")
-            .addClass("btn-danger remove-material")
+                if ($section.find(".govt_gas_connection_payment_scheme:checked").length > 0 
+                    && $section.find(".is_govt_gas_connection_paid").is(":checked")) {
+                    total += gasAmount;
+                }
+
+                if ($section.find(".parking_payment_scheme:checked").length > 0 
+                    && $section.find(".is_parking_paid").is(":checked")) {
+                    total += parkingAmount;
+                }
+
+                if ($section.find(".utility_payment_scheme:checked").length > 0 
+                    && $section.find(".is_utility_included").is(":checked")) {
+                    total += utilityAmount;
+                }
+
+                if ($section.find(".is_discount_applicable").is(":checked")) {
+                    total -= discountAmount;
+                }
+
+                if ($section.find("#is_discount_applicable_total").is(":checked")) {
+                    let discountAmountTotal = parseFloat($section.find("#discount_amount_total").val()) || 0;
+                    total -= discountAmountTotal;
+                }
+
+
+                $section.find(".total_price_flat").val(total);
+            } else {
+                $section.find(".total_price_flat").val(""); 
+            }
+        }
+
+        $(document).on("keyup input change", 
+            ".flat_size, .price_per_sqft, .is_negotiate_total_price, .gas_amount, .parking_amount, .utility_amount, .flat-select, .govt_gas_connection_payment_scheme, .parking_payment_scheme, .utility_payment_scheme, .is_discount_applicable, input[name='is_discount_applicable_total'], .discount_amount, input[name='discount_amount_total'], .is_govt_gas_connection_paid, .is_parking_paid, .is_utility_included", 
+            function() {
+                calculateFlatTotalPrice($(this));
+                calculateTotal();
+            }
+        );
+
+        $(document).on("keyup input", ".total_price_flat", function() {
+            calculateTotal();
+        });
+
+
+        function updateExtras($selector) {
+            let extras = 0;
+            let extrasVisible = false;
+            let $section = $selector.closest(".flat-details-wrapper");
+
+            if ($section.find(".is_govt_gas_included").is(":checked") &&
+                $section.find(".is_govt_gas_connection_paid").is(":checked") &&
+                $section.find(".gas_pay_scheme input[type='radio']:checked").val() === "handover") {
+                let gasAmount = parseFloat($section.find(".gas_amount").val()) || 0;
+                extras += gasAmount;
+                extrasVisible = true;
+            }
+
+            if ($section.find(".is_parking_included").is(":checked") &&
+                $section.find(".is_parking_paid").is(":checked") &&
+                $section.find(".parking_pay_scheme input[type='radio']:checked").val() === "others") {
+                let parkingAmount = parseFloat($section.find(".parking_amount").val()) || 0;
+                extras += parkingAmount;
+                extrasVisible = true;
+            }
+
+            if ($section.find(".is_utility_included").is(":checked") &&
+                $section.find(".utility_pay_scheme input[type='radio']:checked").val() === "others") {
+                let utilityAmount = parseFloat($section.find(".utility_amount").val()) || 0;
+                extras += utilityAmount;
+                extrasVisible = true;
+            }   
+
+            if (extrasVisible) {
+                console.log('if');
+                $section.find(".extras_group").show();
+                $section.find(".extras_amount").val(extras);
+            } else {
+                console.log('else');
+                $section.find(".extras_group").hide();
+                $section.find(".extras_amount").val("");
+            }
+        }
+
+        function totalExtras() {
+            let total = 0;
+
+            $('.extras_amount').each(function (index) {
+                let val = parseFloat($(this).val());
+
+                if (!isNaN(val)) {
+                    total += val;
+                }
+            });
+
+            $('.extras_amount_total').val(total);
+        }
+
+
+        $(document).on("keyup input change", ".gas_amount, .parking_amount, .utility_amount, .gas_pay_scheme , .is_govt_gas_included, .is_govt_gas_connection_paid, .is_parking_included, .is_parking_paid, .is_utility_included, input[type='radio'], .parking_pay_scheme input[type='radio'], .utility_pay_scheme input[type='radio']", function() {
+            updateExtras($(this));
+            totalExtras();
+
+        });
+
+
+        function calculateDueAmount($selector) {
+            let totalPrice = parseFloat($('.total_price').val()) || 0;
+            let booking = parseFloat($('.booking_amount').val()) || 0;
+            let downpayment = parseFloat($('.downpayment_amount').val()) || 0;
+            let extras = parseFloat($('.extras_amount_total').val()) || 0;
+
+            let due = totalPrice - (booking + downpayment + extras);
+            $(".due_amount").val(due);
+        }
+
+
+        $(document).on("keyup input change", ".total_price, .total_price_flat, .is_negotiate_total_price, .price_per_sqft, .flat_size, .booking_amount, .downpayment_amount, .discount_amount_total, .gas_amount, .discount_amount, .parking_amount, .utility_amount, .gas_pay_scheme input[type='radio'], .parking_pay_scheme input[type='radio'], input[name='is_discount_applicable'], input[name='is_discount_applicable_total'], .utility_pay_scheme input[type='radio']", function() {
+            calculateDueAmount($(this));
+        });
+
+        function calculateEMI(){
+            let $emi = 0;
+            $('.emi_amount_flat').each(function(){
+                let $val = parseFloat($(this).val()) || 0;
+                $emi += $val;
+                $('.emi_amount').val($emi);
+            })
+        }
+        $(document).on("keyup input change", ".emi_amount_flat", function() {
+            calculateEMI();
+        });
+
+        function calculateEMICount() {
+            let dueAmount = parseFloat($(".due_amount").val()) || 0;
+            let emiAmount = parseFloat($(".emi_amount").val()) || 0;
+            if (dueAmount > 0 && emiAmount > 0) {
+                let emiCount = Math.ceil(dueAmount / emiAmount);
+                $(".emi_count").val(emiCount);
+            } else {
+                $(".emi_count").val("");
+            }
+        }
+
+        // Events
+        $(document).on("keyup input change", ".due_amount, .emi_amount, .emi_amount_flat, .total_price_flat, .is_negotiate_total_price, .price_per_sqft, .flat_size, .discount_amount_total, input[name='is_discount_applicable_total'], .gas_amount, .parking_amount, .utility_amount, .gas_pay_scheme input[type='radio'], .parking_pay_scheme input[type='radio'], input[name='is_discount_applicable'], input[name='is_discount_applicable_total'], .utility_pay_scheme input[type='radio']", function () {
+            calculateEMICount();
+        });
+        // Handled documents field
+       function updateDocumentTypeOptions($section) {
+            let selectedValues = [];
+
+            // Collect all selected values
+            $section.find(".document-type").each(function () {
+                let val = $(this).val();
+                if (val) selectedValues.push(val);
+            });
+            // Update options for each select
+            $section.find(".document-type").each(function () {
+                let currentVal = $(this).val();
+                $(this).find("option").each(function () {
+                    if ($(this).val() === "") {
+                        $(this).show(); 
+                    } else if ($(this).val() === currentVal) {
+                        $(this).show(); 
+                    } else if (selectedValues.includes($(this).val())) {
+                        $(this).hide(); 
+                    } else {
+                        $(this).show();
+                    }
+                });
+
+                let fileInput = $(this).closest(".document-item").find("input[type='file']");
+                let hasExistingFile = $(this).closest(".document-item").find("a[href]").length > 0;
+                if ($(this).val()) {
+                    if (!hasExistingFile) {
+                        fileInput.prop("required", true);
+                    } else {
+                        fileInput.prop("required", false);
+                    }
+                } else {
+                    fileInput.prop("required", false);
+                    fileInput.val(''); 
+                }
+            });
+
+            // Hide + button if all options are selected
+            let totalOptions = $section.find(".document-type").first().find("option").length - 1; 
+            let selectedCount = $section.find(".document-type").filter(function () {
+                return $(this).val() !== "";
+            }).length;
+
+            if (selectedCount >= totalOptions) {
+                $section.find(".add-doc").hide();
+            } else {
+                $section.find(".add-doc").show();
+            }
+        }
+
+        $(document).on("click", ".add-doc", function () {
+            let $section = $(this).closest(".flat-details-wrapper");
+            // Validate all selects
+            let allSelected = true;
+            $section.find(".document-type").each(function () {
+                if ($(this).val() === "") {
+                    allSelected = false;
+                    return false;
+                }
+            });
+
+            if (!allSelected) {
+                alert("Please select a document type in all rows before adding a new one.");
+                return;
+            }
+
+            let wrapper = $section.find(".document-wrapper");
+            let newIndex = wrapper.find(".document-item").length;
+            let item = $(this).closest(".document-item");
+            let clone = item.clone(false, false);
+
+            // Clear values in clone
+            clone.find("select").val("");
+            clone.find("input[type='file']").val("");
+            clone.find("a").remove();
+            // clone.find("input[type='hidden']").remove();
+            clone.find("input[type='hidden'][name^='document_id']").remove();
+            // clone.find("select").attr("name", function(_, name){
+            //     return name.replace(/\[\d+\]$/, "[" + newIndex + "]");
+            // });
+
+            // clone.find("input[type='file']").attr("name", function(_, name){
+            //     return name.replace(/\[\d+\]$/, "[" + newIndex + "]");
+            // });
+            clone.find("select, input[type='file']").each(function(){
+
+                let name = $(this).attr("name");
+
+                if(name){
+                    name = name.replace(/\[\d*\]$/, "[" + newIndex + "]");
+                    $(this).attr("name", name);
+                }
+
+            });
+
+            // Hide label in cloned rows
+            clone.find("label").html("&nbsp;");
+
+            // Change + to -
+            let btn = clone.find(".add-doc");
+            btn.removeClass("btn-success add-doc")
+            .addClass("btn-danger remove-doc")
             .text("-");
 
-        wrapper.append(clone);
+            wrapper.append(clone);
 
-        updateMaterialOptions();
-    });
+            updateDocumentTypeOptions($section);
+        });
 
-    // Remove Row
-    $(document).on("click", ".remove-material", function () {
-        $(this).closest(".material-item").remove();
-        updateMaterialOptions();
-    });
+        $(document).on("click", ".remove-doc", function () {
+            let $section = $(this).closest(".flat-details-wrapper");
+            $(this).closest(".document-item").remove();
+            updateDocumentTypeOptions($section);
+        });
 
-    // On change of material dropdown or details input
-    $(document).on("change", "select[name='material_type_id[]'], input[name='material_details[]']", function () {
-        updateMaterialOptions();
-    });
+        $(document).on("change", ".document-type", function () {
+            let $section = $(this).closest(".flat-details-wrapper");
+            updateDocumentTypeOptions($section);
+        });
 
-    // Form submit validation
-    $("#your-form-id").on("submit", function (e) {
-        let valid = true;
+        // Initial call
+        $(".flat-details-wrapper").each(function () {
+            updateDocumentTypeOptions($(this));
+        });
 
-        $(".material-item").each(function () {
-            let type = $(this).find("select[name='material_type_id[]']").val();
-            let details = $(this).find("input[name='material_details[]']").val();
 
-            // Check partial fill
-            if ((type && !details) || (!type && details)) {
-                valid = false;
-                return false; // break loop
+
+       function updateMaterialOptions($section) {
+            let selectedValues = [];
+
+            // Collect selected material types
+            $section.find(".material-type").each(function () {
+            let val = $(this).val();
+                if (val) selectedValues.push(val);
+            });
+
+
+            let totalOptions =
+                $section.find(".material-type")
+                    .first()
+                    .find("option")
+                    .not('[value=""]')
+                    .length;
+
+            let selectedCount =
+                $section.find(".material-type")
+                    .filter(function () {
+                        return $(this).val() !== "";
+                    }).length;
+
+            if (selectedCount >= totalOptions) {
+                $section.find(".add-material").hide();
+            } else {
+                $section.find(".add-material").show();
+            }
+            // Prevent duplicates
+            $section.find(".material-type").each(function () {
+                let currentVal = $(this).val();
+
+                $(this).find("option").each(function () {
+                    if ($(this).val() === "") {
+                        $(this).show();
+                    } else if ($(this).val() === currentVal) {
+                        $(this).show();
+                    } else if (selectedValues.includes($(this).val())) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+            });
+
+            // Make material details mandatory if material type selected
+            $section.find(".material-type").each(function () {
+                let detailsInput = $(this).closest(".material-item").find("input[name='material_details[][]']");
+                if ($(this).val() !== "") {
+                    detailsInput.prop("required", true);
+                } else {
+                    detailsInput.prop("required", false);
+                }
+            });
+        }
+
+        // Add New Material Row
+        $(document).on("click", ".add-material", function () {
+            let $section = $(this).closest(".flat-details-wrapper");
+            let allSelected = true;
+
+            $section.find(".material-type").each(function () {
+                if ($(this).val() === "") {
+                    allSelected = false;
+                    return false;
+                }
+            });
+
+            if (!allSelected) {
+                alert("Please select a material type in all rows before adding a new one.");
+                return;
+            }
+
+            let wrapper = $section.find(".material-wrapper");
+            let newIndex = wrapper.find(".material-item").length;
+            let item = $(this).closest(".material-item");
+            let clone = item.clone(false, false);
+
+            clone.find("select").val("");
+            clone.find("input").val("");
+            clone.find("label").html("&nbsp;");
+            clone.find("a").remove();
+            clone.find("input[type='hidden']").remove();
+
+            clone.find("select").attr("name", function(_, name){
+                return name.replace(/\[\d+\]$/, "[" + newIndex + "]");
+            });
+
+            clone.find("input.material_details").attr("name", function(_, name){
+                return name.replace(/\[\d+\]$/, "[" + newIndex + "]");
+            }).val("");
+
+            clone.find("input[type='file']").attr("name", function(_, name){
+                return name.replace(/\[\d+\]$/, "[" + newIndex + "]");
+            });
+
+            clone.find(".add-material")
+                .removeClass("btn-success add-material")
+                .addClass("btn-danger remove-material")
+                .text("-");
+
+            wrapper.append(clone);
+
+            updateMaterialOptions($section);
+        });
+
+        // Remove Row
+        $(document).on("click", ".remove-material", function () {
+            let $section = $(this).closest(".flat-details-wrapper");
+            $(this).closest(".material-item").remove();
+            updateMaterialOptions($section);
+        });
+
+        // On change of material dropdown
+        $(document).on("change", ".material-type", function () {
+            let $section = $(this).closest(".flat-details-wrapper");
+            updateMaterialOptions($section);
+        });
+
+        // Form submit validation
+        $("form").on("submit", function (e) {
+            let valid = true;
+
+            $(".material-item").each(function () {
+                let type = $(this).find(".material-type").val();
+                let details = $(this).find(".material_details").val();
+                console.log("Type:", type, "Details:", details);
+
+                if ((type && !details) || (!type && details)) {
+                    valid = false;
+                    return false; 
+                }
+            });
+
+            if (!valid) {
+                alert("Please fill out both Material Type and Material Details for all rows.");
+                e.preventDefault();
             }
         });
 
-        if (!valid) {
-            alert("Please fill both Material Type and Details for all filled rows.");
-            e.preventDefault();
+        $(".flat-details-wrapper").each(function () {
+            updateMaterialOptions($(this));
+        });
+        function updateFlatNumbering() {
+            $('#flat-wrapper .flat-details-wrapper').each(function (index) {
+                $(this).find('.flat-title').text('Flat Details ' + (index + 1) + ':');
+            });
         }
-    });
 
-    // Initial load
-    updateMaterialOptions();
+        function isFlatValid(flat) {
+            let isValid = true;
 
-</script>
+            flat.find('[required]:visible').each(function () {
+                console.log('Checking:', this.name, 'Value:', $(this).val(), 'Visible:', $(this).is(':visible'));
+                if (!this.checkValidity()) {
+                    console.log('INVALID FIELD:', this.name);
+                    this.reportValidity(); 
+                    isValid = false;
+                    return false; 
+                }
+            });
+
+            return isValid;
+        }
+
+        // $('#add-flat').on('click', function () {
+
+        //     let wrapper = $('#flat-wrapper');
+        //     let lastFlat = wrapper.find('.flat-details-wrapper:last');
+        //     let index = $('.flat-details-wrapper').length;
+
+        //     if (!isFlatValid(lastFlat)) {
+        //         alert('Please fill out all required fields in the last flat before adding a new one.');
+        //         return;
+        //     }
+
+        //     let clone = wrapper.find('.flat-details-wrapper:first').clone();
+
+        //     //  Reset all inputs
+        //     clone.find('input').each(function () {
+        //         if ($(this).is(':checkbox, :radio')) {
+        //             $(this).prop('checked', false);
+        //         } else {
+        //             $(this).val('');
+        //         }
+        //     });
+
+        //     clone.find('select').val('');
+        //     clone.find("option").show();
+        //     clone.find('textarea').val('');
+        //     clone.find('input[type="file"]').val('');
+        //     clone.find(".govt_gas_connection_payment_scheme").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
+        //     clone.find(".parking_payment_scheme").attr('name', 'parking_payment_scheme[' + index + ']');
+        //     clone.find(".utility_payment_scheme").attr('name', 'utility_payment_scheme[' + index + ']');
+
+        //     //  Remove extra document/material rows
+        //     clone.find('.document-item:not(:first)').remove();
+        //     clone.find('.material-item:not(:first)').remove();
+
+
+        //     //  FORCE hide all conditional UI
+        //     clone.find(
+        //         '#utility_pay_scheme, \
+        //         #utility_amount_group, \
+        //         #parking_fee_group, \
+        //         #parking_pay_scheme, \
+        //         #gas_amount_group, \
+        //         #gas_pay_scheme, \
+        //         #is_govt_gas_connection_paid_group, \
+        //         #is_parking_paid_group, \
+        //         #discount_amount_group, \
+        //         #extras'
+        //     ).hide();
+
+        //     //  Reset conditional UI
+        //     clone.find('#discount_amount_group, #extras').hide();
+
+        //     //  Add Remove button (inside card)
+        //     clone.find('.flat-remove-btn').remove(); 
+
+        //     clone.append(`
+        //         <div class="text-right mt-3 flat-remove-btn">
+        //             <button type="button" class="btn btn-danger remove-flat">
+        //                 Remove Flat
+        //             </button>
+        //         </div>
+        //     `);
+
+        //     wrapper.append(clone);
+        //     updateFlatNumbering();
+        // });
+
+        $('#add-flat').on('click', function () {
+            let wrapper = $('#flat-wrapper');
+            let lastFlat = wrapper.find('.flat-details-wrapper:last');
+            let index = $('.flat-details-wrapper').length;
+
+            if (!isFlatValid(lastFlat)) {
+                alert('Please fill out all required fields in the last flat before adding a new one.');
+                return;
+            }
+
+            let clone = wrapper.find('.flat-details-wrapper:first').clone();
+            clone.find('a[href]').remove();
+
+            // Reset all inputs
+            clone.find('input').each(function () {
+                if ($(this).is(':checkbox, :radio')) {
+                    $(this).prop('checked', false).prop('required', false);
+                } else {
+                    $(this).val('');
+                }
+            });
+
+            clone.find('select').val('');
+            clone.find("option").show();
+            clone.find('textarea').val('');
+            clone.find('input[type="file"]').val('');
+
+            // Update names for dynamic arrays
+            clone.find(".govt_gas_connection_payment_scheme").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
+            clone.find(".parking_payment_scheme").attr('name', 'parking_payment_scheme[' + index + ']');
+            clone.find(".utility_payment_scheme").attr('name', 'utility_payment_scheme[' + index + ']');
+            clone.find('[name^="document_type_id"]').attr('name', 'document_type_id[' + index + '][]');
+            clone.find('[name^="material_type_id"]').attr('name', 'material_type_id[' + index + '][]');
+            clone.find('[name^="material_details"]').attr('name', 'material_details[' + index + '][]');
+            clone.find('.material_details').prop('required', false);
+            clone.find('input[name="flat_id[]"]').remove();
+
+            clone.find('.is_negotiate_total_price').prop('checked', false);
+
+            clone.find('.price_per_sqft_group')
+                .removeAttr('style')
+                .show();
+
+            // Remove extra document/material rows
+            clone.find('.document-item:not(:first)').remove();
+            clone.find('.material-item:not(:first)').remove();
+
+            // Hide all conditional UI & remove required
+            clone.find(
+                '#utility_pay_scheme, #utility_amount_group, #parking_fee_group, #parking_pay_scheme, #gas_amount_group, #gas_pay_scheme, #is_govt_gas_connection_paid_group, #is_parking_paid_group, #discount_amount_group, #extras'
+            ).each(function() {
+                $(this).hide();
+                $(this).find('input, select, textarea').prop('required', false).prop('checked', false).val('');
+            });           
+
+            // Reset buttons
+            clone.find(".add-doc").show();
+            clone.find(".add-material").show();
+            clone.find(".remove-doc, .remove-material").remove();
+
+            // Add Remove button
+            clone.find('.flat-remove-btn').remove();
+            clone.append(`
+                <div class="text-right mt-3 flat-remove-btn">
+                    <button type="button" class="btn btn-danger remove-flat">
+                        Remove Flat
+                    </button>
+                </div>
+            `);
+
+            wrapper.append(clone);
+            updateFlatNumbering();
+        });
+
+        //  Remove flat
+        $(document).on('click', '.remove-flat', function () {
+            $(this).closest('.flat-details-wrapper').remove();
+            updateFlatNumbering();
+            calculateTotal();
+            totalExtras();
+            calculateDueAmount($(this));
+            calculateEMICount();
+        });
+    </script>
 @endpush

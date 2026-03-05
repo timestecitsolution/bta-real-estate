@@ -77,7 +77,6 @@
 
                                 @foreach($projectFlats as $flatDetail)
                                     <tr>
-
                                         {{-- SL --}}
                                         @if($isFirstClientRow)
                                             <td rowspan="{{ $clientRowSpan }}" class="text-center">{{ $sl }}</td>
@@ -136,16 +135,16 @@
                                             @endforelse
                                         </td>
 
-                                        {{-- Options --}}
-                                        @if($isFirstProjectRow)
-                                            <td class="text-center" rowspan="{{ $projectRowSpan }}">
+                                        {{-- Options (client-level) --}}
+                                        @if($isFirstClientRow)
+                                            <td class="text-center" rowspan="{{ $clientRowSpan }}">
                                                 <div class="dropdown">
                                                     <button class="btn btn-sm light dk dropdown-toggle" data-toggle="dropdown">
                                                         <i class="material-icons">&#xe5d4;</i> Options
                                                     </button>
 
                                                     <div class="dropdown-menu pull-right">
-                                                        @if(@Auth::user()->permissionsGroup->edit_status && app()->environment('local'))
+                                                        @if(@Auth::user()->permissionsGroup->edit_status)
                                                             <a class="dropdown-item"
                                                             href="{{ route('flat-booking.edit', $booking->id) }}">
                                                                 <i class="material-icons">&#xe3c9;</i> Edit
@@ -160,6 +159,7 @@
                                             </td>
                                         @endif
                                     </tr>
+
                                     @php
                                         $isFirstClientRow = false;
                                         $isFirstProjectRow = false;
