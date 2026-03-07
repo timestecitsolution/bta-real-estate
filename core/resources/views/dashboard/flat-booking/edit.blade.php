@@ -725,11 +725,11 @@ $projects = Helper::Topics(8);
                                 $(this).attr('name', 'document[' + selectedFlatId + '][' + docIndex + ']');
                             }
 
-                            $(this).find('input[type="hidden"][name^="document_id"]').attr(
+                        });
+                        $(this).find('input[type="hidden"][name^="document_id"]').attr(
                                 'name',
                                 'document_id[' + selectedFlatId + '][' + docIndex + ']'
                             );
-                        });
                 });
 
                 // ------------------------
@@ -749,6 +749,11 @@ $projects = Helper::Topics(8);
                             $(this).attr('name', 'material_document[' + selectedFlatId + ']['+ matIndex + ']');
                         }
                     });
+                    console.log(selectedFlatId);
+                    $(this).find('input[type="hidden"][name^="material_id"]').attr(
+                        'name',
+                        'material_id[' + selectedFlatId + '][' + matIndex + ']'
+                    );
                 });
 
                 updateFlatSelectOptions();

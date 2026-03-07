@@ -411,18 +411,12 @@ class FlatBookingController extends Controller
             =============================== */
 
             foreach ($FlatBookingMap as $flatId => $flatInfo) {
-
-                // $existingDocs = FlatDocuments::where('booking_id', $booking_id)
-                //     ->where('flat_id', $flatId)
-                //     ->get()
-                //     ->keyBy('id');
                 $existingDocs = FlatDocuments::where('booked_flat_id', $flatInfo['booked_flat_id'])
                     ->get()
                     ->keyBy('id');
 
                 $requestDocIds = [];
                 if (isset($request->document_type_id[$flatId])) {
-                    // dd($flatId);
                     foreach ($request->document_type_id[$flatId] as $index => $documentTypeId) {
 
                         $docId = $request->document_id[$flatId][$index] ?? null;
@@ -476,13 +470,11 @@ class FlatBookingController extends Controller
                         }
                     }
                 }
-                    // dd([$existingDocs, $requestDocIds]);
 
                 // Only delete if user actually removed row
                 foreach ($existingDocs as $docId => $doc) {
                     $filePath = $this->getUploadPath('') . $doc->file_path;
                     $docId = intval($docId);
-                    // dd([$docId, $requestDocIds]);
                     if (!in_array($docId, $requestDocIds)) {
                         if ($doc->file_path && file_exists($filePath)) {
                             unlink($filePath);
@@ -498,8 +490,7 @@ class FlatBookingController extends Controller
 
             foreach ($FlatBookingMap as $flatId => $flatInfo) {
 
-                $existingMaterials = MaterialDetails::where('booking_id', $booking_id)
-                    ->where('flat_id', $flatId)
+                $existingMaterials = MaterialDetails::where('booked_flat_id', $flatInfo['booked_flat_id'])
                     ->get()
                     ->keyBy('id');
 
@@ -509,49 +500,56 @@ class FlatBookingController extends Controller
 
                     foreach ($request->material_type_id[$flatId] as $index => $materialTypeId) {
 
-                        if (!$materialTypeId) continue;
-
                         $materialId = $request->material_id[$flatId][$index] ?? null;
                         $file = $request->file("material_document.$flatId.$index");
 
+                        // =========================
+                        // EXISTING MATERIAL UPDATE
+                        // =========================
                         if ($materialId && isset($existingMaterials[$materialId])) {
 
                             $material = $existingMaterials[$materialId];
                             $requestMaterialIds[] = intval($materialId);
 
+                            if ($materialTypeId) {
+                                $material->material_type_id = $materialTypeId;
+                            }
+
+                            $material->details = $request->material_details[$flatId][$index] ?? null;
+
+                            // replace file if uploaded
                             if ($file) {
 
-                                // Correct absolute path
-                                if ($material->material_document) {
+                                $filePath = $this->getUploadPath('') . $material->material_document;
 
-                                    $oldPath = $this->getUploadPath('material_documents_client')
-                                            . '/' .
-                                            basename($material->material_document);
-
-                                    if (file_exists($oldPath)) {
-                                        unlink($oldPath);
-                                    }
+                                if ($material->material_document && file_exists($filePath)) {
+                                    unlink($filePath);
                                 }
 
                                 $path = $this->getUploadPath('material_documents_client');
                                 $fileName = time().rand(1111,9999).'.'.$file->getClientOriginalExtension();
                                 $file->move($path, $fileName);
 
-                                $material->material_document =
-                                    'material_documents_client/'.$fileName;
+                                $material->material_document = 'material_documents_client/'.$fileName;
                             }
 
-                            $material->material_type_id = $materialTypeId;
-                            $material->details = $request->material_details[$flatId][$index] ?? null;
                             $material->save();
-                        } else {
+                        }
+
+                        // =========================
+                        // NEW MATERIAL CREATE
+                        // =========================
+                        elseif ($materialTypeId) {
 
                             $fileName = null;
 
                             if ($file) {
+
                                 $path = $this->getUploadPath('material_documents_client');
                                 $fileName = time().rand(1111,9999).'.'.$file->getClientOriginalExtension();
                                 $file->move($path, $fileName);
+
+                                $fileName = 'material_documents_client/'.$fileName;
                             }
 
                             $newMaterial = MaterialDetails::create([
@@ -561,32 +559,27 @@ class FlatBookingController extends Controller
                                 'flat_id' => $flatId,
                                 'material_type_id' => $materialTypeId,
                                 'details' => $request->material_details[$flatId][$index] ?? null,
-                                'material_document' => $fileName
-                                    ? 'material_documents_client/'.$fileName
-                                    : null,
+                                'material_document' => $fileName,
                             ]);
 
-                            $requestMaterialIds[] = $newMaterial->id;
+                            $requestMaterialIds[] = intval($newMaterial->id);
                         }
                     }
                 }
 
-                // DELETE REMOVED MATERIAL + FILE
+                // =========================
+                // DELETE REMOVED MATERIAL
+                // =========================
                 foreach ($existingMaterials as $materialId => $material) {
 
                     $materialId = intval($materialId);
 
                     if (!in_array($materialId, $requestMaterialIds)) {
 
-                        if ($material->material_document) {
+                        $filePath = $this->getUploadPath('') . $material->material_document;
 
-                            $filePath = $this->getUploadPath('material_documents_client')
-                                        . '/' .
-                                        basename($material->material_document);
-
-                            if (file_exists($filePath)) {
-                                unlink($filePath);
-                            }
+                        if ($material->material_document && file_exists($filePath)) {
+                            unlink($filePath);
                         }
 
                         $material->delete();
@@ -612,7 +605,6 @@ class FlatBookingController extends Controller
                 'flatBookingDetails.flatDocuments',
                 'flatBookingDetails.materialDocuments'
             ])->findOrFail($id);
-            // dd($booking);
 
             foreach ($booking->flatBookingDetails as $flatDetail) {
                 foreach ($flatDetail->flatDocuments as $doc) {
