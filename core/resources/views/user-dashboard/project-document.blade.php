@@ -20,7 +20,7 @@
                 </td>
 
                 <td>
-                    <a href="{{ asset('uploads/'.$doc->file_path ?? '') }}" class="btn btn-sm btn-info" target="_blank">
+                    <a href="{{ asset('uploads/'.$doc->file_path ?? '') }}" class="btn btn-sm btn-success" target="_blank">
                         View Document
                     </a>
                 </td>
