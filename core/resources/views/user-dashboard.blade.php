@@ -51,7 +51,14 @@
                         Material Details
                     </button>
                 </li>
-                <li class="nav-item" role="material_details">
+                @if($Contact->status == '2')
+                <li class="nav-item" role="Project Documents">
+                    <button class="nav-link" style="color: black !important;" id="project-document-tab" data-bs-toggle="tab" data-bs-target="#project-document" type="button" role="tab" aria-controls="project-document" aria-selected="false">
+                        Project Documets
+                    </button>
+                </li>
+                @endif
+                <li class="nav-item" role="application">
                     <button class="nav-link" style="color: black !important;" id="application-form-tab" data-bs-toggle="tab" data-bs-target="#application-form" type="button" role="tab" aria-controls="application-form" aria-selected="false">
                         Application
                     </button>
@@ -99,6 +106,11 @@
                 <div class="tab-pane fade" id="material-details" role="tabpanel" aria-labelledby="material-details-tab">
                     @include('user-dashboard.material-details')
                 </div>
+                @if($Contact->status == '2')
+                <div class="tab-pane fade" id="project-document" role="tabpanel" aria-labelledby="project-document-tab">
+                    @include('user-dashboard.project-document')
+                </div>
+                @endif
                 <div class="tab-pane fade" id="application-form" role="tabpanel" aria-labelledby="application-form-tab">
                     @include('user-dashboard.application-form')
                 </div>

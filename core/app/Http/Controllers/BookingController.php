@@ -218,10 +218,11 @@ class BookingController extends Controller
         ->when($user->status == 0, function ($query) use ($user) {
             return $query->where('customer_id', $user->contact_id);
         })->get();
-        $allocated_flats = LandlordEngagement::with(['project', 'flat', 'customer', 'flatDocuments', 'materials.materialType'])
+        $allocated_flats = LandlordEngagement::with(['project', 'flat', 'customer', 'projectDocuments.documentType', 'flatDocuments', 'materials.materialType'])
                 ->when($user->status == 0, function ($query) use ($user) {
                     return $query->where('landlord_id', $user->contact_id);
                 })->get();
+                // dd($allocated_flats);
                 
         // Step 1: Default empty collections
         $prices_details = collect();

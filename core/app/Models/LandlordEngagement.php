@@ -24,7 +24,10 @@ class LandlordEngagement extends Model
     {
         return $this->belongsTo(Topics::class, 'project_id');
     }
-
+    public function projectDocuments()
+    {
+        return $this->hasMany(EngagementProjectDocument::class, 'project_id', 'project_id');
+    }
     public function flat()
     {
         return $this->belongsTo(FlatDetailsModel::class, 'flat_id');
