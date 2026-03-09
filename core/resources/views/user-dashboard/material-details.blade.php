@@ -1,7 +1,7 @@
 <h3>Flat Material Details</h3>
 <form method="POST" action="{{ route('dashboard-new-post') }}">
 @csrf
-    <div class="row">
+    <div class="row align-items-center">
 
         <div class="col-md-3">
             <label>Client <span>*</span></label>

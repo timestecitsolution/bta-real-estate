@@ -2,7 +2,7 @@
     <h3>Allocated Flats</h3>
     <form method="POST" action="{{ route('dashboard-new-post') }}">
         @csrf
-        <div class="row g-2">
+        <div class="row g-2 align-items-center">
             <div class="col-md-3">
                 <label>Landlord <span>*</span></label>
                 <select name="landlord_id" class="form-select" required>

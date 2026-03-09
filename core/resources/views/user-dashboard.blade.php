@@ -29,11 +29,6 @@
                     </button>
                 </li>
                 @endif
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" style="color: black !important;" id="user-profile-tab" data-bs-toggle="tab" data-bs-target="#user-profile" type="button" role="tab" aria-controls="user-profile" aria-selected="false">
-                        User Profile
-                    </button>
-                </li>
                 @if($user->status == '1')
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" style="color: black !important;" id="bulk-sms-tab" data-bs-toggle="tab" data-bs-target="#bulk-sms" type="button" role="tab" aria-controls="bulk-sms" aria-selected="false">
@@ -41,11 +36,6 @@
                     </button>
                 </li>
                 @endif
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" style="color: black !important;" id="reset-password-tab" data-bs-toggle="tab" data-bs-target="#reset-password" type="button" role="tab" aria-controls="reset-password" aria-selected="false">
-                        Reset Password
-                    </button>
-                </li>
                 <li class="nav-item" role="material_details">
                     <button class="nav-link" style="color: black !important;" id="material-details-tab" data-bs-toggle="tab" data-bs-target="#material-details" type="button" role="tab" aria-controls="material-details" aria-selected="false">
                         Material Details
@@ -61,6 +51,16 @@
                 <li class="nav-item" role="application">
                     <button class="nav-link" style="color: black !important;" id="application-form-tab" data-bs-toggle="tab" data-bs-target="#application-form" type="button" role="tab" aria-controls="application-form" aria-selected="false">
                         Application
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" style="color: black !important;" id="user-profile-tab" data-bs-toggle="tab" data-bs-target="#user-profile" type="button" role="tab" aria-controls="user-profile" aria-selected="false">
+                        User Profile
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" style="color: black !important;" id="reset-password-tab" data-bs-toggle="tab" data-bs-target="#reset-password" type="button" role="tab" aria-controls="reset-password" aria-selected="false">
+                        Reset Password
                     </button>
                 </li>
                 <div class="ms-3">
@@ -89,17 +89,11 @@
                     @include('user-dashboard.allocated-flats')
                 </div>
                 @endif
-                <div class="tab-pane fade" id="user-profile" role="tabpanel" aria-labelledby="user-profile-tab">
-                    @include('user-dashboard.user-profile')
-                </div>
                 @if($Contact->status == '0')
                     <div class="tab-pane fade" id="bulk-sms" role="tabpanel" aria-labelledby="bulk-sms-tab">
                         @include('user-dashboard.bulk-sms')
                     </div>
                 @endif
-                <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
-                    @include('user-dashboard.reset-password')
-                </div>
                 <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
                     @include('user-dashboard.reset-password')
                 </div>
@@ -113,6 +107,12 @@
                 @endif
                 <div class="tab-pane fade" id="application-form" role="tabpanel" aria-labelledby="application-form-tab">
                     @include('user-dashboard.application-form')
+                </div>
+                <div class="tab-pane fade" id="user-profile" role="tabpanel" aria-labelledby="user-profile-tab">
+                    @include('user-dashboard.user-profile')
+                </div>
+                 <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
+                    @include('user-dashboard.reset-password')
                 </div>
             </div>
             
