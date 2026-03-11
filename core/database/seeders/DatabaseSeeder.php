@@ -29,5 +29,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CategoriesSeeder::class);
         $this->call(TopicsSeeder::class);
         $this->call(WebmailGroupsSeeder::class);
+        $this->call(LegacyEmiMigrationSeeder::class);
     }
 }

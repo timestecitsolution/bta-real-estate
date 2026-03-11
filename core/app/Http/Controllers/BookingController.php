@@ -19,6 +19,7 @@ use App\Models\EmiPayment;
 use App\Models\ClientApplicationSubject;
 use App\Models\CentralApplication;
 use App\Models\LandlordEngagement;
+use App\Models\FlatBookingModel;
 use Helper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -144,9 +145,9 @@ class BookingController extends Controller
     {
         $currentFlatId = $request->current_flat_id;
         
-        $priceFlatIds = DB::table('price')
-            ->pluck('flat_id')
-            ->toArray();
+        // $priceFlatIds = DB::table('price')
+        //     ->pluck('flat_id')
+        //     ->toArray();
 
         $bookedFlatIds = DB::table('booked_flat_info')
             ->pluck('flat_id')
@@ -157,7 +158,7 @@ class BookingController extends Controller
             ->toArray();
 
         $excludedFlatIds = array_unique(array_merge(
-            $priceFlatIds,
+            // $priceFlatIds,
             $bookedFlatIds,
             $engagedFlatIds
         ));
@@ -218,6 +219,15 @@ class BookingController extends Controller
         ->when($user->status == 0, function ($query) use ($user) {
             return $query->where('customer_id', $user->contact_id);
         })->get();
+
+
+        $all_booking_details = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats', 'flatBookingDetails.flatDocuments', 'flatBookingDetails.emis', 'flatBookingDetails.invoices'])
+        ->when($user->status == 0, function ($query) use ($user) {
+            return $query->where('client_id', $user->contact_id);
+        })->get();
+
+        // dd($all_booking_details);
+
         $allocated_flats = LandlordEngagement::with(['project', 'flat', 'customer', 'projectDocuments.documentType', 'flatDocuments', 'materials.materialType'])
                 ->when($user->status == 0, function ($query) use ($user) {
                     return $query->where('landlord_id', $user->contact_id);
@@ -331,7 +341,7 @@ class BookingController extends Controller
             ->where('applied_by', $user->id)
             ->get();
 
-        return view('user-dashboard', compact('all_prices_details','prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details', 'applicationSubjects', 'applicationdata', 'allocated_flats', 'landlord_id'));
+        return view('user-dashboard', compact('all_prices_details', 'all_booking_details', 'prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details', 'applicationSubjects', 'applicationdata', 'allocated_flats', 'landlord_id'));
     }
 
 

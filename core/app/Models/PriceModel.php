@@ -72,7 +72,7 @@ class PriceModel extends Model
 
     public function invoices()
     {
-        return $this->hasOne(Invoices::class, 'booking_id');
+        return $this->hasOne(Invoices::class, 'price_id');
     }
 
 }

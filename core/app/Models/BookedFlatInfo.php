@@ -49,4 +49,12 @@ class BookedFlatInfo extends Model
     {
         return $this->hasMany(MaterialDetails::class, 'booked_flat_id', 'id');
     }
+    public function emis()
+    {
+        return $this->hasMany(EmiPayment::class, 'price_id');
+    }
+    public function invoices()
+    {
+        return $this->hasOne(Invoices::class, 'price_id');
+    }
 }
