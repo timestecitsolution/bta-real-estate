@@ -13,8 +13,9 @@
 /core/uploads/
 /core/uploads/land_query/
 /uploads/*
+/backup/*
 !/uploads/.gitkeep
-
+/databases/*
 Homestead.yaml
 Homestead.json
 .phpunit.result.cache

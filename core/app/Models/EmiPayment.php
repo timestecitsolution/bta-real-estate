@@ -10,29 +10,27 @@ class EmiPayment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'price_id',
-        'extras_amount',
-        'payment_category',
-        'emi_amount',
+        'transaction_id',
+        'booking_id',
+        'total_amount',
+        'total_extras',
         'emi_due_date',
         'emi_paid_date',
         'status',
-        'remaining_due',
-        'remaining_due_amount_with_extras',
-        'total_paid_amount',
-        'total_paid_amount_with_extras',
-        'remaining_emi_count',
-        'payment_method',
-        'trx_no',
-        'document_path',
-        'voucher_no',
-        'note',
-        'created_by',
-        'updated_by',
     ];
 
     public function invoices()
     {
-        return $this->hasOne(Invoices::class, 'emi_id');
+        return $this->hasOne(Invoices::class, 'emi_payment_id', 'id');
+    }
+
+    public function emiPaymentItems()
+    {
+        return $this->hasMany(EmiPaymentItems::class, 'emi_payment_id','id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasOne(Transactions::class, 'id' , 'transaction_id');
     }
 }

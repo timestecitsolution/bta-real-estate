@@ -15,20 +15,26 @@
         ->unique('id')
         ->values();
     }else{
-        $priceJsData = $all_prices_details->map(function ($item) {
-            return [
-                'project_id' => $item->project->id,
-                'flat_id'    => $item->flat->id,
-                'flat_title' => $item->flat->flat_name,
-            ];
-        })->values();
+        $priceJsData = $all_booking_details
+            ->pluck('flatBookingDetails')
+            ->flatten()
+            ->map(function ($item) {
+                return [
+                    'project_id' => $item->projects->id ?? null,
+                    'flat_id'    => $item->flats->id ?? null,
+                    'flat_title' => $item->flats->flat_name ?? null,
+                ];
+            })
+            ->values();
 
 
-        $projects = $all_prices_details
-        ->pluck('project')
-        ->filter()
-        ->unique('id')
-        ->values();
+        $projects = $all_booking_details
+            ->pluck('flatBookingDetails')
+            ->flatten()
+            ->pluck('projects')
+            ->filter()
+            ->unique('id')
+            ->values();
     }
 @endphp
 

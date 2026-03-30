@@ -182,19 +182,23 @@ class BookingController extends Controller
 
     public function getFlatsByCustomer($customer_id)
     {
-        $flats = PriceModel::where('customer_id', $customer_id)
-                    ->where('is_cancelled', '!=', 1)
-                    ->with('flat')
-                    ->get()
-                    ->pluck('flat');  
+
+        $flats = FlatBookingModel::where('client_id', $customer_id)
+                ->where('is_cancelled', '!=', 1)
+                ->with(['flatBookingDetails.flats'])
+                ->get()
+                ->pluck('flatBookingDetails')
+                ->flatten()
+                ->pluck('flats');
         return response()->json($flats);
+
     }
     public function getFlatsByLandlord($customer_id)
     {
         $flats = LandlordEngagement::where('landlord_id', $customer_id)
                     ->with(['project', 'flat', 'customer', 'flatDocuments', 'materials.materialType'])
                     ->get()
-                    ->pluck('flat');  
+                    ->pluck('flat'); 
         return response()->json($flats);
     }
 
@@ -221,23 +225,21 @@ class BookingController extends Controller
         })->get();
 
 
-        $all_booking_details = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats', 'flatBookingDetails.flatDocuments', 'flatBookingDetails.emis', 'flatBookingDetails.invoices'])
+        $all_booking_details = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats', 'flatBookingDetails.flatDocuments', 'flatBookingDetails.emis', 'flatBookingDetails.invoices', 'flatBookingDetails.transactions'])
         ->when($user->status == 0, function ($query) use ($user) {
             return $query->where('client_id', $user->contact_id);
         })->get();
-
-        // dd($all_booking_details);
 
         $allocated_flats = LandlordEngagement::with(['project', 'flat', 'customer', 'projectDocuments.documentType', 'flatDocuments', 'materials.materialType'])
                 ->when($user->status == 0, function ($query) use ($user) {
                     return $query->where('landlord_id', $user->contact_id);
                 })->get();
-                // dd($allocated_flats);
                 
         // Step 1: Default empty collections
         $prices_details = collect();
         $emi_details = collect();
         $material_details = collect();
+        $booking_details = collect();
         $landlord_id = null;
 
 
@@ -255,10 +257,17 @@ class BookingController extends Controller
                     return $query->where('customer_id', $user->contact_id);
                 })
                 ->get();
-            // Step 4: Fetch EMI based on selected prices
-            $price_ids = $prices_details->pluck('id');
 
-            $emi_details = EmiPayment::whereIn('price_id', $price_ids)
+            $booking_details = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats', 'flatBookingDetails.flatDocuments', 'flatBookingDetails.emis', 'flatBookingDetails.invoices' , 'flatBookingDetails.transactions'])
+            ->where('client_id', $filter_customer_id)
+            ->when($user->status == 0, function ($query) use ($user) {
+                return $query->where('client_id', $user->contact_id);
+            })->get();
+
+            // Step 4: Fetch EMI based on selected prices
+            $booking_ids = $booking_details->pluck('id');
+
+            $emi_details = EmiPayment::with(['invoices', 'emiPaymentItems', 'transactions'])->whereIn('booking_id', $booking_ids)
                 ->when($filter_from_date && $filter_to_date, function ($query) use ($filter_from_date, $filter_to_date) {
                     return $query->whereBetween('emi_paid_date', [$filter_from_date, $filter_to_date]);
                 })
@@ -268,44 +277,63 @@ class BookingController extends Controller
                 ->when(!$filter_from_date && $filter_to_date, function ($query) use ($filter_to_date) {
                     return $query->whereDate('emi_paid_date', '<=', $filter_to_date);
                 })
+                // ->where('status', 'Paid')
                 ->get();
-
                 //  Dynamic EMI Balance Calculation
-                $prices = $prices_details->keyBy('id');
+                $bookings = $booking_details->keyBy('id');
                 $calculatedEmis = collect();
 
-                foreach ($emi_details->groupBy('price_id') as $price_id => $emis) {
+                foreach ($emi_details->groupBy('booking_id') as $booking_id => $emis) {
 
-                    $price_info = $prices[$price_id];
-                    $total_price = floatval($price_info->price ?? 0); 
-                    $emi_count = intval($price_info->emi_count ?? 0);
-                    $booking_amount = floatval($price_info->booking_amount ?? 0);
-                    $downpayment_amount = floatval($price_info->downpayment_amount ?? 0);
+                    $booking_info = $bookings[$booking_id];
+                    $total_price = floatval($booking_info->total_price ?? 0); 
+                    $emi_count = intval($booking_info->emi_count ?? 0);
+                    $booking_amount = floatval($booking_info->booking_amount ?? 0);
+                    $downpayment_amount = floatval($booking_info->downpayment_amount ?? 0);
 
                     $total_paid = $booking_amount + $downpayment_amount;
                     $total_paid_with_extras = $booking_amount + $downpayment_amount;
                     $actual_emi_paid_count = 0;
 
                     foreach ($emis as $index => $emi) {
-
-                        $emi_amount = floatval($emi->emi_amount ?? 0);
-                        $extras_amount = floatval($emi->extras_amount ?? 0);
-
+                        $emi_amount = floatval($emi->total_amount ?? 0);
 
                         if ($emi_amount > 0) {
                             $total_paid += $emi_amount;
                             $actual_emi_paid_count++;
                         }
 
-                        // $total_paid += $emi_amount;
-                        $total_paid_with_extras += ($emi_amount + $extras_amount);
-
                         $emi->total_paid_amount = $total_paid;
                         $emi->remaining_due = max($total_price - $total_paid, 0);
 
+                        $current_total_with_extras = $total_paid_with_extras;
+
+                        foreach($emi->emiPaymentItems as $index => $emiItems){
+
+                            if ($emiItems->status !== 'Paid') {
+                                continue; 
+                            }
+
+                            // $extras_amount = floatval($emiItems->extras_amount ?? 0);
+                            // $total_paid_with_extras += ($emiItems->amount + $extras_amount);
+                            // $emi->total_paid_amount_with_extras = $total_paid_with_extras;
+                            // $emi->remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
+
+                            $amount = floatval($emiItems->amount ?? 0);
+                            $extras_amount = floatval($emiItems->extras_amount ?? 0);
+
+                            $current_total_with_extras += ($amount + $extras_amount);
+                        }
+
+                        // $emi->voucher_no = $emi->transactions->voucher_no;
+                        // $emi->document_path = $emi->transactions->document_path;
+                        // $emi->remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
+                        $total_paid_with_extras = $current_total_with_extras;
                         $emi->total_paid_amount_with_extras = $total_paid_with_extras;
                         $emi->remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
 
+                        $emi->voucher_no = $emi->transactions->voucher_no ?? null;
+                        $emi->document_path = $emi->transactions->document_path ?? null;
                         $emi->remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
 
                         $calculatedEmis->push($emi);
@@ -313,8 +341,7 @@ class BookingController extends Controller
                 }
 
                 $emi_details = $calculatedEmis;
-
-                $material_details = MaterialDetails::whereIn('booking_id', $price_ids)
+                $material_details = MaterialDetails::whereIn('booking_id', $booking_ids)
                     ->join('material_types', 'material_details.material_type_id', '=', 'material_types.id')
                     ->select('material_details.*', 'material_types.material_type')
                     ->get();
@@ -340,8 +367,7 @@ class BookingController extends Controller
         $applicationdata = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator', 'attachments', 'project', 'flat'])
             ->where('applied_by', $user->id)
             ->get();
-
-        return view('user-dashboard', compact('all_prices_details', 'all_booking_details', 'prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details', 'applicationSubjects', 'applicationdata', 'allocated_flats', 'landlord_id'));
+        return view('user-dashboard', compact('all_prices_details', 'all_booking_details', 'booking_details', 'prices_details', 'customer_details', 'allDocumentTypes', 'emi_details', 'user', 'Contact', 'filter_customer_id', 'filter_flat_id', 'filter_from_date', 'filter_to_date', 'bulksmsdata', 'material_details', 'applicationSubjects', 'applicationdata', 'allocated_flats', 'landlord_id'));
     }
 
 

@@ -1,9 +1,9 @@
-<div class="modal fade" id="detailsModal{{ $flat->id }}" tabindex="-1" aria-labelledby="detailsModalLabel{{ $flat->id }}" aria-hidden="true">
+<div class="modal fade" id="bookingDetailsModal{{ $booking->id }}" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content" id="printArea{{ $flat->id }}">
+        <div class="modal-content" id="printArea{{ $booking->id }}">
             <div class="modal-header">
-                <h4 class="modal-title fw-bold" id="detailsModalLabel{{ $flat->id }}">
-                    Invoice - {{ $flat->flats->flat_name ?? 'N/A' }}
+                <h4 class="modal-title fw-bold" id="detailsModalLabel{{ $booking->id }}">
+                    Invoice
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -14,8 +14,19 @@
                     <img src="{{ asset('uploads/settings/logo-short.svg') }}" alt="Company Logo" class="mb-2" style="max-height: 60px;">
                     <h2 class="fw-bold text-uppercase">Building Technology Architecture</h2>
                     <p class="mb-0">Client Name: {{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</p>
-                    <p class="mb-0">Project: {{ $flat->projects->title_en ?? 'N/A' }} ({{ $flat->flats->flat_name ?? 'N/A' }})</p>
-                    <p class="mb-0">Flat Size: {{ $flat->flat_size ?? 'N/A' }} sqft</p>
+                    <p class="mb-0">
+                        Project: 
+                        @foreach($booking->flatBookingDetails as $flat)
+
+                            {{ $flat->projects->title_en ?? 'N/A' }}
+                            ({{ $flat->flats->flat_name ?? 'N/A' }} ({{ $flat->flats->flat_size ?? 'N/A' }} sqft))
+
+                            @if(!$loop->last)
+                                ,
+                            @endif
+
+                        @endforeach
+                    </p>
                     <small>Invoice No: {{ $flat->invoices->invoice_no ?? 'N/A' }}</small>
                 </div>
 
@@ -28,86 +39,31 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <th>Price (Per sqft)</th>
-                            <td>{{ number_format($flat->price_per_sqft, 2) ?? 'N/A' }} Tk</td>
+                            <th>Booking Amount</th>
+                            <td>{{ number_format($booking->booking_amount, 2) ?? 'N/A' }} Tk</td>
 
-                            <th>Total Price (Flat)</th>
-                            <td>{{ number_format($flat->total_price_flat, 2) ?? 'N/A' }} Tk</td>
+                            <th>Downpayment Amount</th>
+                            <td>{{ number_format($booking->downpayment_amount, 2) ?? 'N/A' }} Tk</td>
                         </tr>
                         <tr>
                             <th>Due Amount</th>
-                            <td>{{ number_format(($flat->due_amount + $flat->extras_amount), 2) ?? 'N/A' }} Tk</td>
+                            <td>{{ number_format(($booking->due_amount_total + $booking->extras_total), 2) ?? 'N/A' }} Tk</td>
 
-                            <th>EMI Amount (Per Month)</th>
-                            <td>{{ number_format($flat->emi_amount_flat, 2) ?? 'N/A' }} Tk</td>
+                            <th>Total EMI Amount (Per Month)</th>
+                            <td>{{ number_format($booking->total_emi_amount, 2) ?? 'N/A' }} Tk</td>
                         </tr>
                         <tr>
+                            <th>Total EMI Count</th>
+                            <td>{{ $booking->emi_count ?? 'N/A' }}</td>
+
                             <th>EMI Starts From</th>
-                            <td>{{ $flat->emi_start_date_flat ?? 'N/A' }}</td>
+                            <td>{{ $booking->emi_start_date ?? 'N/A' }}</td>
                         </tr>
                     </tbody>
                 </table>
-
-                <!-- Optional Charges -->
-                <table class="table table-bordered mt-3">
-                    <thead class="table-light">
-                        <tr>
-                            <th colspan="2" class="text-center">Additional Charges & Facilities</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>Govt Gas Connection</th>
-                            <td>{{ $flat->is_govt_gas_included == 1 ? 'Included' : 'Not Included' }}</td>
-                        </tr>
-                        @if($flat->is_govt_gas_connection_paid == 1)
-                        <tr>
-                            <th>Gas Connection Amount</th>
-                            <td>{{ number_format($flat->gas_connection_fee, 2) ?? 'N/A' }} Tk</td>
-                        </tr>
-                        @endif
-
-                        <tr>
-                            <th>Parking</th>
-                            <td>{{ $flat->is_parking_included == 1 ? 'Included' : 'Not Included' }}</td>
-                        </tr>
-                        @if($flat->is_parking_paid == 1)
-                        <tr>
-                            <th>Parking Amount</th>
-                            <td>{{ number_format($flat->parking_fee, 2) ?? 'N/A' }} Tk</td>
-                        </tr>
-                        @endif
-
-                        <tr>
-                            <th>Utility</th>
-                            <td>{{ $flat->is_utility_included == 1 ? 'Included' : 'Special Offer by BTA' }}</td>
-                        </tr>
-                        @if($flat->is_utility_included == 1)
-                        <tr>
-                            <th>Utility Charge</th>
-                            <td>{{ number_format($flat->utility_fee, 2) ?? 'N/A' }} Tk</td>
-                        </tr>
-                        @endif
-
-                        @if($flat->is_applicable_discount == 1)
-                        <tr>
-                            <th>Discount</th>
-                            <td>- {{ number_format($flat->discounted_amount, 2) ?? 'N/A' }} Tk</td>
-                        </tr>
-                        @endif
-
-                        @if($flat->extras_amount != null)
-                        <tr>
-                            <th>Extras (Gas, Parking, Utility)</th>
-                            <td>{{ number_format($flat->extras_amount, 2) ?? 'N/A' }} Tk</td>
-                        </tr>
-                        @endif
-                    </tbody>
-                </table>
-
                 <!-- Invoice Footer -->
                 <div class="mt-2 text-end">
-                    <h5 class="fw-bold">Grand Total: {{ number_format($flat->total_price_flat, 2) ?? 'N/A' }} Tk</h5>
+                    <h5 class="fw-bold">Grand Total: {{ number_format($booking->total_price, 2) ?? 'N/A' }} Tk</h5>
                 </div>
                 <!-- <div class="signature-section mt-3 d-flex justify-content-between">
                     <div class="signature text-center">

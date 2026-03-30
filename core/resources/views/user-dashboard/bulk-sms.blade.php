@@ -18,7 +18,7 @@
 
             <div class="form-group mb-3">
                 <label>Select Client(s)</label>
-                <select name="customer_ids[]" id="customerSelect" class="form-control" multiple required>
+                <select name="customer_ids[]" id="customerSelect" class="form-control select2-multiple" data-placeholder="Select Customers" multiple required>
                     <option value="all">-- Select All Clients --</option>
                     @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
                         @if($customer && $customer->id)

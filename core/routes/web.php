@@ -97,7 +97,7 @@ Route::middleware(['force.password.change'])->group(function() {
     Route::get('/dashboard-new', [BookingController::class, 'dashboard'])->name('dashboard-new')->middleware('user');
     Route::post('/dashboard-new', [BookingController::class, 'dashboard'])->name('dashboard-new-post')->middleware('user');
     Route::get('/emi/flat-details', [EmiController::class, 'getFlatDetails'])->name('emi.flat.details');
-    Route::get('/emi/customer/flats', [EmiController::class, 'getCustomerFlats'])->name('emi.customer.flats');
+    Route::get('/emi/client/flats', [EmiController::class, 'getClientFlats'])->name('emi.client.flats');
     Route::post('/emi/store', [EmiController::class, 'storeEmi'])->name('emi.store');
     Route::post('/emi/{emi}', [EmiController::class, 'updateEmi'])->name('emi.update');
     Route::get('/emiapprove/{id}', [EmiController::class, 'approve'])->name('emi.approve');

@@ -1,0 +1,48 @@
+**/Keep database and project backup first/**
+
+php artisan migrate
+Seeder File: LegacyEmiMigrationSeeder
+php artisan db:seed --class=LegacyEmiMigrationSeeder
+
+Table:smartend_emi_payments
+UPDATE smartend_emi_payments
+SET booking_id = CASE booking_id
+    WHEN 3 THEN 7
+    WHEN 4 THEN 6
+    WHEN 5 THEN 6
+    WHEN 6 THEN 5
+    WHEN 7 THEN 4
+    WHEN 8 THEN 3
+    WHEN 9 THEN 2
+    WHEN 12 THEN 1
+END
+WHERE booking_id IN (3,4,5,6,7,8,9,12);
+
+Table:smartend_transactions
+
+UPDATE smartend_transactions
+SET booking_id = CASE booking_id
+    WHEN 3 THEN 7
+    WHEN 4 THEN 6
+    WHEN 5 THEN 6
+    WHEN 6 THEN 5
+    WHEN 7 THEN 4
+    WHEN 8 THEN 3
+    WHEN 9 THEN 2
+    WHEN 12 THEN 1
+END
+WHERE booking_id IN (3,4,5,6,7,8,9,12);
+
+Table:smartend_emi_payment_items
+
+UPDATE smartend_emi_payment_items epi
+JOIN smartend_emi_payments ep ON epi.emi_payment_id = ep.id
+SET epi.flat_info_id = CASE ep.booking_id
+    WHEN 1 THEN 1
+    WHEN 2 THEN 2
+    WHEN 3 THEN 3
+    WHEN 4 THEN 4
+    WHEN 5 THEN 5
+    WHEN 7 THEN 8
+END
+WHERE ep.booking_id IN (1,2,3,4,5,7);

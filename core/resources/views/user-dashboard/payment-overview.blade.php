@@ -1,7 +1,7 @@
 <h3>Payment Overview</h3>
 <form method="POST" action="{{ route('dashboard-new-post') }}">
 @csrf
-    <div class="row">
+    <div class="row align-items-center">
         <div class="col-md-3">
             <label>Client <span>*</span></label>
             <select name="filter_customer_id" class="custom-select form-control" required>
@@ -21,21 +21,20 @@
             <label>To Date</label>
             <input type="date" class="form-control" name="filter_to_date" value="{{ $filter_to_date ?? '' }}" placeholder="To Date">
         </div>
-        <div class="col-md-3 d-flex align-items-end">
+        <div class="col-md-3">
             <button type="submit" class="btn btn-success w-100">Filter</button>
         </div>
     </div>
 </form>
-@if($prices_details->isNotEmpty())
+@if($booking_details->isNotEmpty())
 <div class="table-responsive">
     <table id="payment-table" class="table table-striped table-bordered">
         <thead class="d-md-table-header-group">
             <tr>
                 <th>SL No</th>
                 <th>Customer Name</th>
-                <th>Project (Flat)</th>
                 <th>EMI Amount</th>
-                <th>Extras Amount</th>
+                <!-- <th>Extras Amount</th> -->
                 <th>Total / Remaining EMI</th>
                 <th>DUE</th>
                 <th>Paid Date</th>
@@ -51,24 +50,19 @@
         </thead>
         <tbody>
             @php $sl = 1; @endphp
-            @foreach($prices_details as $price)
+            @foreach($booking_details as $booking)
                 @php
-                    $customer = $price->customer;
-                    $emis = $emi_details->where('price_id', $price->id);
+                    $customer = $booking->client;
+                    $emis = $emi_details->where('booking_id', $booking->id);
                 @endphp
 
                 @foreach($emis as $emi)
-                    <tr class="{{ $price->is_cancelled ? 'table-danger' : '' }}">
+                    <tr class="{{ $booking->is_cancelled ? 'table-danger' : '' }}">
                         <td data-label="SL No">{{ $sl++ }}</td>
                         <td data-label="Customer Name">{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</td>
-                        <td data-label="Project (Flat)">
-                            {{ $price->project->title_en ?? 'N/A' }}
-                            ({{ $price->flat->title ?? 'N/A' }})
-                        </td>
-                        <td data-label="EMI Amount">{{ $emi->emi_amount ? number_format($emi->emi_amount, 2) : 'N/A' }}</td>
-                        <td data-label="Extras Amount">{{ $emi->extras_amount ? number_format($emi->extras_amount, 2) : 'N/A' }}</td>
+                        <td data-label="EMI Amount">{{ $emi->total_amount ? number_format($emi->total_amount, 2) : 'N/A' }}</td>
                         <td data-label="Total / Remaining EMI">
-                            {{ $price->emi_count ?? '0' }} / {{ $emi->remaining_emi_count ?? '0' }}
+                            {{ $booking->emi_count ?? '0' }} / {{ $emi->remaining_emi_count ?? '0' }}
                         </td>
                         <td data-label="Remaining Due (with Extras)">
                             {{ isset($emi->remaining_due_amount_with_extras) ? number_format($emi->remaining_due_amount_with_extras, 2) : '0.00' }}
@@ -77,7 +71,7 @@
                             {{ $emi->emi_paid_date ? \Carbon\Carbon::parse($emi->emi_paid_date)->format('d M Y') : 'N/A' }}
                         </td>
                         <td data-label="Status">
-                            <span class="badge {{ $emi->status == 'approved' ? 'bg-success' : 'bg-danger' }}">
+                            <span class="badge {{ $emi->status == 'Paid' ? 'bg-success' : 'bg-danger' }}">
                                 {{ $emi->status ? ucfirst($emi->status) : 'N/A' }}
                             </span>
                         </td>
@@ -89,8 +83,8 @@
                         </td> -->
                         @if($user->status == '1')
                         <td data-label="Action">
-                            @if($price->is_cancelled != '1')
-                                @if($emi->status == 'pending' && $user->status == '1')
+                            @if($booking->is_cancelled != '1')
+                                @if($emi->status == 'Pending' && $user->status == '1')
                                     <a href="{{ route('emi.approve', $emi->id) }}" class="btn btn-sm btn-success">Approve</a>
                                     <a href="{{ route('emi.reject', $emi->id) }}" class="btn btn-sm btn-warning">Reject</a>
                                 @endif
@@ -103,13 +97,14 @@
                                         Delete
                                     </button>
                                 </form>
-
-                                <button type="button" class="btn btn-sm btn-warning editEmiBtn"
-                                        data-id="{{ $emi->id }}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editEmiModal{{ $emi->id }}">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
+                                    @if($emi->status != 'Unpaid')
+                                        <button type="button" class="btn btn-sm btn-warning editEmiBtn"
+                                                data-id="{{ $emi->id }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editEmiModal{{ $emi->id }}">
+                                            <i class="fa fa-edit"></i> Edit
+                                        </button>
+                                    @endif
                                 @include('user-dashboard.emi-schedule-edit', ['emi' => $emi])
                             @endif
                         </td>
@@ -126,15 +121,15 @@
                                 N/A
                             @endif
                         </td>
-                            <td data-label="Invoice">
-                                @if($price->is_cancelled != 1)
-                                    <!-- Details Modal Trigger -->
-                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#invoiceModal{{ $emi->id }}">
-                                        View Details
-                                    </button>
-                                    @include('user-dashboard.invoice-modal', ['emi' => $emi])
-                                @endif
-                            </td>
+                        <td data-label="Invoice">
+                            @if($booking->is_cancelled != 1)
+                                <!-- Details Modal Trigger -->
+                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#invoiceModal{{ $emi->id }}">
+                                    View Details
+                                </button>
+                                @include('user-dashboard.invoice-modal', ['emi' => $emi, 'booking' => $booking])
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             @endforeach

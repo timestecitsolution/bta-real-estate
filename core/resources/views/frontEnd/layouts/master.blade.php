@@ -205,21 +205,24 @@
 
 
     $(document).ready(function() {
-        // Initialize Select2
-        $('#customerSelect').select2({
-            placeholder: "Select Client(s)",
+        $('.select2-multiple').select2({
+            placeholder: "Select Options",
             allowClear: true,
             width: '100%'
         });
 
-        // Handle "Select All" option
-        $('#customerSelect').on('select2:select', function(e) {
-            if (e.params.data.id === 'all') {
-                // Select all customers except "all"
-                let allOptions = $('#customerSelect option[value!="all"]').map(function() {
+        // Generic Select All handler
+        $(document).on('select2:select select2:unselect', '.select2-multiple', function(e) {
+
+            let selected = $(this).val();
+
+            if (selected && selected.includes('all')) {
+
+                let allOptions = $(this).find('option[value!="all"]').map(function() {
                     return $(this).val();
                 }).get();
-                $('#customerSelect').val(allOptions).trigger('change');
+
+                $(this).val(allOptions).trigger('change.select2');
             }
         });
     });

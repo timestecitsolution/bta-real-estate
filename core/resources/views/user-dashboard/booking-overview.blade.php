@@ -2,15 +2,14 @@
     <h3>Booked Flats</h3>
     <form method="POST" action="{{ route('dashboard-new-post') }}">
         @csrf
-        <div class="row g-2">
+        <div class="row align-items-center">
             <div class="col-md-3">
                 <label>Client <span>*</span></label>
                 <select name="filter_customer_id" class="form-select" required>
                     <option value="">Select Client</option>
-                    @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
-                        <option value="{{ $customer->id }}" 
-                            {{ (isset($filter_customer_id) && $filter_customer_id==$customer->id) ? 'selected' : '' }}>
-                            {{ $customer->first_name }} {{ $customer->last_name }}
+                    @foreach($all_booking_details->pluck('client')->unique('id') as $client)
+                        <option value="{{ $client->id }}" {{ $filter_customer_id == $client->id ? 'selected' : '' }}>
+                            {{ $client->first_name }} {{ $client->last_name }}
                         </option>
                     @endforeach
                 </select>
@@ -23,12 +22,12 @@
                 <label>To Date</label>
                 <input type="date" class="form-control" name="filter_to_date" value="{{ $filter_to_date ?? '' }}">
             </div>
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-3">
                 <button type="submit" class="btn btn-success w-100">Filter</button>
             </div>
         </div>
     </form>
-    @if($prices_details->isNotEmpty())
+    @if($booking_details->isNotEmpty())
     <div class="table-responsive">
         <table id="booked-table" class="table table-bordered">
             <thead>
@@ -39,46 +38,69 @@
                     <th>Flat Size (sqft)</th>
                     <th>Project</th>
                     <th>Price</th>
-                    <th>Booking Amount</th>
-                    <th>Due Amount</th>
+                    <!-- <th>Booking Amount</th>
+                    <th>Due Amount</th> -->
                     <th>View Documents</th>
-                    <th>View Details</th>
+                    <th>Flat Details</th>
+                    <th>Booking Details</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($prices_details as $key => $price)
-                @php
-                    $customer = $price->customer;
-                    $existingDocuments = App\Models\FlatDocuments::where('booking_id', $price->id)->get();
-                @endphp
-                <tr class="{{ $price->is_cancelled ? 'table-danger' : '' }}">
-                    <td data-label="SL">{{ $loop->iteration }}</td>
-                    <td data-label="Client">{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</td>
-                    <td data-label="Flat">{{ $price->flat->title ?? 'N/A' }}</td>
-                    <td data-label="Flat Size (sqft)">{{ $price->flat_size ?? 'N/A' }}</td>
-                    <td data-label="Project">{{ $price->project->title_en ?? 'N/A' }}</td>
-                    <td data-label="Price">{{ $price->price ?? 'N/A' }}</td>
-                    <td data-label="Booking Amount">{{ $price->booking_amount ?? 'N/A' }}</td>
-                    <td data-label="Due Amount">{{ $price->due_amount + $price->extras_amount ?? 'N/A' }}</td>
-                    <td data-label="View Documents">
-                        @if($existingDocuments->isNotEmpty())
-                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#documentsModal{{ $price->id }}">
-                                View Documents
-                            </button>
-                            @include('user-dashboard.view-documents-modal', ['existingDocuments' => $existingDocuments, 'price' => $price])
-                        @else
-                            <span>No documents</span>
+                @foreach($booking_details as $booking)
+                    @php
+                        $totalFlats = $booking->flatBookingDetails->count();
+                    @endphp
+                    @foreach($booking->flatBookingDetails as $key => $flat)
+                        @php
+                            $customer = $booking->client;
+                            $existingDocuments = $flat->flatDocuments;
+                        @endphp
+                    <tr class="{{ $flat->is_cancelled ? 'table-danger' : '' }}">
+                        <td data-label="SL">{{ $loop->iteration }}</td>
+                        <td data-label="Client">{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</td>
+                        <td data-label="Flat">{{ $flat->flats->flat_name ?? 'N/A' }}</td>
+                        <td data-label="Flat Size (sqft)">{{ $flat->flat_size ?? 'N/A' }}</td>
+                        <td data-label="Project">{{ $flat->projects->title_en ?? 'N/A' }}</td>
+                        <td data-label="Price">{{ $flat->total_price_flat ?? 'N/A' }}</td>
+                        @if($loop->first)
+                            <!-- <td data-label="Booking Amount" rowspan="{{ $totalFlats }}" class="align-middle">
+                                {{ $booking->booking_amount ?? 'N/A' }}
+                            </td> -->
+
+                            <!-- <td data-label="Due Amount" rowspan="{{ $totalFlats }}" class="align-middle">
+                                {{ ($booking->due_amount_total + $booking->extras_total) ?? 'N/A' }}
+                            </td> -->
                         @endif
-                    </td>
-                    @if($price->is_cancelled != 1)
-                    <td data-label="View Details">
-                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ $price->id }}">
-                            View Details
-                        </button>
-                        @include('user-dashboard.view-details-modal', ['price' => $price])
-                    </td>
-                    @endif
-                </tr>
+                        <td data-label="View Documents">
+                            @if($existingDocuments->isNotEmpty())
+                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#documentsModal{{ $flat->id }}">
+                                    View Documents
+                                </button>
+                                @include('user-dashboard.view-documents-modal', ['existingDocuments' => $existingDocuments, 'price' => $flat])
+                            @else
+                                <span>No documents</span>
+                            @endif
+                        </td>
+                        @if($flat->is_cancelled != 1)
+                        <td data-label="Flat Details">
+                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ $flat->id }}">
+                                Flat Details
+                            </button>
+                            @include('user-dashboard.view-details-modal', ['flat' => $flat])
+                        </td>
+                        @endif
+                        <td>
+                            @if($loop->first)
+                                <button class="btn btn-info btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#bookingDetailsModal{{ $booking->id }}">
+                                    Booking Details
+                                </button>
+                                @include('user-dashboard.booking-details-modal', ['booking'=>$booking])
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
                 @endforeach
             </tbody>
         </table>

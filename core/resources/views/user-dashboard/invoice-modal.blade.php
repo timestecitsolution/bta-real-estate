@@ -39,7 +39,7 @@
                             {{ $emi->emi_due_date ? \Carbon\Carbon::parse($emi->emi_due_date)->addMonth()->format('d M Y') : 'N/A' }}
                         </p>
                         <p><b>Status:</b>
-                            <span class="badge {{ $emi->status == 'approved' ? 'bg-success' : ($emi->status == 'pending' ? 'bg-warning' : 'bg-danger') }}">
+                            <span class="badge {{ $emi->status == 'Paid' ? 'bg-success' : ($emi->status == 'Unpaid' ? 'bg-warning' : 'bg-danger') }}">
                                 {{ ucfirst($emi->status) }}
                             </span>
                         </p>
@@ -71,7 +71,7 @@
                         </tr>
                         <tr>
                             <td><b>Total EMI Count</b></td>
-                            <td class="text-end">{{ $price->emi_count ?? 'N/A' }}</td>
+                            <td class="text-end">{{ $booking->emi_count ?? 'N/A' }}</td>
 
                             <td><b>Remaining EMI Count</b></td>
                             <td class="text-end">{{ $emi->remaining_emi_count ?? 'N/A' }}</td>
@@ -93,10 +93,10 @@
                             <td class="text-end">{{ number_format($emi->emi_amount, 2) }} ৳</td>
                         </tr>
                         @endif
-                        @if($emi->extras_amount)
+                        @if($emi->total_extras)
                         <tr>
                             <td>Extras Paid Amount</td>
-                            <td class="text-end">{{ number_format($emi->extras_amount, 2) }} ৳</td>
+                            <td class="text-end">{{ number_format($emi->total_extras, 2) }} ৳</td>
                         </tr>
                         @endif
                     </tbody>
@@ -104,7 +104,7 @@
                         <tr class="table-success fw-bold">
                             <td class="text-end">Total Paid This Transaction</td>
                             <td class="text-end">
-                                {{ number_format(($emi->emi_amount ?? 0) + ($emi->extras_amount ?? 0), 2) }} ৳
+                                {{ number_format(($emi->total_amount ?? 0) + ($emi->total_extras ?? 0), 2) }} ৳
                             </td>
                         </tr>
                     </tfoot>

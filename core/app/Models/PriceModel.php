@@ -62,7 +62,7 @@ class PriceModel extends Model
 
     public function emis()
     {
-        return $this->hasMany(EmiPayment::class, 'price_id');
+        return $this->hasMany(EmiPayment::class, 'booking_id');
     }
 
     public function documents()
@@ -72,7 +72,7 @@ class PriceModel extends Model
 
     public function invoices()
     {
-        return $this->hasOne(Invoices::class, 'price_id');
+        return $this->hasOne(Invoices::class, 'booking_id');
     }
 
 }

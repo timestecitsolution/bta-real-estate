@@ -114,15 +114,22 @@
 @endif
 @push('scripts')
 <script>
+$(document).ready(function () {
+
     $('#filter_customer_id').on('change', function () {
+
+        let flatsRoute = "{{ $Contact->status == '2' 
+            ? route('get.flats.by.landlord', '') 
+            : route('get.flats.by.customer', '') }}";
+
         let customerId = $(this).val();
-        let selectedFlat = "{{ $filter_flat_id ?? '' }}";  
+        let selectedFlat = "{{ $filter_flat_id ?? '' }}";
 
         $('#filter_flat_id').html('<option value="">-- Select Flat --</option>');
 
         if (customerId) {
             $.ajax({
-                url: "{{ route('get.flats.by.landlord', '') }}/" + customerId,
+                url: flatsRoute + '/' + customerId,
                 type: "GET",
                 success: function (data) {
 
@@ -146,10 +153,10 @@
         }
     });
 
-    $(document).ready(function () {
-        if ($('#filter_customer_id').val()) {
-            $('#filter_customer_id').trigger('change');
-        }
-    });
+    if ($('#filter_customer_id').val()) {
+        $('#filter_customer_id').trigger('change');
+    }
+
+});
 </script>
 @endpush

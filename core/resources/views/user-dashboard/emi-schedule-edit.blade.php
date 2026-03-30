@@ -4,6 +4,7 @@
             @csrf
             @method('POST')
             <input type="hidden" name="emi_id" value="{{ $emi->id }}">
+            <input type="hidden" name="booking_id" value="{{ $booking->id }}">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit EMI #{{ $emi->id }}</h5>
@@ -11,37 +12,37 @@
                 </div>
 
                 <div class="modal-body">
-                    @if($emi->emi_amount > 0)
+                    @if($emi->total_amount > 0)
                     <div class="mb-3">
-                        <label>EMI Amount</label>
-                        <input type="number" name="emi_amount" value="{{ $emi->emi_amount }}" class="form-control" required>
+                        <label>EMI Amount*</label>
+                        <input type="number" name="emi_amount" value="{{ $emi->total_amount }}" class="form-control" required>
                     </div>
                     @endif
-                    @if($emi->extras_amount > 0)
+                    @if($emi->total_extras > 0)
                     <div class="mb-3">
-                        <label>Extras Amount</label>
-                        <input type="number" name="extras_amount" value="{{ $emi->extras_amount }}" class="form-control" required>
+                        <label>Extras Amount*</label>
+                        <input type="number" name="extras_amount" value="{{ $emi->total_extras }}" class="form-control" required>
                     </div>
                     @endif
                     <div class="mb-3">
-                        <label>Payment Method</label>
+                        <label>Payment Method*</label>
                         <select name="payment_method_edit" class="form-control" required>
-                            <option value="cash" {{ $emi->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
-                            <option value="check" {{ $emi->payment_method == 'check' ? 'selected' : '' }}>Cheque</option>
-                            <option value="bank_transfer" {{ $emi->payment_method == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                            <option value="cash" {{ $emi->transactions->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
+                            <option value="check" {{ $emi->transactions->payment_method == 'check' ? 'selected' : '' }}>Cheque</option>
+                            <option value="bank_transfer" {{ $emi->transactions->payment_method == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
                         </select>
                     </div>
                     <div class="mb-3" id="transaction_no_amount_group_edit">
                         <label>Transaction No (Ex: Cheque No/Bank Transfer Ref No).</label>
-                        <input type="text" name="transaction_no_edit" value="{{ $emi->trx_no }}" class="form-control" placeholder="Transaction No">
+                        <input type="text" name="transaction_no_edit" value="{{ $emi->transactions->trx_no }}" class="form-control" placeholder="Transaction No">
                     </div>
                     <div class="mb-3" id="check_ds_image_amount_group_edit">
                         <label>Documents (Ex: Cheque/Deposit Slip Image)</label>
                         <input type="file" name="check_ds_image_edit" class="form-control">
-                        @if($emi->document_path)
+                        @if($emi->transactions->document_path)
                             <div class="mt-2">
                                 <p>Current Document:</p>
-                                <a href="{{ asset('uploads/' . $emi->document_path) }}" target="_blank" class="btn btn-sm btn-info">
+                                <a href="{{ asset('uploads/' . $emi->transactions->document_path) }}" target="_blank" class="btn btn-sm btn-info">
                                     Preview
                                 </a>
                             </div>
@@ -52,12 +53,12 @@
                         <input type="text" name="voucher_no" value="{{ $emi->voucher_no }}" class="form-control">
                     </div>
                     <div class="mb-3">
-                        <label>Paid Date</label>
-                        <input type="date" name="paying_date" value="{{ $emi->emi_paid_date }}" class="form-control">
+                        <label>Paid Date*</label>
+                        <input type="date" name="paying_date" value="{{ $emi->emi_paid_date }}" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label>Note</label>
-                        <textarea name="note" class="form-control">{{ $emi->note }}</textarea>
+                        <textarea name="note" class="form-control">{{ $emi->transactions->note }}</textarea>
                     </div>
                 </div>
 

@@ -63,7 +63,7 @@ class LegacyEmiMigrationSeeder extends Seeder
 
                     DB::table('emi_payment_items')->insert([
                         'emi_payment_id' => $emiPaymentId,
-                        'flat_id' => '0',
+                        'flat_info_id' => '0',
                         'charge_type' => 'EMI',
                         'amount' => $payment->emi_amount,
                         'status' => $mapStatus[strtolower($payment->status)] ?? 'Unpaid',
@@ -71,6 +71,14 @@ class LegacyEmiMigrationSeeder extends Seeder
                         'emi_paid_date' => $payment->emi_paid_date,
                         'created_at' => $payment->created_at,
                         'updated_at' => $payment->updated_at,
+                    ]);
+
+                    DB::table('invoices')
+                    ->where('emi_payment_id', $payment->id)
+                    ->whereNotNull('emi_payment_id')
+                    ->update([
+                        'transaction_id' => $transactionId,
+                        'emi_payment_id' => $emiPaymentId
                     ]);
                 }
 
@@ -110,7 +118,7 @@ class LegacyEmiMigrationSeeder extends Seeder
 
                     DB::table('emi_payment_items')->insert([
                         'emi_payment_id' => $emiPaymentId,
-                        'flat_id' => '0',
+                        'flat_info_id' => '0',
                         'charge_type' => 'EXTRA',
                         'amount' => $payment->extras_amount,
                         'status' => $mapStatus[strtolower($payment->status)] ?? 'Unpaid',
@@ -118,6 +126,14 @@ class LegacyEmiMigrationSeeder extends Seeder
                         'emi_paid_date' => $payment->emi_paid_date,
                         'created_at' => $payment->created_at,
                         'updated_at' => $payment->updated_at,
+                    ]);
+
+                    DB::table('invoices')
+                    ->where('emi_payment_id', $payment->id)
+                    ->whereNotNull('emi_payment_id')
+                    ->update([
+                        'transaction_id' => $transactionId,
+                        'emi_payment_id' => $emiPaymentId
                     ]);
                 }
 
@@ -129,5 +145,14 @@ class LegacyEmiMigrationSeeder extends Seeder
                 throw $e;
             }
         }
+
+        DB::statement("SET @num := 0");
+        DB::statement("
+            UPDATE smartend_invoices
+            SET id = @num := (@num + 1)
+            ORDER BY id
+        ");
+
+        DB::statement("ALTER TABLE smartend_invoices AUTO_INCREMENT = 1");
     }
 }
