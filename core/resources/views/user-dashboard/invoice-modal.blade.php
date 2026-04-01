@@ -28,8 +28,8 @@
                     <div class="col-6">
                         <h5>Bill To:</h5>
                         <p class="mb-1"><b>{{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }}</b></p>
-                        <p class="mb-1">{{ $price->flat->title ?? 'N/A' }}</p>
-                        <p>Project: {{ $price->project->title_en ?? 'N/A' }}</p>
+                        <!-- <p class="mb-1">{{ $price->flat->title ?? 'N/A' }}</p>
+                        <p>Project: {{ $price->project->title_en ?? 'N/A' }}</p> -->
                     </div>
                     <div class="col-6 text-end">
                         <p class="mb-1"><b>Due Date:</b> {{ $emi->emi_due_date ? \Carbon\Carbon::parse($emi->emi_due_date)->format('d M Y') : 'N/A' }}</p>

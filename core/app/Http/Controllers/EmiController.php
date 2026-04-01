@@ -378,28 +378,32 @@ class EmiController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
+
     // public function getFlatDetails(Request $request)
     // {
     //     $flatId = $request->flat_id;
 
-    //     $price = PriceModel::with(['project', 'flat', 'customer'])
-    //         ->where('flat_id', $flatId)
-    //         ->first();
+    //     $flat_booking = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats'])
+    //     ->whereHas('flatBookingDetails', function($query) use ($flatId) {
+    //         $query->where('flat_id', $flatId);
+    //     })->first();
 
-    //     if (!$price) {
+    //     $flat_booking_detail = $flat_booking->flatBookingDetails->first();
+
+    //     if (!$flat_booking) {
     //         return response()->json(['error' => 'No data found'], 404);
     //     }
 
     //     // Base variables
-    //     $total_price = floatval($price->price ?? 0);
-    //     $emi_count = intval($price->emi_count ?? 0);
-    //     $monthly_emi = floatval($price->emi ?? 0);
-    //     $due_amount = floatval($price->due_amount ?? 0);
-    //     $extras_amount_total = floatval($price->extras_amount ?? 0);
+    //     $total_price = floatval($flat_booking->total_price ?? 0);
+    //     $emi_count = intval($flat_booking->emi_count ?? 0);
+    //     $monthly_emi = floatval($flat_booking->total_emi_amount ?? 0);
+    //     $due_amount = floatval($flat_booking->due_amount_total ?? 0);
+    //     $extras_amount_total = floatval($flat_booking->extras_total ?? 0);
 
     //     // Fetch EMI Payments
-    //     $emis = EmiPayment::where('price_id', $price->id)
-    //         ->where('status', 'approved')
+    //     $emis = EmiPayment::where('booking_id', $flat_booking->id)
+    //         ->where('status', 'Paid')
     //         ->orderBy('id', 'asc')
     //         ->get();
 
@@ -410,8 +414,8 @@ class EmiController extends Controller
 
     //     // Dynamic calculation (same as dashboard)
     //     foreach ($emis as $emi) {
-    //         $emi_amount = floatval($emi->emi_amount ?? 0);
-    //         $extras_amount = floatval($emi->extras_amount ?? 0);
+    //         $emi_amount = floatval($emi->total_amount ?? 0);
+    //         $extras_amount = floatval($emi->total_extras ?? 0);
 
     //         if ($emi_amount > 0) {
     //             $total_paid += $emi_amount;
@@ -427,7 +431,7 @@ class EmiController extends Controller
     //     $remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
 
     //     // Extras calculation
-    //     $total_extras_paid = $emis->sum('extras_amount');
+    //     $total_extras_paid = $emis->sum('total_extras');
     //     $remaining_extras = max($extras_amount_total - $total_extras_paid, 0);
 
     //     // Next EMI date calculation
@@ -435,9 +439,9 @@ class EmiController extends Controller
     //     if ($lastEmi) {
     //         $nextEmiDueDate = \Carbon\Carbon::parse($lastEmi->emi_due_date)->addMonth();
     //     } else {
-    //         $nextEmiDueDate = \Carbon\Carbon::parse($price->emi_start_date);
+    //         $nextEmiDueDate = \Carbon\Carbon::parse($flat_booking->emi_start_date);
     //     }
-    //     $latestStatus = EmiPayment::where('price_id', $price->id)
+    //     $latestStatus = EmiPayment::where('booking_id', $flat_booking->id)
     //                     ->orderByDesc('id')
     //                     ->first()
     //                     ->status ?? null;
@@ -445,21 +449,21 @@ class EmiController extends Controller
     //     $currentDueAmount = $monthly_emi;
 
     //     // Grand totals
-    //     $totalPaidAmount = ($price->booking_amount ?? 0) + ($price->downpayment_amount ?? 0) + $total_paid;
+    //     $totalPaidAmount = ($flat_booking->booking_amount ?? 0) + ($flat_booking->downpayment_amount ?? 0) + $total_paid;
     //     $totalPaidAmountWithExtras = $totalPaidAmount + $total_extras_paid;
     //     $dueAmountWithExtras = $due_amount + $remaining_extras;
 
     //     return response()->json([
-    //         'price_id' => $price->id,
-    //         'project_id' => $price->project_id,
-    //         'flat_id' => $price->flat_id,
-    //         'flat_size' => $price->flat_size,
-    //         'customer_id' => $price->customer_id,
-    //         'price_per_sqft' => $price->price_per_sqft,
-    //         'total_price' => $price->price,
+    //         'booking_id' => $flat_booking->id,
+    //         'project_id' => $flat_booking_detail->project_id,
+    //         'flat_id' => $flat_booking_detail->flat_id,
+    //         'flat_size' => $flat_booking_detail->flat_size,
+    //         'client_id' => $flat_booking->client_id,
+    //         'price_per_sqft' => $flat_booking_detail->price_per_sqft,
+    //         'total_price' => $flat_booking->total_price,
     //         'emi' => $monthly_emi,
-    //         'booking_amount' => $price->booking_amount,
-    //         'downpayment_amount' => $price->downpayment_amount,
+    //         'booking_amount' => $flat_booking->booking_amount,
+    //         'downpayment_amount' => $flat_booking->downpayment_amount,
     //         'due_amount' => $due_amount,
     //         'remaining_due_amount' => $remaining_due,
     //         'extras_amount' => $remaining_extras,
@@ -474,47 +478,64 @@ class EmiController extends Controller
     //         'total_paid_amount_with_extras_final' => $totalPaidAmountWithExtras,
     //         'due_amount_with_extras' => $dueAmountWithExtras,
     //         'current_installment_amount' => $currentDueAmount,
-    //         'emi_start_date' => $price->emi_start_date,
+    //         'emi_start_date' => $flat_booking->emi_start_date,
     //         'emi_due_date' => $nextEmiDueDate->format('Y-m-d'),
-    //         'is_cancelled' => $price->is_cancelled,
+    //         'is_cancelled' => $flat_booking->is_cancelled,
     //     ]);
     // }
-
-
     public function getFlatDetails(Request $request)
     {
-        $flatId = $request->flat_id;
+        $flatIds = $request->flat_id;
 
-        $flat_booking = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats'])
-        ->whereHas('flatBookingDetails', function($query) use ($flatId) {
-            $query->where('flat_id', $flatId);
-        })->first();
-
-        $flat_booking_detail = $flat_booking->flatBookingDetails->first();
-
-        if (!$flat_booking) {
-            return response()->json(['error' => 'No data found'], 404);
+        if (!is_array($flatIds)) {
+            $flatIds = [$flatIds];
         }
 
-        // Base variables
+        // Get booking
+        $bookings = FlatBookingModel::with(['flatBookingDetails'])
+            ->whereHas('flatBookingDetails', function($q) use ($flatIds) {
+                $q->whereIn('flat_id', $flatIds);
+            })
+            ->get();
+
+        if ($bookings->isEmpty()) {
+            return response()->json(['error' => 'Please select at least one flat'], 404);
+        }
+
+        // Ensure same booking
+        if ($bookings->pluck('id')->unique()->count() > 1) {
+            return response()->json(['error' => 'Flats for different booking not allowed'], 400);
+        }
+
+        $flat_booking = $bookings->first();
+        // Selected flats only
+        $selectedDetails = $flat_booking->flatBookingDetails
+            ->whereIn('flat_id', $flatIds);
+
+        // =========================
+        //  AGGREGATION
+        // =========================
+
         $total_price = floatval($flat_booking->total_price ?? 0);
         $emi_count = intval($flat_booking->emi_count ?? 0);
         $monthly_emi = floatval($flat_booking->total_emi_amount ?? 0);
         $due_amount = floatval($flat_booking->due_amount_total ?? 0);
+
         $extras_amount_total = floatval($flat_booking->extras_total ?? 0);
 
-        // Fetch EMI Payments
+        // =========================
+        // 🔥 EMI PAYMENTS
+        // =========================
+
         $emis = EmiPayment::where('booking_id', $flat_booking->id)
             ->where('status', 'Paid')
             ->orderBy('id', 'asc')
             ->get();
 
-        // Default initialization
         $total_paid = 0;
         $total_paid_with_extras = 0;
         $actual_emi_paid_count = 0;
 
-        // Dynamic calculation (same as dashboard)
         foreach ($emis as $emi) {
             $emi_amount = floatval($emi->total_amount ?? 0);
             $extras_amount = floatval($emi->total_extras ?? 0);
@@ -527,65 +548,86 @@ class EmiController extends Controller
             $total_paid_with_extras += ($emi_amount + $extras_amount);
         }
 
-        // Derived values (dynamic)
         $remaining_due = max($total_price - $total_paid, 0);
         $remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
         $remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
 
-        // Extras calculation
+        // =========================
+        // 🔥 EXTRAS
+        // =========================
+
         $total_extras_paid = $emis->sum('total_extras');
         $remaining_extras = max($extras_amount_total - $total_extras_paid, 0);
 
-        // Next EMI date calculation
+        // =========================
+        // 🔥 EMI DATE
+        // =========================
+
         $lastEmi = $emis->sortByDesc('emi_due_date')->first();
+
         if ($lastEmi) {
             $nextEmiDueDate = \Carbon\Carbon::parse($lastEmi->emi_due_date)->addMonth();
         } else {
             $nextEmiDueDate = \Carbon\Carbon::parse($flat_booking->emi_start_date);
         }
+
         $latestStatus = EmiPayment::where('booking_id', $flat_booking->id)
-                        ->orderByDesc('id')
-                        ->first()
-                        ->status ?? null;
+            ->latest()
+            ->first()
+            ->status ?? null;
 
-        $currentDueAmount = $monthly_emi;
+        // =========================
+        // FINAL TOTALS
+        // =========================
 
-        // Grand totals
-        $totalPaidAmount = ($flat_booking->booking_amount ?? 0) + ($flat_booking->downpayment_amount ?? 0) + $total_paid;
+        $totalPaidAmount = ($flat_booking->booking_amount ?? 0)
+            + ($flat_booking->downpayment_amount ?? 0)
+            + $total_paid;
+
         $totalPaidAmountWithExtras = $totalPaidAmount + $total_extras_paid;
         $dueAmountWithExtras = $due_amount + $remaining_extras;
 
+        // =========================
+        // RESPONSE
+        // =========================
+
         return response()->json([
             'booking_id' => $flat_booking->id,
-            'project_id' => $flat_booking_detail->project_id,
-            'flat_id' => $flat_booking_detail->flat_id,
-            'flat_size' => $flat_booking_detail->flat_size,
             'client_id' => $flat_booking->client_id,
-            'price_per_sqft' => $flat_booking_detail->price_per_sqft,
-            'total_price' => $flat_booking->total_price,
+
+            // aggregated values
+            'total_price' => $total_price,
             'emi' => $monthly_emi,
-            'booking_amount' => $flat_booking->booking_amount,
-            'downpayment_amount' => $flat_booking->downpayment_amount,
+            'emi_count' => $emi_count,
+
             'due_amount' => $due_amount,
             'remaining_due_amount' => $remaining_due,
+
             'extras_amount' => $remaining_extras,
-            'emi_count' => $emi_count,
+
             'remaining_emi_count' => $remaining_emi_count,
+
             'total_paid_amount' => $total_paid,
             'total_extras_paid' => $total_extras_paid,
+
             'latest_status' => $latestStatus,
+
             'total_paid_amount_with_extras' => $total_paid_with_extras,
             'remaining_due_amount_with_extras' => $remaining_due_amount_with_extras,
+
             'total_paid_amount_final' => $totalPaidAmount,
             'total_paid_amount_with_extras_final' => $totalPaidAmountWithExtras,
+
             'due_amount_with_extras' => $dueAmountWithExtras,
-            'current_installment_amount' => $currentDueAmount,
+
+            'current_installment_amount' => $monthly_emi,
+
             'emi_start_date' => $flat_booking->emi_start_date,
             'emi_due_date' => $nextEmiDueDate->format('Y-m-d'),
+
             'is_cancelled' => $flat_booking->is_cancelled,
         ]);
     }
-
     public function getClientFlats(Request $request)
     {
         $clientId = $request->client_id;
@@ -594,8 +636,9 @@ class EmiController extends Controller
             ->where('client_id', $clientId)
             ->get()
             ->flatMap(function($booking) {
-                return $booking->flatBookingDetails->map(function($detail) {
+                return $booking->flatBookingDetails->map(function($detail) use ($booking) {
                     return [
+                        'booking_id'   => $booking->id,
                         'flat_id' => optional($detail->flats)->id,
                         'flat_title' => optional($detail->flats)->flat_name,
                         'project_title' => optional($detail->projects)->title_en

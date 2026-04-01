@@ -32,5 +32,5 @@ class EmiPayment extends Model
     public function transactions()
     {
         return $this->hasOne(Transactions::class, 'id' , 'transaction_id');
-    }
+    }  
 }

@@ -566,6 +566,112 @@ $projects = Helper::Topics(8);
                             ]) !!}
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Payment Method*</label>
+                        <div class="col-sm-10">
+                            <select name="payment_method" class="custom-select form-control" required>
+                                <option value="">Select Payment Method*</option>
+
+                                <option value="cash"
+                                    {{ old('payment_method', $booking->transaction->payment_method ?? '') == 'cash' ? 'selected' : '' }}>
+                                    Cash
+                                </option>
+
+                                <option value="check"
+                                    {{ old('payment_method', $booking->transaction->payment_method ?? '') == 'check' ? 'selected' : '' }}>
+                                    Cheque
+                                </option>
+
+                                <option value="bank_transfer"
+                                    {{ old('payment_method', $booking->transaction->payment_method ?? '') == 'bank_transfer' ? 'selected' : '' }}>
+                                    Bank Transfer
+                                </option>
+                            </select>
+
+                            @error('payment_method')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row" id="transaction_no_amount_group">
+                        <label class="col-sm-2 form-control-label">
+                            Transaction No (Ex: Cheque No/Bank Transfer Ref No.)
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text"
+                                id="transaction_no"
+                                class="form-control"
+                                name="transaction_no"
+                                value="{{ old('transaction_no', $booking->transaction->trx_no ?? '') }}"
+                                placeholder="Transaction No">
+                        </div>
+
+                        @error('transaction_no')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group row" id="check_ds_image_amount_group">
+                        <label class="col-sm-2 form-control-label">
+                            Documents (Ex: Cheque/Deposit Slip Image)
+                        </label>
+
+                        <div class="col-sm-10">
+
+                            {{-- FILE INPUT --}}
+                            <input type="file"
+                                id="check_ds_image"
+                                class="form-control"
+                                name="check_ds_image">
+
+                            {{-- 🔥 EXISTING FILE PATH --}}
+                            <input type="hidden" name="existing_document_transaction"
+                                value="{{ $booking->transaction->document_path ?? '' }}">
+
+                            {{-- PREVIEW --}}
+                            @if(!empty($booking->transaction->document_path))
+                                <div class="mt-2">
+                                    <a href="{{ asset('uploads/' . $booking->transaction->document_path) }}" target="_blank">
+                                        View Uploaded Document
+                                    </a>
+                                </div>
+                            @endif
+
+                        </div>
+
+                        @error('check_ds_image')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Voucher No</label>
+                        <div class="col-sm-10">
+                            <input type="text"
+                                class="form-control"
+                                name="voucher_no"
+                                value="{{ old('voucher_no', $booking->transaction->voucher_no ?? '') }}"
+                                placeholder="Voucher No">
+                        </div>
+
+                        @error('voucher_no')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Note</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control"
+                                    name="note"
+                                    placeholder="Note">{{ old('note', $booking->transaction->note ?? '') }}</textarea>
+
+                            @error('note')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group row m-t-md">
                     <div class="offset-sm-2 col-sm-10">
@@ -576,7 +682,6 @@ $projects = Helper::Topics(8);
                                 &#xe5cd;</i> {!! __('backend.cancel') !!}</a>
                     </div>
                 </div>
-
                 {{Form::close()}}
             </div>
         </div>
@@ -588,6 +693,43 @@ $projects = Helper::Topics(8);
         $(function () {
             $('.icp-auto').iconpicker({placement: '{{ (@Helper::currentLanguage()->direction=="rtl")?"topLeft":"topRight" }}'});
         });
+
+        $('select[name="payment_method"]').on('change', function () {
+
+            let method = $(this).val();
+
+            if(method === 'cash') {
+
+                // hide fields
+                $('#transaction_no_amount_group').hide();
+                $('#check_ds_image_amount_group').hide();
+
+                // remove required + clear value
+                $('input[name="transaction_no"]').prop('required', false).val('');
+                $('input[name="check_ds_image"]').prop('required', false).val('');
+
+            } 
+            else if(method === 'check' || method === 'bank_transfer') {
+
+                // show fields
+                $('#transaction_no_amount_group').show();
+                $('#check_ds_image_amount_group').show();
+
+                // make required
+                $('input[name="transaction_no"]').prop('required', true);
+            } 
+            else {
+
+                $('#transaction_no_amount_group').hide();
+                $('#check_ds_image_amount_group').hide();
+
+                $('input[name="transaction_no"]').prop('required', false).val('');
+                $('input[name="check_ds_image"]').prop('required', false).val('');
+            }
+
+        }).trigger('change');
+
+
 
         function rebuildUsedFlats(exceptSelect) {
             let used = [];
@@ -660,9 +802,7 @@ $projects = Helper::Topics(8);
         }
 
         let isInitialLoad = true;
-
         $(document).ready(function () {
-
             $('.flat-details-wrapper').each(function() {
                 let $wrapper = $(this);
                 let projectId = $wrapper.find('.project_id').val();
@@ -749,7 +889,6 @@ $projects = Helper::Topics(8);
                             $(this).attr('name', 'material_document[' + selectedFlatId + ']['+ matIndex + ']');
                         }
                     });
-                    console.log(selectedFlatId);
                     $(this).find('input[type="hidden"][name^="material_id"]').attr(
                         'name',
                         'material_id[' + selectedFlatId + '][' + matIndex + ']'

@@ -13,6 +13,8 @@ use App\Models\FlatBookingModel;
 use App\Models\BookedFlatInfo;
 use App\Models\FlatDocuments;
 use App\Models\MaterialDetails;
+use App\Models\Transactions;
+use App\Models\Invoices;
 use DB;
 use Auth;
 use File;
@@ -121,7 +123,62 @@ class FlatBookingController extends Controller
                 'emi_start_date' => $request->emi_start_date,
             ]);
 
+            // Handle file upload
+            $documentPath = null;
+            if ($request->hasFile('check_ds_image')) {
+                $path = $this->getUploadPath('booking_payment_document');
+                $file = $request->file('check_ds_image');
+                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $fileName);
+                Helper::imageResize($path . $fileName);
+                Helper::imageOptimize($path . $fileName);
+                $documentPath = 'booking_payment_document/' . $fileName;
+            }
+            $user = Auth::user();
             $booking_id = $FlatBooking->id;
+            // =======================
+            // TRANSACTION
+            // =======================
+            $transaction = Transactions::create([
+                'booking_id' => $booking_id,
+                'transaction_type' => 'BOOKING',
+                'amount' => $request->total_price,
+                'payment_method' => $request->payment_method,
+                'trx_no' => $request->transaction_no,
+                'voucher_no' => $request->voucher_no,
+                'document_path' => $documentPath,
+                'note' => $request->note,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // =======================
+            // INVOICE (OLD STRUCTURE KEEP)
+            // =======================
+            $lastInvoice = Invoices::orderBy('id', 'desc')->first();
+            if ($lastInvoice) {
+                $lastNumber = (int) str_replace('INV-', '', $lastInvoice->invoice_no);
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            // Generate new invoice number
+            $invoiceNo = 'INV-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $transactionId = $transaction->id;
+            Invoices::create([
+                'transaction_id' => $transactionId,
+                'invoice_no'  => $invoiceNo,
+                'payment_type'=> 'booking',
+                'emi_payment_id' => null,
+                'booking_id' => $booking_id,
+                'client_id'   => $request->customer_id,
+                'total_price' => $request->total_price,
+                'created_by'  => $user->id,
+            ]);
+
             $FlatBookingMap = [];
             foreach ($request->project_id as $index => $projectId) {
                 $flatId = $request->flat_id[$index];
@@ -254,8 +311,7 @@ class FlatBookingController extends Controller
      */
     public function edit(string $id)
     {
-        $booking = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats', 'flatBookingDetails.flatDocuments', 'flatBookingDetails.materialDocuments'])->findOrFail($id);
-        // dd($booking->flatBookingDetails);
+        $booking = FlatBookingModel::with(['client', 'transaction', 'invoices', 'flatBookingDetails.projects', 'flatBookingDetails.flats', 'flatBookingDetails.flatDocuments', 'flatBookingDetails.materialDocuments'])->findOrFail($id);
         $contacts = Contact::where('status', 1)->get();
         $documentTypes = DocumentType::all();
         $materialTypes = MaterialType::all();
@@ -305,7 +361,64 @@ class FlatBookingController extends Controller
             ]);
 
             $booking_id = $FlatBooking->id;
+            // Handle payment files
+            $documentPathTransaction = $request->existing_document_transaction; // default old file
 
+            // CASE 1: CASH → file remove
+            if ($request->payment_method === 'cash') {
+
+                if (!empty($request->existing_document_transaction)) {
+                    $oldPath = $this->getUploadPath('') . $request->existing_document_transaction;
+
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+
+                $documentPathTransaction = null;
+            }
+
+            // CASE 2: NEW FILE UPLOAD → replace
+            elseif ($request->hasFile('check_ds_image')) {
+
+                // delete old file
+                if (!empty($request->existing_document_transaction)) {
+                    $oldPath = $this->getUploadPath('') . $request->existing_document_transaction;
+
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+
+                // upload new
+                $path = $this->getUploadPath('booking_payment_document');
+                $file = $request->file('check_ds_image');
+
+                $fileName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                $file->move($path, $fileName);
+
+                Helper::imageResize($path.$fileName);
+                Helper::imageOptimize($path.$fileName);
+
+                $documentPathTransaction = 'booking_payment_document/'.$fileName;
+            }
+
+            $transaction = Transactions::where('booking_id', $id)->firstOrFail();
+            $transaction->update([
+                'amount' => $request->total_price,
+                'payment_method' => $request->payment_method,
+                'trx_no' => $request->transaction_no,
+                'voucher_no' => $request->voucher_no,
+                'document_path' => $documentPathTransaction,
+                'note' => $request->note,
+            ]);
+            $invoice = Invoices::where('transaction_id', $transaction->id)->first();
+            if ($invoice) {
+                $invoice->update([
+                    'total_price' => $request->total_price,
+                    'client_id'   => $request->customer_id,
+                ]);
+            }
             /* ===============================
             DELETE OLD CHILD DATA
             =============================== */
@@ -606,6 +719,29 @@ class FlatBookingController extends Controller
                 'flatBookingDetails.materialDocuments'
             ])->findOrFail($id);
 
+            // =======================
+            // DELETE TRANSACTION + FILE
+            // =======================
+            $transaction = Transactions::where('booking_id', $id)->first();
+
+            if ($transaction) {
+                if ($transaction->document_path) {
+                    $path = $this->getUploadPath('') . $transaction->document_path;
+                    if (file_exists($path)) {
+                        unlink($path);
+                    }
+                }
+                $transaction->delete();
+            }
+
+            // =======================
+            // DELETE INVOICE
+            // =======================
+            Invoices::where('booking_id', $id)->delete();
+
+            // =======================
+            // DELETE FLAT DETAILS + FILES
+            // =======================
             foreach ($booking->flatBookingDetails as $flatDetail) {
                 foreach ($flatDetail->flatDocuments as $doc) {
                     $path = $this->getUploadPath('') . $doc->file_path;

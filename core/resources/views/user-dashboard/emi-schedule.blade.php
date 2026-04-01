@@ -139,12 +139,11 @@
     $('select[name="client_id_select"]').on('change', function() {
         var clientId = $(this).val();
         var flatSelect = $('select[name="flat_id[]"]');
-
+        $('select[name="flat_id[]"]').val([]).trigger('change.select2');
         $('#current_installment_amount').val('');
         $('#emi_due_date').val('');
 
         flatSelect.html('<option value="">Select Flat</option>');
-        // flatSelect.html('<option value="all">Select All</option>');
 
         if(clientId) {
             $.ajax({
@@ -152,14 +151,13 @@
                 type: "GET",
                 data: { client_id: clientId },
                 success: function(response) {
-                    console.log(response);
                     if(response.length === 0) {
                         flatSelect.html('<option value="">No Flats Found</option>');
                         return;
                     }
                     $.each(response, function(index, flat) {
                         flatSelect.append(
-                            '<option value="'+flat.flat_id+'">'+flat.flat_title+' ('+flat.project_title+')</option>'
+                            '<option value="'+flat.flat_id+'" data-booking="'+flat.booking_id+'">'+flat.flat_title+' ('+flat.project_title+')</option>'
                         );
                     });
                 },
@@ -170,6 +168,53 @@
         }
     });
 
+    function showErrorModal(message) {
+
+        let modal = $(`
+            <div class="modal fade" id="errorModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5>Error</h5>
+                        </div>
+                        <div class="modal-body text-center">
+                            <p>${message}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-light" id="errorOkBtn">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        $('body').append(modal);
+        modal.modal('show');
+
+        modal.on('hidden.bs.modal', function () {
+            modal.remove();
+        });
+    }
+    $(document).on('click', '#errorOkBtn', function () {
+
+        // modal hide
+        $('#errorModal').modal('hide');
+
+        // modal remove
+        $('#errorModal').remove();
+
+        $('select[name="flat_id[]"]').val([]).trigger('change.select2');
+
+        $('input[name="booking_id"]').val('');
+        $('input[name="total_amount"]').val('');
+        $('input[name="total_emi_count"]').val('');
+        $('input[name="remaining_emi_count"]').val('');
+        $('input[name="due_amount"]').val('');
+        $('input[name="remaining_due_amount"]').val('');
+        $('input[name="emi_due_date"]').val('');
+
+        $('#current_installment_amount').val('');
+    });
     $('select[name="flat_id[]"]').on('change', function() {
         var flatId = $(this).val();
 
@@ -179,7 +224,6 @@
                 type: "GET",
                 data: { flat_id: flatId },
                 success: function(response) {
-                    console.log(response);
                     if(response.latest_status === 'pending') {
                         alert('The latest EMI for this flat is still pending approval. Please wait until it is approved before making another payment.');
                         $('select[name="flat_id[]"]').val('');
@@ -312,8 +356,9 @@
                     });
 
                 },
-                error: function() {
-                    alert("Something went wrong!");
+                error: function(xhr) {
+                    let message = xhr.responseJSON?.error || "Something went wrong!";
+                    showErrorModal(message);
                 }
             });
         }

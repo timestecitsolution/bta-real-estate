@@ -27,6 +27,14 @@ class FlatBookingModel extends Model
     {
         return $this->belongsTo(Contact::class, 'client_id');
     }
+    public function transaction()
+    {
+        return $this->belongsTo(Transactions::class, 'id', 'booking_id');
+    }
+    public function invoices()
+    {
+        return $this->belongsTo(Invoices::class, 'id', 'booking_id');
+    }
     public function flatBookingDetails()
     {
         return $this->hasMany(BookedFlatInfo::class, 'booking_id', 'id');

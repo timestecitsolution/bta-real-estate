@@ -954,6 +954,55 @@ $projects = Helper::Topics(8);
                             ]) !!}
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Payment Method*</label>
+                        <div class="col-sm-10">
+                            <select name="payment_method" class="custom-select form-control" required>
+                                <option value="">Select Payment Method*</option>
+                                <option value="cash">Cash</option>
+                                <option value="check">Cheque</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                            </select>
+                            @error('payment_method')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="form-group row" id="transaction_no_amount_group">
+                        <label class="col-sm-2 form-control-label">Transaction No (Ex: Cheque No/Bank Transfer Ref No.)</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="transaction_no" class="form-control" name="transaction_no" placeholder="Transaction No">
+                        </div>
+                        @error('transaction_no')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group row" id="check_ds_image_amount_group">
+                        <label class="col-sm-2 form-control-label">Documents (Ex: Cheque/Deposit Slip Image)</label>
+                        <div class="col-sm-10">
+                            <input type="file" id="check_ds_image" class="form-control" name="check_ds_image" placeholder="Cheque/DS Image">
+                        </div>
+                        @error('check_ds_image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Voucher No</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="voucher_no" placeholder="Voucher No">
+                        </div>
+                        @error('voucher_no')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Note</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" name="note" placeholder="Note"></textarea>
+                            @error('note')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                    </div>
                 </div>
                 <div class="form-group row m-t-md">
                     <div class="offset-sm-2 col-sm-10">
@@ -1043,6 +1092,29 @@ $projects = Helper::Topics(8);
         }
         
         $(document).ready(function () {
+            $('#extras_amount_check_group').hide();
+            $('#extras_amount_group').hide();
+            $('#extras_amount').prop('required', false);
+
+            $('#transaction_no_amount_group').hide();
+            $('#check_ds_image_amount_group').hide();
+            $('#transaction_no').prop('required', false).val('');
+            $('#check_ds_image').prop('required', false).val('');
+
+            $('select[name="payment_method"]').on('change', function() {
+                    var paymentMethod = $(this).val();
+                    if(paymentMethod === 'check' || paymentMethod === 'bank_transfer') {
+                        $('#transaction_no_amount_group').show();
+                        $('#check_ds_image_amount_group').show();
+                        // $('#transaction_no').prop('required', true);
+                        // $('#check_ds_image').prop('required', true);
+                    } else {
+                        $('#transaction_no_amount_group').hide();
+                        $('#check_ds_image_amount_group').hide();
+                        $('#transaction_no').prop('required', false).val('');
+                        $('#check_ds_image').prop('required', false).val('');
+                    }
+                });
 
             $('.flat-details-wrapper').each(function() {
                 let $wrapper = $(this);
@@ -1172,146 +1244,146 @@ $projects = Helper::Topics(8);
             }
 
 
-        $(document).on('change', '.is_govt_gas_included', function () {
-            toggleGovtGasSection($(this));
-        });
+            $(document).on('change', '.is_govt_gas_included', function () {
+                toggleGovtGasSection($(this));
+            });
 
-        $('.is_govt_gas_included').each(function () {
-            toggleGovtGasSection($(this));
-        });
+            $('.is_govt_gas_included').each(function () {
+                toggleGovtGasSection($(this));
+            });
 
-        function toggleGovtGaspayment($checkbox){
-            let $section = $checkbox.closest('.flat-details-wrapper');
-            if($checkbox.is(':checked')){
-                $section.find(".gas_pay_scheme").show();
-                $section.find(".gas_amount_group").show();
+            function toggleGovtGaspayment($checkbox){
+                let $section = $checkbox.closest('.flat-details-wrapper');
+                if($checkbox.is(':checked')){
+                    $section.find(".gas_pay_scheme").show();
+                    $section.find(".gas_amount_group").show();
 
-                $section.find(".govt_gas_connection_payment_scheme").prop("required", true);
-                $section.find(".gas_amount").prop("required", true);
-            }else{
-                $section.find(".gas_pay_scheme").hide();
-                $section.find(".gas_amount_group").hide();
-                $section.find(".govt_gas_connection_payment_scheme").prop("checked", false).prop("required", false);
-                $section.find(".gas_amount").val("").prop("required", false);
+                    $section.find(".govt_gas_connection_payment_scheme").prop("required", true);
+                    $section.find(".gas_amount").prop("required", true);
+                }else{
+                    $section.find(".gas_pay_scheme").hide();
+                    $section.find(".gas_amount_group").hide();
+                    $section.find(".govt_gas_connection_payment_scheme").prop("checked", false).prop("required", false);
+                    $section.find(".gas_amount").val("").prop("required", false);
+                }
             }
-        }
 
-        $(document).on('change', '.is_govt_gas_connection_paid', function () {
-            toggleGovtGaspayment($(this))
-        });
+            $(document).on('change', '.is_govt_gas_connection_paid', function () {
+                toggleGovtGaspayment($(this))
+            });
 
-        $('.is_govt_gas_connection_paid').each(function () {
-            toggleGovtGaspayment($(this));
-        });
+            $('.is_govt_gas_connection_paid').each(function () {
+                toggleGovtGaspayment($(this));
+            });
 
-        function toggleParkingSection($checkbox) {
-            let $section = $checkbox.closest('.flat-details-wrapper');
+            function toggleParkingSection($checkbox) {
+                let $section = $checkbox.closest('.flat-details-wrapper');
 
-            if ($checkbox.is(':checked')) {
-                $section.find('.is_parking_paid_group').show();
-            } else {
-                $section.find('.is_parking_paid_group').hide();
+                if ($checkbox.is(':checked')) {
+                    $section.find('.is_parking_paid_group').show();
+                } else {
+                    $section.find('.is_parking_paid_group').hide();
 
-                $section.find(".is_parking_paid")
-                    .prop("checked", false)
-                    .prop("required", false);
+                    $section.find(".is_parking_paid")
+                        .prop("checked", false)
+                        .prop("required", false);
 
-                $section.find(".parking_payment_scheme")
-                    .prop("checked", false)
-                    .prop("required", false);
+                    $section.find(".parking_payment_scheme")
+                        .prop("checked", false)
+                        .prop("required", false);
 
-                $section.find(".parking_amount").val("").prop("required", false);
-                $section.find(".parking_pay_scheme").hide();
-                $section.find(".parking_fee_group").hide();
+                    $section.find(".parking_amount").val("").prop("required", false);
+                    $section.find(".parking_pay_scheme").hide();
+                    $section.find(".parking_fee_group").hide();
+                }
+                calculateFlatTotalPrice($checkbox);
+                calculateTotal();
             }
-            calculateFlatTotalPrice($checkbox);
-            calculateTotal();
-        }
 
-        $(document).on('change', '.is_parking_included' , function () {
-            toggleParkingSection($(this));
-        });
+            $(document).on('change', '.is_parking_included' , function () {
+                toggleParkingSection($(this));
+            });
 
-        $('.is_parking_included').each(function () {
-            toggleParkingSection($(this));
-        });
+            $('.is_parking_included').each(function () {
+                toggleParkingSection($(this));
+            });
 
-        function toggleParkingPayment($checkbox){
-            let $section = $checkbox.closest('.flat-details-wrapper');
-            if($checkbox.is(':checked')){
-                $section.find(".parking_pay_scheme").show();
-                $section.find(".parking_fee_group").show();
-                $section.find(".parking_payment_scheme").prop("required", true);
-                $section.find(".parking_amount").prop("required", true);
-            }else{
-                $section.find(".parking_pay_scheme").hide();
-                $section.find(".parking_fee_group").hide();
-                $section.find(".parking_payment_scheme").prop("checked", false).prop("required", false);
-                $section.find(".parking_amount").val("").prop("required", false);
+            function toggleParkingPayment($checkbox){
+                let $section = $checkbox.closest('.flat-details-wrapper');
+                if($checkbox.is(':checked')){
+                    $section.find(".parking_pay_scheme").show();
+                    $section.find(".parking_fee_group").show();
+                    $section.find(".parking_payment_scheme").prop("required", true);
+                    $section.find(".parking_amount").prop("required", true);
+                }else{
+                    $section.find(".parking_pay_scheme").hide();
+                    $section.find(".parking_fee_group").hide();
+                    $section.find(".parking_payment_scheme").prop("checked", false).prop("required", false);
+                    $section.find(".parking_amount").val("").prop("required", false);
+                }
             }
-        }
 
-        $(document).on('change', '.is_parking_paid' , function() {
-            toggleParkingPayment($(this));
-        });
+            $(document).on('change', '.is_parking_paid' , function() {
+                toggleParkingPayment($(this));
+            });
 
-        $('.is_parking_paid').each(function () {
-            toggleParkingPayment($(this));
-        });
+            $('.is_parking_paid').each(function () {
+                toggleParkingPayment($(this));
+            });
 
         
-        function togglePaymentSchemeForUtility($checkbox) {
-            let $section = $checkbox.closest('.flat-details-wrapper');
-            if ($checkbox.is(":checked")) {
-                $section.find(".utility_pay_scheme").show();
-                $section.find(".utility_amount_group").show();
+            function togglePaymentSchemeForUtility($checkbox) {
+                let $section = $checkbox.closest('.flat-details-wrapper');
+                if ($checkbox.is(":checked")) {
+                    $section.find(".utility_pay_scheme").show();
+                    $section.find(".utility_amount_group").show();
 
-                $section.find("input[name='utility_payment_scheme']").prop("required", true);
-                $section.find(".utility_amount").prop("required", true);
-            } else {    
-                $section.find(".utility_pay_scheme").hide();
-                $section.find(".utility_amount_group").hide();  
-                
-                $section.find(".utility_payment_scheme").prop("checked", false).prop("required", false);
-                $section.find(".utility_amount").val("").prop("required", false);
+                    $section.find("input[name='utility_payment_scheme']").prop("required", true);
+                    $section.find(".utility_amount").prop("required", true);
+                } else {    
+                    $section.find(".utility_pay_scheme").hide();
+                    $section.find(".utility_amount_group").hide();  
+                    
+                    $section.find(".utility_payment_scheme").prop("checked", false).prop("required", false);
+                    $section.find(".utility_amount").val("").prop("required", false);
+                }
             }
-        }
 
-        $(document).on("change", ".is_utility_included", function () {
-            togglePaymentSchemeForUtility($(this));
-        });
+            $(document).on("change", ".is_utility_included", function () {
+                togglePaymentSchemeForUtility($(this));
+            });
 
-        $('.is_utility_included').each(function () {
-            togglePaymentSchemeForUtility($(this));
-        });
+            $('.is_utility_included').each(function () {
+                togglePaymentSchemeForUtility($(this));
+            });
 
-        function toggleDiscountField($checked) {
-            let $section = $checked.closest('.flat-details-wrapper');
-            if ($checked.is(":checked")) {
-                $section.find(".discount_amount_group").show();
-                $section.find(".discount_amount").prop("required", true);
-            } else {    
-                $section.find(".discount_amount_group").hide();
-                $section.find(".discount_amount").val("").prop("required", false);
+            function toggleDiscountField($checked) {
+                let $section = $checked.closest('.flat-details-wrapper');
+                if ($checked.is(":checked")) {
+                    $section.find(".discount_amount_group").show();
+                    $section.find(".discount_amount").prop("required", true);
+                } else {    
+                    $section.find(".discount_amount_group").hide();
+                    $section.find(".discount_amount").val("").prop("required", false);
+                }
             }
-        }
-        $(document).on("change", ".is_discount_applicable", function () {
-            toggleDiscountField($(this));
-        });
+            $(document).on("change", ".is_discount_applicable", function () {
+                toggleDiscountField($(this));
+            });
 
-        $('.is_discount_applicable').each(function () {
-            toggleDiscountField($(this));
-        });
+            $('.is_discount_applicable').each(function () {
+                toggleDiscountField($(this));
+            });
 
-        function toggleDiscountFieldTotal() {
-            if ($("#is_discount_applicable_total").is(":checked")) {
-                $("#discount_amount_group_total").show();
-                $("#discount_amount_total").prop("required", true);
-            } else {    
-                $("#discount_amount_group_total").hide();
-                $("#discount_amount_total").val("").prop("required", false);
+            function toggleDiscountFieldTotal() {
+                if ($("#is_discount_applicable_total").is(":checked")) {
+                    $("#discount_amount_group_total").show();
+                    $("#discount_amount_total").prop("required", true);
+                } else {    
+                    $("#discount_amount_group_total").hide();
+                    $("#discount_amount_total").val("").prop("required", false);
+                }
             }
-        }
 
             toggleDiscountFieldTotal();
     
@@ -1367,7 +1439,6 @@ $projects = Helper::Topics(8);
                     e.preventDefault();
                 }
             });
-
         });
 
         function calculateTotal(){
