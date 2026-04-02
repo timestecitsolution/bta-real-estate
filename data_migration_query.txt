@@ -5,6 +5,7 @@ Seeder File: LegacyEmiMigrationSeeder
 php artisan db:seed --class=LegacyEmiMigrationSeeder
 
 Table:smartend_emi_payments
+
 UPDATE smartend_emi_payments
 SET booking_id = CASE booking_id
     WHEN 3 THEN 7
