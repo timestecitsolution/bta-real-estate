@@ -6,7 +6,7 @@
     <input type="hidden" name="client_id">
     
     <label>Client*</label>
-    <select name="filter_customer_id" class="custom-select form-control" required>
+    <select name="client_id_select" class="custom-select form-control" required>
         <option value="">Select Client</option>
         @foreach($all_booking_details->pluck('client')->unique('id') as $client)
             <option value="{{ $client->id }}" {{ $filter_customer_id == $client->id ? 'selected' : '' }}>

@@ -182,7 +182,6 @@ class BookingController extends Controller
 
     public function getFlatsByCustomer($customer_id)
     {
-
         $flats = FlatBookingModel::where('client_id', $customer_id)
                 ->where('is_cancelled', '!=', 1)
                 ->with(['flatBookingDetails.flats'])
