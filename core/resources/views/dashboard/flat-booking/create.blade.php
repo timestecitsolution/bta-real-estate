@@ -1149,7 +1149,6 @@ $projects = Helper::Topics(8);
                 // Documents
                 // ------------------------
                 $section.find('.document-wrapper .document-item').each(function (docIndex) {
-                    console.log(docIndex);
                     $(this).find('select[name^="document_type_id"], input[name^="document"]').each(function () {
                         let originalName = $(this).attr('name');
 
@@ -1469,7 +1468,6 @@ $projects = Helper::Topics(8);
 
                 if ($section.find(".govt_gas_connection_payment_scheme:checked").length > 0 
                     && $section.find(".is_govt_gas_connection_paid").is(":checked")) {
-                        console.log(gasAmount);
                     total += gasAmount;
                 }
 
@@ -1541,11 +1539,9 @@ $projects = Helper::Topics(8);
             }   
 
             if (extrasVisible) {
-                console.log('if');
                 $section.find(".extras_group").show();
                 $section.find(".extras_amount").val(extras);
             } else {
-                console.log('else');
                 $section.find(".extras_group").hide();
                 $section.find(".extras_amount").val("");
             }
@@ -1824,11 +1820,11 @@ $projects = Helper::Topics(8);
         // Form submit validation
         $("form").on("submit", function (e) {
             let valid = true;
-
+            
+            $(this).find(':hidden').find('input, select, textarea').prop('required', false);
             $(".material-item").each(function () {
                 let type = $(this).find(".material-type").val();
                 let details = $(this).find(".material_details").val();
-                console.log("Type:", type, "Details:", details);
 
                 if ((type && !details) || (!type && details)) {
                     valid = false;
@@ -1879,18 +1875,19 @@ $projects = Helper::Topics(8);
             let clone = wrapper.find('.flat-details-wrapper:first').clone();
 
             //  Reset all inputs
-            clone.find('input').each(function () {
+            clone.find('input, select, textarea').each(function () {
                 if ($(this).is(':checkbox, :radio')) {
                     $(this).prop('checked', false);
                 } else {
                     $(this).val('');
                 }
+                $(this).prop('required', false);
             });
 
             clone.find('select').val('');
             clone.find("option").show();
             clone.find('textarea').val('');
-            clone.find('input[type="file"]').val('');
+            clone.find('input[type="file"]').val('').prop("required", false);
             clone.find(".govt_gas_connection_payment_scheme").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
             clone.find(".parking_payment_scheme").attr('name', 'parking_payment_scheme[' + index + ']');
             clone.find(".utility_payment_scheme").attr('name', 'utility_payment_scheme[' + index + ']');
@@ -1913,6 +1910,16 @@ $projects = Helper::Topics(8);
                 #discount_amount_group, \
                 #extras'
             ).hide();
+
+            // IMPORTANT: remove required from hidden inputs
+            clone.find('#gas_amount_group input').removeAttr('required');
+            clone.find('#parking_fee_group input').removeAttr('required');
+            clone.find('#utility_amount_group input').removeAttr('required');
+
+            // radio required fix (if any)
+            clone.find('.gas_pay_scheme input').removeAttr('required');
+            clone.find('.parking_pay_scheme input').removeAttr('required');
+            clone.find('.utility_pay_scheme input').removeAttr('required');
 
             //  Reset conditional UI
             clone.find('#discount_amount_group, #extras').hide();

@@ -1577,7 +1577,8 @@ $projects = Helper::Topics(8);
         // Form submit validation
         $("form").on("submit", function (e) {
             let valid = true;
-
+            
+            $(this).find(':hidden').find('input, select, textarea').prop('required', false);
             $(".material-item").each(function () {
                 let type = $(this).find(".material-type").val();
                 let details = $(this).find(".material_details").val();
