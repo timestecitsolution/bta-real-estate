@@ -92,7 +92,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Negotiate Total Price?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_negotiable_total_price[]', 1, old('is_negotiable_total_price[]'),
+                                            {!! Form::hidden("is_negotiable_total_price[0]", 0, ['class' => 'is_negotiable_total_price_hidden']) !!}
+                                            {!! Form::Checkbox('is_negotiable_total_price[0]', 1, old('is_negotiable_total_price[0]'),
                                                 [
                                                     'id' => 'is_negotiate_total_price',
                                                     'class' => 'is_negotiate_total_price'
@@ -114,6 +115,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Govt Gas Included?</label>
                                         <div class="col-sm-10">
+                                            {{-- Default null value if none is selected --}}
+                                            {!! Form::hidden('is_govt_gas_included[]', 0) !!}
                                             {!! Form::checkbox('is_govt_gas_included[]', 1, old('is_govt_gas_included[]'), [
                                                 'class' => 'is_govt_gas_included'
                                             ]) !!}
@@ -123,7 +126,9 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row is_govt_gas_connection_paid_group" id="is_govt_gas_connection_paid_group">
                                         <label class="col-sm-2 form-control-label">Is Govt Gas Connection Paid?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_govt_gas_connection_paid[]', 1, old('is_govt_gas_connection_paid[]'),
+                                            {{-- Default null value if none is selected --}}
+                                            {!! Form::hidden('is_govt_gas_connection_paid[0]', 0) !!}
+                                            {!! Form::Checkbox('is_govt_gas_connection_paid[0]', 1, old('is_govt_gas_connection_paid[0]'),
                                                 [
                                                     'id' => 'is_govt_gas_connection_paid',
                                                     'class' => 'is_govt_gas_connection_paid'
@@ -134,6 +139,10 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row gas_pay_scheme" id="gas_pay_scheme">
                                         <label class="col-sm-2 form-control-label">Select Payment Scheme For Gas *</label>
                                         <div class="col-sm-10">
+                                            {{-- Default null value if none is selected --}}
+                                            {!! Form::hidden("govt_gas_connection_payment_scheme[$flatIndex]", null, [
+                                                'class' => 'govt_gas_connection_payment_scheme_hidden'
+                                            ]) !!}
                                             <div class="form-check">
                                                 {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'downpayment', old("govt_gas_connection_payment_scheme.$flatIndex") == 'downpayment', ['id' => 'gas_downpayment', 'class' => 'form-check-input gas_downpayment govt_gas_connection_payment_scheme']) !!}
                                                 <label class="form-check-label" for="gas_downpayment">Including with Downpayment</label>
@@ -144,7 +153,7 @@ $projects = Helper::Topics(8);
                                                 <label class="form-check-label" for="gas_emi">Including with EMI</label>
                                             </div>
                                             <div class="form-check">
-                                                {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'handover', old("govt_gas_connection_payment_scheme.$flatIndex") == 'handover', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input gas_pay_scheme_others govt_gas_connection_payment_scheme']) !!}
+                                                {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'others', old("govt_gas_connection_payment_scheme.$flatIndex") == 'others', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input gas_pay_scheme_others govt_gas_connection_payment_scheme']) !!}
                                                 <label class="form-check-label" for="gas_pay_scheme_others">Others</label>
                                             </div>
                                         </div>
@@ -164,7 +173,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Parking Included?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_parking_included[]', 1, old('is_parking_included[]'), 
+                                            {!! Form::hidden("is_parking_included[0]", 0, ['class' => 'is_parking_included_hidden']) !!}
+                                            {!! Form::Checkbox('is_parking_included[0]', 1, old('is_parking_included[0]'), 
                                                 ['id' => 'is_parking_included', 'class' => 'is_parking_included']) !!}
                                         </div>
                                     </div>
@@ -172,7 +182,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row is_parking_paid_group" id="is_parking_paid_group">
                                         <label class="col-sm-2 form-control-label">Is Parking Paid?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_parking_paid[]', 1, old('is_parking_paid[]'), 
+                                            {!! Form::hidden("is_parking_paid[0]", 0, ['class' => 'is_parking_paid_hidden']) !!}
+                                            {!! Form::Checkbox('is_parking_paid[0]', 1, old('is_parking_paid[0]'), 
                                                 ['id' => 'is_parking_paid', 'class' => 'is_parking_paid']) !!}
                                         </div>
                                     </div>
@@ -180,6 +191,7 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row parking_pay_scheme" id="parking_pay_scheme">
                                         <label class="col-sm-2 form-control-label">Select Payment Scheme For Parking *</label>
                                         <div class="col-sm-10">
+                                            {!! Form::hidden("parking_payment_scheme[$flatIndex]", 0, ['class' => 'parking_payment_scheme_hidden']) !!}
                                             <div class="form-check">
                                                 {!! Form::radio("parking_payment_scheme[$flatIndex]", 'downpayment', old("parking_payment_scheme.$flatIndex") == 'downpayment', ['id' => 'parking_downpayment', 'class' => 'form-check-input parking_payment_scheme']) !!}
                                                 <label class="form-check-label" for="parking_downpayment">Including with Downpayment</label>
@@ -212,7 +224,10 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Utility Included?</label>
                                             <div class="col-sm-10">
-                                                {!! Form::Checkbox('is_utility_included[]', 1, old('is_utility_included[]'), 
+                                                {{-- Default null value if none is selected --}}
+                                                {!! Form::hidden("is_utility_included[0]", 0, ['class' => 'is_utility_included_hidden']) !!}
+
+                                                {!! Form::Checkbox('is_utility_included[0]', 1, old('is_utility_included[0]'), 
                                                 ['id' => 'is_utility_included', 'class' => 'is_utility_included']) !!}
                                         </div>
                                     </div>
@@ -220,6 +235,10 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row utility_pay_scheme" id="utility_pay_scheme">
                                         <label class="col-sm-2 form-control-label">Select Payment Scheme For Utility *</label>
                                         <div class="col-sm-10">
+                                            {{-- Default null value if none is selected --}}
+                                            {!! Form::hidden("utility_payment_scheme[$flatIndex]", null, [
+                                                'class' => 'utility_payment_scheme_hidden'
+                                            ]) !!}
                                             <div class="form-check">
                                                 {!! Form::radio("utility_payment_scheme[$flatIndex]", 'downpayment', old("utility_payment_scheme.$flatIndex") == 'downpayment', ['id' => 'utility_downpayment', 'class' => 'form-check-input utility_payment_scheme']) !!}
                                                 <label class="form-check-label" for="utility_downpayment">Including with Downpayment</label>
@@ -263,7 +282,9 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Application Discount?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_discount_applicable[]', 1, old('is_discount_applicable[]'), 
+                                            {!! Form::hidden("is_discount_applicable[0]", 0, ['class' => 'is_discount_applicable_hidden']) !!}
+
+                                            {!! Form::Checkbox('is_discount_applicable[0]', 1, old('is_discount_applicable[0]'), 
                                                 ['id' => 'is_discount_applicable', 'class' => 'is_discount_applicable']) !!}
                                         </div>
                                     </div>
@@ -306,6 +327,12 @@ $projects = Helper::Topics(8);
                                             {!! Form::date('emi_start_date_flat[]', old('emi_start_date_flat[]'), array('id' => '', 'placeholder' => 'Enter EMI Start Date','class' => 'form-control emi_start_date_flat', 'dir'=>@$ActiveLanguage->direction)) !!}
                                         </div>
                                     </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Booking Date</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::date('booking_date_flat[]', old('booking_date_flat[]'), array('id' => '', 'placeholder' => 'Enter Booking Date','class' => 'form-control booking_date_flat', 'dir'=>@$ActiveLanguage->direction)) !!}
+                                        </div>
+                                    </div>
                                     <div class="document-wrapper">
                                         @php
                                             $flatId = $oldFlatId ?? 'new'; 
@@ -320,7 +347,7 @@ $projects = Helper::Topics(8);
                                                     <label class="col-sm-2">&nbsp;</label>
                                                 @endif
                                                 <div class="col-sm-4">
-                                                    <select name="document_type_id[{{ $flatId }}][{{ $docIndex }}]" class="form-control document-type" required>
+                                                    <select name="document_type_id[{{ $flatId }}][{{ $docIndex }}]" class="form-control document-type">
                                                         <option value="">-- Select Document Type --</option>
                                                         @foreach($documentTypes as $documentType)
                                                             <option value="{{ $documentType->id }}" {{ $documentType->id == $docTypeId ? 'selected' : '' }}>
@@ -347,7 +374,7 @@ $projects = Helper::Topics(8);
                                             <div class="form-group row document-item">
                                                 <label class="col-sm-2 form-control-label">Documents</label>
                                                 <div class="col-sm-4">
-                                                    <select name="document_type_id[{{ $flatId }}][0]" class="form-control document-type" required>
+                                                    <select name="document_type_id[{{ $flatId }}][0]" class="form-control document-type">
                                                         <option value="">-- Select Document Type --</option>
                                                         @foreach($documentTypes as $documentType)
                                                             <option value="{{ $documentType->id }}">{{ $documentType->document_type }}</option>
@@ -375,7 +402,7 @@ $projects = Helper::Topics(8);
                                                         <label class="col-sm-2">&nbsp;</label>
                                                     @endif
                                                     <div class="col-sm-4">
-                                                        <select name="material_type_id[{{ $oldFlatId }}][{{ $matIndex }}]" class="form-control material-type" required>
+                                                        <select name="material_type_id[{{ $oldFlatId }}][{{ $matIndex }}]" class="form-control material-type">
                                                             <option value="">-- Select Material --</option>
                                                             @foreach($materialTypes as $material)
                                                                 <option value="{{ $material->id }}" {{ $matId == $material->id ? 'selected' : '' }}>
@@ -404,7 +431,7 @@ $projects = Helper::Topics(8);
                                             <div class="form-group row material-item">
                                                 <label class="col-sm-2 form-control-label">Materials</label>
                                                 <div class="col-sm-4">
-                                                    <select name="material_type_id[{{ $oldFlatId ?? '' }}][0]" class="form-control material-type" required>
+                                                    <select name="material_type_id[{{ $oldFlatId ?? '' }}][0]" class="form-control material-type">
                                                         <option value="">-- Select Material --</option>
                                                         @foreach($materialTypes as $material)
                                                             <option value="{{ $material->id }}">{{ $material->material_type }}</option>
@@ -467,7 +494,8 @@ $projects = Helper::Topics(8);
                             <div class="form-group row">
                                 <label class="col-sm-2 form-control-label">Is Negotiate Total Price?</label>
                                 <div class="col-sm-10">
-                                    {!! Form::Checkbox('is_negotiable_total_price[]', 1, old('is_negotiable_total_price[]'),
+                                    {!! Form::hidden("is_negotiable_total_price[0]", 0, ['class' => 'is_negotiable_total_price_hidden']) !!}
+                                    {!! Form::Checkbox('is_negotiable_total_price[0]', 1, old('is_negotiable_total_price[0]'),
                                         [
                                             'id' => 'is_negotiate_total_price',
                                             'class' => 'is_negotiate_total_price'
@@ -489,7 +517,9 @@ $projects = Helper::Topics(8);
                             <div class="form-group row">
                                 <label class="col-sm-2 form-control-label">Is Govt Gas Included?</label>
                                 <div class="col-sm-10">
-                                    {!! Form::checkbox('is_govt_gas_included[]', 1, old('is_govt_gas_included[]'), [
+                                    {{-- Default null value if none is selected --}}
+                                    {!! Form::hidden("is_govt_gas_included[0]", 0, ['class' => 'is_govt_gas_included_hidden']) !!}
+                                    {!! Form::checkbox('is_govt_gas_included[0]', 1, old('is_govt_gas_included[0]'), [
                                         'class' => 'is_govt_gas_included'
                                     ]) !!}
                                 </div>
@@ -498,7 +528,9 @@ $projects = Helper::Topics(8);
                             <div class="form-group row is_govt_gas_connection_paid_group" id="is_govt_gas_connection_paid_group">
                                 <label class="col-sm-2 form-control-label">Is Govt Gas Connection Paid?</label>
                                 <div class="col-sm-10">
-                                    {!! Form::Checkbox('is_govt_gas_connection_paid[]', 1, old('is_govt_gas_connection_paid[]'),
+                                    {{-- Default null value if none is selected --}}
+                                    {!! Form::hidden("is_govt_gas_connection_paid[0]", 0, ['class' => 'is_govt_gas_connection_paid_hidden']) !!}
+                                    {!! Form::Checkbox('is_govt_gas_connection_paid[0]', 1, old('is_govt_gas_connection_paid[0]'),
                                         [
                                             'id' => 'is_govt_gas_connection_paid',
                                             'class' => 'is_govt_gas_connection_paid'
@@ -509,17 +541,21 @@ $projects = Helper::Topics(8);
                             <div class="form-group row gas_pay_scheme" id="gas_pay_scheme">
                                 <label class="col-sm-2 form-control-label">Select Payment Scheme For Gas *</label>
                                 <div class="col-sm-10">
+                                    {{-- Default null value if none is selected --}}
+                                    {!! Form::hidden("govt_gas_connection_payment_scheme[0]", null, [
+                                        'class' => 'govt_gas_connection_payment_scheme_hidden'
+                                    ]) !!}
                                     <div class="form-check">
-                                        {!! Form::radio('govt_gas_connection_payment_scheme[]', 'downpayment', old('govt_gas_connection_payment_scheme[]') == 'downpayment', ['id' => 'gas_downpayment', 'class' => 'form-check-input gas_downpayment govt_gas_connection_payment_scheme']) !!}
+                                        {!! Form::radio('govt_gas_connection_payment_scheme[0]', 'downpayment', old('govt_gas_connection_payment_scheme[0]') == 'downpayment', ['id' => 'gas_downpayment', 'class' => 'form-check-input gas_downpayment govt_gas_connection_payment_scheme']) !!}
                                         <label class="form-check-label" for="gas_downpayment">Including with Downpayment</label>
                                     </div>
 
                                     <div class="form-check">
-                                        {!! Form::radio('govt_gas_connection_payment_scheme[]', 'emi', old('govt_gas_connection_payment_scheme[]') == 'emi', ['id' => 'gas_emi', 'class' => 'form-check-input gas_emi govt_gas_connection_payment_scheme']) !!}
+                                        {!! Form::radio('govt_gas_connection_payment_scheme[0]', 'emi', old('govt_gas_connection_payment_scheme[0]') == 'emi', ['id' => 'gas_emi', 'class' => 'form-check-input gas_emi govt_gas_connection_payment_scheme']) !!}
                                         <label class="form-check-label" for="gas_emi">Including with EMI</label>
                                     </div>
                                     <div class="form-check">
-                                        {!! Form::radio('govt_gas_connection_payment_scheme[]', 'handover', old('govt_gas_connection_payment_scheme[]') == 'handover', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input gas_pay_scheme_others govt_gas_connection_payment_scheme']) !!}
+                                        {!! Form::radio('govt_gas_connection_payment_scheme[0]', 'others', old('govt_gas_connection_payment_scheme[0]') == 'others', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input gas_pay_scheme_others govt_gas_connection_payment_scheme']) !!}
                                         <label class="form-check-label" for="gas_pay_scheme_others">Others</label>
                                     </div>
                                 </div>
@@ -539,7 +575,9 @@ $projects = Helper::Topics(8);
                             <div class="form-group row">
                                 <label class="col-sm-2 form-control-label">Is Parking Included?</label>
                                 <div class="col-sm-10">
-                                    {!! Form::Checkbox('is_parking_included[]', 1, old('is_parking_included[]'), 
+                                    {{-- Default null value if none is selected --}}
+                                    {!! Form::hidden("is_parking_included[0]", 0, ['class' => 'is_parking_included_hidden']) !!}
+                                    {!! Form::Checkbox('is_parking_included[0]', 1, old('is_parking_included[0]'), 
                                         ['id' => 'is_parking_included', 'class' => 'is_parking_included']) !!}
                                 </div>
                             </div>
@@ -547,7 +585,9 @@ $projects = Helper::Topics(8);
                             <div class="form-group row is_parking_paid_group" id="is_parking_paid_group">
                                 <label class="col-sm-2 form-control-label">Is Parking Paid?</label>
                                 <div class="col-sm-10">
-                                    {!! Form::Checkbox('is_parking_paid[]', 1, old('is_parking_paid[]'), 
+                                    {{-- Default null value if none is selected --}}
+                                    {!! Form::hidden("is_parking_paid[0]", 0, ['class' => 'is_parking_paid_hidden']) !!}
+                                    {!! Form::Checkbox('is_parking_paid[0]', 1, old('is_parking_paid[0]'), 
                                         ['id' => 'is_parking_paid', 'class' => 'is_parking_paid']) !!}
                                 </div>
                             </div>
@@ -555,18 +595,19 @@ $projects = Helper::Topics(8);
                             <div class="form-group row parking_pay_scheme" id="parking_pay_scheme">
                                 <label class="col-sm-2 form-control-label">Select Payment Scheme For Parking *</label>
                                 <div class="col-sm-10">
+                                    {!! Form::hidden("parking_payment_scheme[0]", 0, ['class' => 'parking_payment_scheme_hidden']) !!}
                                     <div class="form-check">
-                                        {!! Form::radio('parking_payment_scheme[]', 'downpayment', old('parking_payment_scheme[]') == 'downpayment', ['id' => 'parking_downpayment', 'class' => 'form-check-input parking_payment_scheme']) !!}
+                                        {!! Form::radio('parking_payment_scheme[0]', 'downpayment', old('parking_payment_scheme[0]') == 'downpayment', ['id' => 'parking_downpayment', 'class' => 'form-check-input parking_payment_scheme']) !!}
                                         <label class="form-check-label" for="parking_downpayment">Including with Downpayment</label>
                                     </div>
 
                                     <div class="form-check">
-                                        {!! Form::radio('parking_payment_scheme[]', 'emi', old('parking_payment_scheme[]') == 'emi', ['id' => 'parking_emi', 'class' => 'form-check-input parking_payment_scheme']) !!}
+                                        {!! Form::radio('parking_payment_scheme[0]', 'emi', old('parking_payment_scheme[0]') == 'emi', ['id' => 'parking_emi', 'class' => 'form-check-input parking_payment_scheme']) !!}
                                         <label class="form-check-label" for="parking_emi">Including with EMI</label>
                                     </div>
 
                                     <div class="form-check">
-                                        {!! Form::radio('parking_payment_scheme[]', 'others', old('parking_payment_scheme[]') == 'others', ['id' => 'parking_others', 'class' => 'form-check-input parking_payment_scheme']) !!}
+                                        {!! Form::radio('parking_payment_scheme[0]', 'others', old('parking_payment_scheme[0]') == 'others', ['id' => 'parking_others', 'class' => 'form-check-input parking_payment_scheme']) !!}
                                         <label class="form-check-label" for="parking_others">Others</label>
                                     </div>
                                 </div>
@@ -587,7 +628,9 @@ $projects = Helper::Topics(8);
                             <div class="form-group row">
                                 <label class="col-sm-2 form-control-label">Is Utility Included?</label>
                                     <div class="col-sm-10">
-                                        {!! Form::Checkbox('is_utility_included[]', 1, old('is_utility_included[]'), 
+                                        {{-- Default null value if none is selected --}}
+                                        {!! Form::hidden("is_utility_included[0]", 0, ['class' => 'is_utility_included_hidden']) !!}
+                                        {!! Form::Checkbox('is_utility_included[0]', 1, old('is_utility_included[0]'), 
                                         ['id' => 'is_utility_included', 'class' => 'is_utility_included']) !!}
                                 </div>
                             </div>
@@ -595,18 +638,22 @@ $projects = Helper::Topics(8);
                             <div class="form-group row utility_pay_scheme" id="utility_pay_scheme">
                                 <label class="col-sm-2 form-control-label">Select Payment Scheme For Utility *</label>
                                 <div class="col-sm-10">
+                                    {{-- Default null value if none is selected --}}
+                                    {!! Form::hidden("utility_payment_scheme[0]", null, [
+                                        'class' => 'utility_payment_scheme_hidden'
+                                    ]) !!}
                                     <div class="form-check">
-                                        {!! Form::radio('utility_payment_scheme[]', 'downpayment', old('utility_payment_scheme[]') == 'downpayment', ['id' => 'utility_downpayment', 'class' => 'form-check-input utility_payment_scheme']) !!}
+                                        {!! Form::radio('utility_payment_scheme[0]', 'downpayment', old('utility_payment_scheme[0]') == 'downpayment', ['id' => 'utility_downpayment', 'class' => 'form-check-input utility_payment_scheme']) !!}
                                         <label class="form-check-label" for="utility_downpayment">Including with Downpayment</label>
                                     </div>
 
                                     <div class="form-check">
-                                        {!! Form::radio('utility_payment_scheme[]', 'emi', old('utility_payment_scheme[]') == 'emi', ['id' => 'utility_emi', 'class' => 'form-check-input utility_payment_scheme']) !!}
+                                        {!! Form::radio('utility_payment_scheme[0]', 'emi', old('utility_payment_scheme[0]') == 'emi', ['id' => 'utility_emi', 'class' => 'form-check-input utility_payment_scheme']) !!}
                                         <label class="form-check-label" for="utility_emi">Including with EMI</label>
                                     </div>
 
                                     <div class="form-check">
-                                        {!! Form::radio('utility_payment_scheme[]', 'others', old('utility_payment_scheme[]') == 'others', ['id' => 'utility_others', 'class' => 'form-check-input utility_payment_scheme']) !!}
+                                        {!! Form::radio('utility_payment_scheme[0]', 'others', old('utility_payment_scheme[0]') == 'others', ['id' => 'utility_others', 'class' => 'form-check-input utility_payment_scheme']) !!}
                                         <label class="form-check-label" for="utility_others">Others</label>
                                     </div>
                                 </div>
@@ -638,7 +685,8 @@ $projects = Helper::Topics(8);
                             <div class="form-group row">
                                 <label class="col-sm-2 form-control-label">Is Applicable Discount?</label>
                                 <div class="col-sm-10">
-                                    {!! Form::Checkbox('is_discount_applicable[]', 1, old('is_discount_applicable[]'), 
+                                    {!! Form::hidden("is_discount_applicable[0]", 0, ['class' => 'is_discount_applicable_hidden']) !!}
+                                    {!! Form::Checkbox('is_discount_applicable[0]', 1, old('is_discount_applicable[0]'), 
                                         ['id' => 'is_discount_applicable', 'class' => 'is_discount_applicable']) !!}
                                 </div>
                             </div>
@@ -678,6 +726,12 @@ $projects = Helper::Topics(8);
                                 <label class="col-sm-2 form-control-label">EMI Start Date</label>
                                 <div class="col-sm-10">
                                     {!! Form::date('emi_start_date_flat[]', old('emi_start_date_flat[]'), array('id' => '', 'placeholder' => 'Enter EMI Start Date','class' => 'form-control emi_start_date_flat', 'dir'=>@$ActiveLanguage->direction)) !!}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 form-control-label">Booking Date</label>
+                                <div class="col-sm-10">
+                                    {!! Form::date('booking_date_flat[]', old('booking_date_flat[]'), array('id' => '', 'placeholder' => 'Enter Booking Date','class' => 'form-control booking_date_flat', 'dir'=>@$ActiveLanguage->direction)) !!}
                                 </div>
                             </div>
                             <div class="document-wrapper">
@@ -955,6 +1009,12 @@ $projects = Helper::Topics(8);
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Paid Date</label>
+                        <div class="col-sm-10">
+                            {!! Form::date('paid_date', old('paid_date'), array('id' => '', 'placeholder' => 'Enter Paid Date','class' => 'form-control paid_date', 'dir'=>@$ActiveLanguage->direction)) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-sm-2 form-control-label">Payment Method*</label>
                         <div class="col-sm-10">
                             <select name="payment_method" class="custom-select form-control" required>
@@ -1152,12 +1212,6 @@ $projects = Helper::Topics(8);
                     $(this).find('select[name^="document_type_id"], input[name^="document"]').each(function () {
                         let originalName = $(this).attr('name');
 
-                        // if (originalName.includes('document_type_id')) {
-                        //     $(this).attr('name', 'document_type_id[' + selectedFlatId + '][]');
-                        // }
-                        // if (originalName.includes('document')) {
-                        //     $(this).attr('name', 'document[' + selectedFlatId + '][]');
-                        // }
                         if ($(this).is('select.document-type')) {
                                 $(this).attr('name', 'document_type_id[' + selectedFlatId + '][]');
                             }
@@ -1517,7 +1571,7 @@ $projects = Helper::Topics(8);
 
             if ($section.find(".is_govt_gas_included").is(":checked") &&
                 $section.find(".is_govt_gas_connection_paid").is(":checked") &&
-                $section.find(".gas_pay_scheme input[type='radio']:checked").val() === "handover") {
+                $section.find(".gas_pay_scheme input[type='radio']:checked").val() === "others") {
                 let gasAmount = parseFloat($section.find(".gas_amount").val()) || 0;
                 extras += gasAmount;
                 extrasVisible = true;
@@ -1875,9 +1929,18 @@ $projects = Helper::Topics(8);
             let clone = wrapper.find('.flat-details-wrapper:first').clone();
 
             //  Reset all inputs
+            // clone.find('input, select, textarea').each(function () {
+            //     if ($(this).is(':checkbox, :radio')) {
+            //         $(this).prop('checked', false);
+            //     } else {
+            //         $(this).val('');
+            //     }
+            //     $(this).prop('required', false);
+            // });
             clone.find('input, select, textarea').each(function () {
                 if ($(this).is(':checkbox, :radio')) {
                     $(this).prop('checked', false);
+                } else if ($(this).attr('type') === 'hidden') {
                 } else {
                     $(this).val('');
                 }
@@ -1888,16 +1951,70 @@ $projects = Helper::Topics(8);
             clone.find("option").show();
             clone.find('textarea').val('');
             clone.find('input[type="file"]').val('').prop("required", false);
+
+            clone.find(".is_negotiate_total_price").attr('name', 'is_negotiable_total_price[' + index + ']');
+            clone.find(".is_negotiable_total_price_hidden").attr('name', 'is_negotiable_total_price[' + index + ']');
+
             clone.find(".govt_gas_connection_payment_scheme").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
+            clone.find(".is_govt_gas_included").attr('name', 'is_govt_gas_included[' + index + ']');
+            clone.find(".is_govt_gas_included_hidden").attr('name', 'is_govt_gas_included[' + index + ']');
+            clone.find(".is_govt_gas_connection_paid").attr('name', 'is_govt_gas_connection_paid[' + index + ']');
+            clone.find(".is_govt_gas_connection_paid_hidden").attr('name', 'is_govt_gas_connection_paid[' + index + ']');
+            clone.find(".govt_gas_connection_payment_scheme_hidden").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
+
             clone.find(".parking_payment_scheme").attr('name', 'parking_payment_scheme[' + index + ']');
+            clone.find(".is_parking_included").attr('name', 'is_parking_included[' + index + ']');
+            clone.find(".is_parking_included_hidden").attr('name', 'is_parking_included[' + index + ']');
+            clone.find(".is_parking_paid").attr('name', 'is_parking_paid[' + index + ']');
+            clone.find(".is_parking_paid_hidden").attr('name', 'is_parking_paid[' + index + ']');
+            clone.find(".parking_payment_scheme_hidden").attr('name', 'parking_payment_scheme[' + index + ']');
+
+            clone.find(".is_utility_included").attr('name', 'is_utility_included[' + index + ']');
+            clone.find(".is_utility_included_hidden").attr('name', 'is_utility_included[' + index + ']');
+            clone.find(".is_utility_paid").attr('name', 'is_utility_paid[' + index + ']');
+            clone.find(".is_utility_paid_hidden").attr('name', 'is_utility_paid[' + index + ']');
             clone.find(".utility_payment_scheme").attr('name', 'utility_payment_scheme[' + index + ']');
+            clone.find(".utility_payment_scheme_hidden").attr('name', 'utility_payment_scheme[' + index + ']');
+
+            clone.find(".is_discount_applicable").attr('name', 'is_discount_applicable[' + index + ']');
+            clone.find(".is_discount_applicable_hidden").attr('name', 'is_discount_applicable[' + index + ']');
+
+            clone.find(".is_govt_gas_included_hidden").val(0);
+            clone.find(".is_govt_gas_connection_paid_hidden").val(0);
+            clone.find(".govt_gas_connection_payment_scheme_hidden").val('');
+            clone.find(".is_negotiate_total_price_hidden").val(0);
+            clone.find(".is_parking_included_hidden").val(0);
+            clone.find(".is_parking_paid_hidden").val(0);
+            clone.find(".parking_payment_scheme_hidden").val('');
+            clone.find(".is_utility_included_hidden").val(0);
+            clone.find(".is_utility_paid_hidden").val(0);
+            clone.find(".utility_payment_scheme_hidden").val('');
+            clone.find(".is_discount_applicable_hidden").val(0);
 
             //  Remove extra document/material rows
             clone.find('.document-item:not(:first)').remove();
             clone.find('.material-item:not(:first)').remove();
+            clone.find('.material-type').val('');
+            clone.find('.material-details').val('');
 
+            clone.find('.add-material')
+                .removeClass('btn-danger remove-material')
+                .addClass('btn-success add-material')
+                .text('+')
+                .show();
 
-            //  FORCE hide all conditional UI
+            // Document reset
+            clone.find('.document-item:not(:first)').remove();
+            clone.find('.document-type').val('').find('option').show();
+            clone.find('input[name^="document_type_id"]').val('');
+
+            // add-document button reset
+            clone.find('.add-doc')
+                .removeClass('btn-danger remove-doc')
+                .addClass('btn-success add-doc')
+                .text('+')
+                .show();
+
             clone.find(
                 '#utility_pay_scheme, \
                 #utility_amount_group, \
@@ -1937,6 +2054,8 @@ $projects = Helper::Topics(8);
 
             wrapper.append(clone);
             updateFlatNumbering();
+            updateMaterialOptions(clone);
+            updateDocumentTypeOptions(clone);
         });
 
         //  Remove flat

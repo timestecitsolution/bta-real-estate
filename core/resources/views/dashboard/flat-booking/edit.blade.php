@@ -87,7 +87,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Negotiate Total Price?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_negotiable_total_price[]', 1, $flat->is_negotiate_total_price,
+                                            {!! Form::hidden("is_negotiable_total_price[$flatIndex]", 0, ['class' => 'is_negotiate_total_price_hidden']) !!}
+                                            {!! Form::Checkbox("is_negotiable_total_price[$flatIndex]", 1, $flat->is_negotiate_total_price,
                                                 [
                                                     'class' => 'is_negotiate_total_price'
                                                 ]) !!}
@@ -108,7 +109,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Govt Gas Included?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::checkbox('is_govt_gas_included[]', 1, $flat->is_govt_gas_included, [
+                                            {!! Form::hidden("is_govt_gas_included[$flatIndex]", 0, ['class' => 'is_govt_gas_included_hidden']) !!}
+                                            {!! Form::checkbox("is_govt_gas_included[$flatIndex]", 1, $flat->is_govt_gas_included, [
                                                 'class' => 'is_govt_gas_included'
                                             ]) !!}
                                         </div>
@@ -117,7 +119,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row is_govt_gas_connection_paid_group" id="is_govt_gas_connection_paid_group">
                                         <label class="col-sm-2 form-control-label">Is Govt Gas Connection Paid?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_govt_gas_connection_paid[]', 1, $flat->is_govt_gas_connection_paid,
+                                            {!! Form::hidden("is_govt_gas_connection_paid[$flatIndex]", 0, ['class' => 'is_govt_gas_connection_paid_hidden']) !!}
+                                            {!! Form::Checkbox("is_govt_gas_connection_paid[$flatIndex]", 1, $flat->is_govt_gas_connection_paid,
                                                 [
                                                     'id' => 'is_govt_gas_connection_paid',
                                                     'class' => 'is_govt_gas_connection_paid'
@@ -128,6 +131,7 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row gas_pay_scheme" id="gas_pay_scheme">
                                         <label class="col-sm-2 form-control-label">Select Payment Scheme For Gas *</label>
                                         <div class="col-sm-10">
+                                            {!! Form::hidden("govt_gas_connection_payment_scheme[$flatIndex]", null, ['class' => 'govt_gas_connection_payment_scheme_hidden']) !!}
                                             <div class="form-check">
                                                 {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'downpayment', $flat->govt_gas_payment_scheme == 'downpayment', ['id' => 'gas_downpayment', 'class' => 'form-check-input gas_downpayment govt_gas_connection_payment_scheme']) !!}
                                                 <label class="form-check-label" for="gas_downpayment">Including with Downpayment</label>
@@ -138,7 +142,7 @@ $projects = Helper::Topics(8);
                                                 <label class="form-check-label" for="gas_emi">Including with EMI</label>
                                             </div>
                                             <div class="form-check">
-                                                {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'handover', $flat->govt_gas_payment_scheme == 'handover', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input gas_pay_scheme_others govt_gas_connection_payment_scheme']) !!}
+                                                {!! Form::radio("govt_gas_connection_payment_scheme[$flatIndex]", 'others', $flat->govt_gas_payment_scheme == 'others', ['id' => 'gas_pay_scheme_others', 'class' => 'form-check-input gas_pay_scheme_others govt_gas_connection_payment_scheme']) !!}
                                                 <label class="form-check-label" for="gas_pay_scheme_others">Others</label>
                                             </div>
                                         </div>
@@ -158,7 +162,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Parking Included?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_parking_included[]', 1, $flat->is_parking_included, 
+                                            {!! Form::hidden("is_parking_included[$flatIndex]", 0, ['class' => 'is_parking_included_hidden']) !!}
+                                            {!! Form::Checkbox("is_parking_included[$flatIndex]", 1, $flat->is_parking_included, 
                                                 ['id' => 'is_parking_included', 'class' => 'is_parking_included']) !!}
                                         </div>
                                     </div>
@@ -166,7 +171,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row is_parking_paid_group" id="is_parking_paid_group">
                                         <label class="col-sm-2 form-control-label">Is Parking Paid?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_parking_paid[]', 1, $flat->is_parking_paid, 
+                                            {!! Form::hidden("is_parking_paid[$flatIndex]", 0, ['class' => 'is_parking_paid_hidden']) !!}
+                                            {!! Form::Checkbox("is_parking_paid[$flatIndex]", 1, $flat->is_parking_paid, 
                                                 ['id' => 'is_parking_paid', 'class' => 'is_parking_paid']) !!}
                                         </div>
                                     </div>
@@ -174,6 +180,7 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row parking_pay_scheme" id="parking_pay_scheme">
                                         <label class="col-sm-2 form-control-label">Select Payment Scheme For Parking *</label>
                                         <div class="col-sm-10">
+                                            {!! Form::hidden("parking_payment_scheme[$flatIndex]", null, ['class' => 'parking_payment_scheme_hidden']) !!}
                                             <div class="form-check">
                                                 {!! Form::radio("parking_payment_scheme[$flatIndex]", 'downpayment', $flat->parking_payment_scheme == 'downpayment', ['id' => 'parking_downpayment', 'class' => 'form-check-input parking_payment_scheme']) !!}
                                                 <label class="form-check-label" for="parking_downpayment">Including with Downpayment</label>
@@ -206,7 +213,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Utility Included?</label>
                                             <div class="col-sm-10">
-                                                {!! Form::Checkbox('is_utility_included[]', 1, $flat->is_utility_included, 
+                                                {!! Form::hidden("is_utility_included[$flatIndex]", 0, ['class' => 'is_utility_included_hidden']) !!}
+                                                {!! Form::Checkbox("is_utility_included[$flatIndex]", 1, $flat->is_utility_included, 
                                                 ['id' => 'is_utility_included', 'class' => 'is_utility_included']) !!}
                                         </div>
                                     </div>
@@ -214,6 +222,7 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row utility_pay_scheme" id="utility_pay_scheme">
                                         <label class="col-sm-2 form-control-label">Select Payment Scheme For Utility *</label>
                                         <div class="col-sm-10">
+                                            {!! Form::hidden("utility_payment_scheme[$flatIndex]", null, ['class' => 'utility_payment_scheme_hidden']) !!}
                                             <div class="form-check">
                                                 {!! Form::radio("utility_payment_scheme[$flatIndex]", 'downpayment', $flat->utility_payment_scheme == 'downpayment', ['id' => 'utility_downpayment', 'class' => 'form-check-input utility_payment_scheme']) !!}
                                                 <label class="form-check-label" for="utility_downpayment">Including with Downpayment</label>
@@ -257,7 +266,8 @@ $projects = Helper::Topics(8);
                                     <div class="form-group row">
                                         <label class="col-sm-2 form-control-label">Is Applicable Discount?</label>
                                         <div class="col-sm-10">
-                                            {!! Form::Checkbox('is_discount_applicable[]', 1, $flat->is_applicable_discount, 
+                                            {!! Form::hidden("is_discount_applicable[$flatIndex]", 0, ['class' => 'is_discount_applicable_hidden']) !!}
+                                            {!! Form::Checkbox("is_discount_applicable[$flatIndex]", 1, $flat->is_applicable_discount, 
                                                 ['id' => 'is_discount_applicable', 'class' => 'is_discount_applicable']) !!}
                                         </div>
                                     </div>
@@ -297,6 +307,12 @@ $projects = Helper::Topics(8);
                                         <label class="col-sm-2 form-control-label">EMI Start Date</label>
                                         <div class="col-sm-10">
                                             {!! Form::date('emi_start_date_flat[]', $flat->emi_start_date_flat, array('id' => '', 'placeholder' => 'Enter EMI Start Date','class' => 'form-control emi_start_date_flat', 'dir'=>@$ActiveLanguage->direction)) !!}
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 form-control-label">Booking Date</label>
+                                        <div class="col-sm-10">
+                                            {!! Form::date('booking_date_flat[]', $flat->booking_date_flat, array('id' => '', 'placeholder' => 'Enter Booking Date','class' => 'form-control booking_date_flat', 'dir'=>@$ActiveLanguage->direction)) !!}
                                         </div>
                                     </div>
                                     <div class="document-wrapper">
@@ -563,6 +579,15 @@ $projects = Helper::Topics(8);
                                 'id'=>'emi_start_date', 
                                 'class'=>'form-control emi_start_date', 
                                 'required'=>'true'
+                            ]) !!}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 form-control-label">Paid Date</label>
+                        <div class="col-sm-10">
+                            {!! Form::date('paid_date', $booking->transaction->paid_date, [
+                                'id'=>'paid_date', 
+                                'class'=>'form-control paid_date'
                             ]) !!}
                         </div>
                     </div>
@@ -1231,7 +1256,7 @@ $projects = Helper::Topics(8);
 
             if ($section.find(".is_govt_gas_included").is(":checked") &&
                 $section.find(".is_govt_gas_connection_paid").is(":checked") &&
-                $section.find(".gas_pay_scheme input[type='radio']:checked").val() === "handover") {
+                $section.find(".gas_pay_scheme input[type='radio']:checked").val() === "others") {
                 let gasAmount = parseFloat($section.find(".gas_amount").val()) || 0;
                 extras += gasAmount;
                 extrasVisible = true;
@@ -1621,73 +1646,6 @@ $projects = Helper::Topics(8);
             return isValid;
         }
 
-        // $('#add-flat').on('click', function () {
-
-        //     let wrapper = $('#flat-wrapper');
-        //     let lastFlat = wrapper.find('.flat-details-wrapper:last');
-        //     let index = $('.flat-details-wrapper').length;
-
-        //     if (!isFlatValid(lastFlat)) {
-        //         alert('Please fill out all required fields in the last flat before adding a new one.');
-        //         return;
-        //     }
-
-        //     let clone = wrapper.find('.flat-details-wrapper:first').clone();
-
-        //     //  Reset all inputs
-        //     clone.find('input').each(function () {
-        //         if ($(this).is(':checkbox, :radio')) {
-        //             $(this).prop('checked', false);
-        //         } else {
-        //             $(this).val('');
-        //         }
-        //     });
-
-        //     clone.find('select').val('');
-        //     clone.find("option").show();
-        //     clone.find('textarea').val('');
-        //     clone.find('input[type="file"]').val('');
-        //     clone.find(".govt_gas_connection_payment_scheme").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
-        //     clone.find(".parking_payment_scheme").attr('name', 'parking_payment_scheme[' + index + ']');
-        //     clone.find(".utility_payment_scheme").attr('name', 'utility_payment_scheme[' + index + ']');
-
-        //     //  Remove extra document/material rows
-        //     clone.find('.document-item:not(:first)').remove();
-        //     clone.find('.material-item:not(:first)').remove();
-
-
-        //     //  FORCE hide all conditional UI
-        //     clone.find(
-        //         '#utility_pay_scheme, \
-        //         #utility_amount_group, \
-        //         #parking_fee_group, \
-        //         #parking_pay_scheme, \
-        //         #gas_amount_group, \
-        //         #gas_pay_scheme, \
-        //         #is_govt_gas_connection_paid_group, \
-        //         #is_parking_paid_group, \
-        //         #discount_amount_group, \
-        //         #extras'
-        //     ).hide();
-
-        //     //  Reset conditional UI
-        //     clone.find('#discount_amount_group, #extras').hide();
-
-        //     //  Add Remove button (inside card)
-        //     clone.find('.flat-remove-btn').remove(); 
-
-        //     clone.append(`
-        //         <div class="text-right mt-3 flat-remove-btn">
-        //             <button type="button" class="btn btn-danger remove-flat">
-        //                 Remove Flat
-        //             </button>
-        //         </div>
-        //     `);
-
-        //     wrapper.append(clone);
-        //     updateFlatNumbering();
-        // });
-
         $('#add-flat').on('click', function () {
             let wrapper = $('#flat-wrapper');
             let lastFlat = wrapper.find('.flat-details-wrapper:last');
@@ -1702,12 +1660,21 @@ $projects = Helper::Topics(8);
             clone.find('a[href]').remove();
 
             // Reset all inputs
-            clone.find('input').each(function () {
+            // clone.find('input').each(function () {
+            //     if ($(this).is(':checkbox, :radio')) {
+            //         $(this).prop('checked', false).prop('required', false);
+            //     } else {
+            //         $(this).val('');
+            //     }
+            // });
+            clone.find('input, select, textarea').each(function () {
                 if ($(this).is(':checkbox, :radio')) {
-                    $(this).prop('checked', false).prop('required', false);
+                    $(this).prop('checked', false);
+                } else if ($(this).attr('type') === 'hidden') {
                 } else {
                     $(this).val('');
                 }
+                $(this).prop('required', false);
             });
 
             clone.find('select').val('');
@@ -1716,9 +1683,56 @@ $projects = Helper::Topics(8);
             clone.find('input[type="file"]').val('');
 
             // Update names for dynamic arrays
-            clone.find(".govt_gas_connection_payment_scheme").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
+            // Negotiate Total Price
+            clone.find(".is_negotiate_total_price").attr('name', 'is_negotiable_total_price[' + index + ']');
+            clone.find(".is_negotiable_total_price_hidden").attr('name', 'is_negotiable_total_price[' + index + ']');
+            clone.find(".is_negotiable_total_price_hidden").val(0);
+
+            // Discount
+            clone.find(".is_discount_applicable").attr('name', 'is_discount_applicable[' + index + ']');
+            clone.find(".is_discount_applicable_hidden").attr('name', 'is_discount_applicable[' + index + ']');
+            clone.find(".is_discount_applicable_hidden").val(0);
+
+            // Parking
+            clone.find(".is_parking_included").attr('name', 'is_parking_included[' + index + ']');
+            clone.find(".is_parking_included_hidden").attr('name', 'is_parking_included[' + index + ']');
+            clone.find(".is_parking_included_hidden").val(0);
+
+            clone.find(".is_parking_paid").attr('name', 'is_parking_paid[' + index + ']');
+            clone.find(".is_parking_paid_hidden").attr('name', 'is_parking_paid[' + index + ']');
+            clone.find(".is_parking_paid_hidden").val(0);
+
             clone.find(".parking_payment_scheme").attr('name', 'parking_payment_scheme[' + index + ']');
+            clone.find(".parking_payment_scheme_hidden").attr('name', 'parking_payment_scheme[' + index + ']');
+            clone.find(".parking_payment_scheme_hidden").val('');
+
+            // Utility
+            clone.find(".is_utility_included").attr('name', 'is_utility_included[' + index + ']');
+            clone.find(".is_utility_included_hidden").attr('name', 'is_utility_included[' + index + ']');
+            clone.find(".is_utility_included_hidden").val(0);
+
+            clone.find(".is_utility_paid").attr('name', 'is_utility_paid[' + index + ']');
+            clone.find(".is_utility_paid_hidden").attr('name', 'is_utility_paid[' + index + ']');
+            clone.find(".is_utility_paid_hidden").val(0);
+
             clone.find(".utility_payment_scheme").attr('name', 'utility_payment_scheme[' + index + ']');
+            clone.find(".utility_payment_scheme_hidden").attr('name', 'utility_payment_scheme[' + index + ']');
+            clone.find(".utility_payment_scheme_hidden").val('');
+
+            // Gas
+            clone.find(".is_govt_gas_included").attr('name', 'is_govt_gas_included[' + index + ']');
+            clone.find(".is_govt_gas_included_hidden").attr('name', 'is_govt_gas_included[' + index + ']');
+            clone.find(".is_govt_gas_included_hidden").val(0);
+
+            clone.find(".is_govt_gas_connection_paid").attr('name', 'is_govt_gas_connection_paid[' + index + ']');
+            clone.find(".is_govt_gas_connection_paid_hidden").attr('name', 'is_govt_gas_connection_paid[' + index + ']');
+            clone.find(".is_govt_gas_connection_paid_hidden").val(0);
+
+            clone.find(".govt_gas_connection_payment_scheme").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
+            clone.find(".govt_gas_connection_payment_scheme_hidden").attr('name', 'govt_gas_connection_payment_scheme[' + index + ']');
+            clone.find(".govt_gas_connection_payment_scheme_hidden").val('');
+
+
             clone.find('[name^="document_type_id"]').attr('name', 'document_type_id[' + index + '][]');
             clone.find('[name^="material_type_id"]').attr('name', 'material_type_id[' + index + '][]');
             clone.find('[name^="material_details"]').attr('name', 'material_details[' + index + '][]');

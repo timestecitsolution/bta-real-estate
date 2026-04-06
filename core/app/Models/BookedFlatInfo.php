@@ -33,6 +33,7 @@ class BookedFlatInfo extends Model
         'total_price_flat',
         'emi_amount_flat',
         'emi_start_date_flat',
+        'booking_date_flat',
     ];
     public function projects(){
         return $this->belongsTo(Topic::class, 'project_id', 'id');

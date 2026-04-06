@@ -90,6 +90,7 @@ class FlatBookingController extends Controller
             'total_price_flat.*' => 'required|numeric',
             'emi_amount_flat.*' => 'nullable|numeric',
             'emi_start_date_flat.*' => 'nullable|date',
+            'booking_date_flat.*' => 'nullable|date',
             'document_type_id.*.*' => 'nullable|integer',
             'document.*.*' => 'nullable|file|max:10240',
             'material_type_id.*.*' => 'nullable|integer',
@@ -106,6 +107,11 @@ class FlatBookingController extends Controller
             'emi_count' => 'required|numeric|min:1',
             'is_emi_date_combined' => 'nullable|numeric',
             'emi_start_date' => 'nullable|date',
+            'paid_date' => 'nullable|date',
+            'payment_method' => 'required|string',
+            'transaction_no' => 'nullable|string',
+            'voucher_no' => 'nullable|string',
+            'note' => 'nullable|string',
         ]);
         DB::transaction(function () use ($request) {
             $FlatBooking = FlatBookingModel::create([
@@ -148,6 +154,7 @@ class FlatBookingController extends Controller
                 'voucher_no' => $request->voucher_no,
                 'document_path' => $documentPath,
                 'note' => $request->note,
+                'paid_date' => $request->paid_date,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
                 'created_at' => now(),
@@ -191,21 +198,22 @@ class FlatBookingController extends Controller
                     'price_per_sqft' => $request->price_per_sqft[$index] ?? 0,
                     'is_govt_gas_included' => $request->is_govt_gas_included[$index] ?? 0,
                     'is_govt_gas_connection_paid' => $request->is_govt_gas_connection_paid[$index] ?? 0,
-                    'govt_gas_payment_scheme' => $request->govt_gas_connection_payment_scheme[$index] ?? null,
+                    'govt_gas_payment_scheme' => $request->govt_gas_connection_payment_scheme[$index] ?: null,
                     'gas_connection_fee' => $request->gas_amount[$index] ?? 0,
                     'is_parking_included' => $request->is_parking_included[$index] ?? 0,
                     'is_parking_paid' => $request->is_parking_paid[$index] ?? 0,
-                    'parking_payment_scheme' => $request->parking_payment_scheme[$index] ?? null,
+                    'parking_payment_scheme' => $request->parking_payment_scheme[$index] ?: null,
                     'parking_fee' => $request->parking_amount[$index] ?? 0,
                     'is_utility_included' => $request->is_utility_included[$index] ?? 0,
-                    'utility_payment_scheme' => $request->utility_payment_scheme[$index] ?? null,
+                    'utility_payment_scheme' => $request->utility_payment_scheme[$index] ?: null,
                     'utility_fee' => $request->utility_amount[$index] ?? 0,
                     'extras_amount' => $request->extras_amount[$index] ?? 0,
                     'is_applicable_discount' => $request->is_discount_applicable[$index] ?? 0,
-                    'discounted_amount' => $request->discount_amount[$index] ?? 0,
+                    'discounted_amount' => $request->discount_amount[$index] ?? null,
                     'total_price_flat' => $request->total_price_flat[$index],
-                    'emi_amount_flat' => $request->emi_amount_flat[$index] ?? 0,
+                    'emi_amount_flat' => $request->emi_amount_flat[$index] ?? null,
                     'emi_start_date_flat' => $request->emi_start_date_flat[$index] ?? null,
+                    'booking_date_flat' => $request->booking_date_flat[$index] ?? null,
                 ]);
                 $FlatBookingMap[$flatId] = [
                     'booked_flat_id' => $flatDetails->id,
@@ -336,6 +344,9 @@ class FlatBookingController extends Controller
             'downpayment_amount' => 'required|numeric',
             'emi_amount' => 'required|numeric',
             'emi_count' => 'required|numeric|min:1',
+            'payment_method' => 'required|string',
+            'booking_date_flat.*' => 'nullable|date',
+            'paid_date' => 'nullable|date',
         ]);
 
         DB::transaction(function () use ($request, $id) {
@@ -410,6 +421,7 @@ class FlatBookingController extends Controller
                 'trx_no' => $request->transaction_no,
                 'voucher_no' => $request->voucher_no,
                 'document_path' => $documentPathTransaction,
+                'paid_date' => $request->paid_date,
                 'note' => $request->note,
             ]);
             $invoice = Invoices::where('transaction_id', $transaction->id)->first();
@@ -432,7 +444,6 @@ class FlatBookingController extends Controller
             /* ===============================
             CREATE / UPDATE FLATS
             =============================== */
-
             foreach ($request->project_id as $index => $projectId) {
 
                 $flatId = $request->flat_id[$index];
@@ -457,10 +468,11 @@ class FlatBookingController extends Controller
                     'utility_fee' => $request->utility_amount[$index] ?? 0,
                     'extras_amount' => $request->extras_amount[$index] ?? 0,
                     'is_applicable_discount' => $request->is_discount_applicable[$index] ?? 0,
-                    'discounted_amount' => $request->discount_amount[$index] ?? 0,
-                    'total_price_flat' => $request->total_price_flat[$index] ?? 0,
-                    'emi_amount_flat' => $request->emi_amount_flat[$index] ?? 0,
+                    'discounted_amount' => $request->discount_amount[$index] ?? null,
+                    'total_price_flat' => $request->total_price_flat[$index] ?? null,
+                    'emi_amount_flat' => $request->emi_amount_flat[$index] ?? null,
                     'emi_start_date_flat' => $request->emi_start_date_flat[$index] ?? null,
+                    'booking_date_flat' => $request->booking_date_flat[$index] ?? null,
                 ];
 
                 if (isset($existingFlats[$flatId])) {

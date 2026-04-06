@@ -18,6 +18,8 @@ class Transactions extends Model
         'voucher_no',
         'document_path',
         'note',
+        'status',
+        'paid_date',
         'created_by',
         'updated_by',
     ];
