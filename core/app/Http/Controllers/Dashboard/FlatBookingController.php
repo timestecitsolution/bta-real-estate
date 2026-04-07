@@ -15,6 +15,9 @@ use App\Models\FlatDocuments;
 use App\Models\MaterialDetails;
 use App\Models\Transactions;
 use App\Models\Invoices;
+use App\Models\Topic;
+use App\Services\SMSService;
+use App\Models\FlatDetailsModel;
 use DB;
 use Auth;
 use File;
@@ -300,6 +303,50 @@ class FlatBookingController extends Controller
                     }
                 }
             }
+            // Send SMS to customer
+            $contacts = Contact::find($request->customer_id);
+            $customerPhone = '88' . $contacts->phone;
+
+            // Build per-flat details
+            $flatLines = '';
+            foreach ($request->project_id as $index => $projectId) {
+                $project = Topic::find($projectId);
+                $flat    = FlatDetailsModel::find($request->flat_id[$index]);
+
+                $flatSize     = $request->flat_size[$index] ?? 0;
+                $pricePerSqft = $request->price_per_sqft[$index] ?? 0;
+                $flatTotal    = $request->total_price_flat[$index] ?? 0;
+                $flatNo       = $index + 1;
+
+                $flatLines .= "-- Flat {$flatNo} --\n"
+                    . "Project : {$project->title_en}\n"
+                    . "Flat    : {$flat->flat_name}\n"
+                    . "Size    : {$flatSize} sq ft\n"
+                    . "Rate    : " . number_format($pricePerSqft) . " BDT/sqft\n"
+                    . "Price   : " . number_format($flatTotal) . " BDT\n";
+            }
+
+            // Build payment summary
+            $message = "Dear {$contacts->first_name} {$contacts->last_name},\n"
+                . "Your flat booking is confirmed!\n\n"
+                . $flatLines
+                . "\n-- Payment Summary --\n"
+                . "Total Price  : " . number_format($request->total_price) . " BDT\n"
+                . "Booking Money: " . number_format($request->booking_amount) . " BDT\n"
+                . "Down Payment : " . number_format($request->downpayment_amount) . " BDT\n"
+                . "Due Amount   : " . number_format($request->due_amount) . " BDT\n";
+
+            // EMI block (only if applicable)
+            if (!empty($request->emi_count)) {
+                $message .= "\n-- EMI Details --\n"
+                    . "Total EMI : {$request->emi_count} installments\n"
+                    . "Per Month : " . number_format($request->emi_amount) . " BDT\n"
+                    . "1st EMI   : " . date('d-m-Y', strtotime($request->emi_start_date)) . "\n";
+            }
+
+            $message .= "\nThank you for choosing us!";
+            // Send the SMS
+            SMSService::send($customerPhone, $message);
         });
         return redirect()
             ->route('flat-booking')
