@@ -5,6 +5,11 @@
         <div class="dashboard-wrap">
             <!-- ===== Nav Tabs ===== -->
             <ul class="nav nav-tabs mb-4" id="userDashboardTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" style="color: black !important;" id="user-profile-tab" data-bs-toggle="tab" data-bs-target="#user-profile" type="button" role="tab" aria-controls="user-profile" aria-selected="false">
+                        User Profile
+                    </button>
+                </li>
                 @if($Contact->status == '0' || $Contact->status == '1' ||$user->status == '1')
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" style="color: black !important;" id="payment-overview-tab" data-bs-toggle="tab" data-bs-target="#payment-overview" type="button" role="tab" aria-controls="payment-overview" aria-selected="true">
@@ -54,11 +59,6 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" style="color: black !important;" id="user-profile-tab" data-bs-toggle="tab" data-bs-target="#user-profile" type="button" role="tab" aria-controls="user-profile" aria-selected="false">
-                        User Profile
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" style="color: black !important;" id="reset-password-tab" data-bs-toggle="tab" data-bs-target="#reset-password" type="button" role="tab" aria-controls="reset-password" aria-selected="false">
                         Reset Password
                     </button>
@@ -73,6 +73,9 @@
 
             <!-- ===== Tab Content ===== -->
             <div class="tab-content" id="userDashboardTabsContent">
+                <div class="tab-pane fade" id="user-profile" role="tabpanel" aria-labelledby="user-profile-tab">
+                    @include('user-dashboard.user-profile')
+                </div>
                 @if($Contact->status == '0' || $Contact->status == '1' ||$user->status == '1')
                     <div class="tab-pane fade show active" id="payment-overview" role="tabpanel" aria-labelledby="payment-overview-tab">
                         @include('user-dashboard.payment-overview')
@@ -107,9 +110,6 @@
                 @endif
                 <div class="tab-pane fade" id="application-form" role="tabpanel" aria-labelledby="application-form-tab">
                     @include('user-dashboard.application-form')
-                </div>
-                <div class="tab-pane fade" id="user-profile" role="tabpanel" aria-labelledby="user-profile-tab">
-                    @include('user-dashboard.user-profile')
                 </div>
                  <div class="tab-pane fade" id="reset-password" role="tabpanel" aria-labelledby="reset-password-tab">
                     @include('user-dashboard.reset-password')

@@ -20,10 +20,10 @@
                 <label>Select Client(s)</label>
                 <select name="customer_ids[]" id="customerSelect" class="form-control select2-multiple" data-placeholder="Select Customers" multiple required>
                     <option value="all">-- Select All Clients --</option>
-                    @foreach($all_prices_details->pluck('customer')->unique('id') as $customer)
-                        @if($customer && $customer->id)
-                            <option value="{{ $customer->id }}">
-                                {{ $customer->first_name }} {{ $customer->last_name }}
+                    @foreach($all_booking_details->pluck('client')->unique('id') as $client)
+                        @if($client && $client->id)
+                            <option value="{{ $client->id }}">
+                                {{ $client->first_name }} {{ $client->last_name }}
                             </option>
                         @endif
                     @endforeach

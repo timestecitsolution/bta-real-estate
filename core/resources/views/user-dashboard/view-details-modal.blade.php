@@ -35,13 +35,12 @@
                             <td>{{ number_format($flat->total_price_flat, 2) ?? 'N/A' }} Tk</td>
                         </tr>
                         <tr>
-                            <th>Due Amount</th>
-                            <td>{{ number_format(($flat->due_amount + $flat->extras_amount), 2) ?? 'N/A' }} Tk</td>
+                            <!-- <th>Due Amount</th>
+                            <td>{{ number_format(($flat->due_amount + $flat->extras_amount), 2) ?? 'N/A' }} Tk</td> -->
 
                             <th>EMI Amount (Per Month)</th>
                             <td>{{ number_format($flat->emi_amount_flat, 2) ?? 'N/A' }} Tk</td>
-                        </tr>
-                        <tr>
+
                             <th>EMI Starts From</th>
                             <td>{{ $flat->emi_start_date_flat ?? 'N/A' }}</td>
                         </tr>
