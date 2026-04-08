@@ -273,7 +273,7 @@ $projects = Helper::Topics(8);
                                     </div>
 
                                     <div class="form-group row discount_amount_group" id="discount_amount_group" style="display: none;">
-                                        <label class="col-sm-2 form-control-label">Discounted Amount</label>
+                                        <label class="col-sm-2 form-control-label">Discounted Amount *</label>
                                         <div class="col-sm-10">
                                             {!! Form::number('discount_amount[]', $flat->discounted_amount, [
                                                 'id' => 'discount_amount',
@@ -923,7 +923,21 @@ $projects = Helper::Topics(8);
                 updateFlatSelectOptions();
             });
 
+            // Page load e existing state check
+            $('.flat-details-wrapper').each(function () {
+                let $section = $(this);
 
+                if ($section.find('.is_negotiate_total_price').is(':checked')) {
+                    $section.find('.price_per_sqft_group').hide();
+                    $section.find('.price_per_sqft').prop('required', false);
+                    // .val('') দিও না — edit form e existing value মুছে যাবে
+                } else {
+                    $section.find('.price_per_sqft_group').show();
+                    $section.find('.price_per_sqft').prop('required', true);
+                }
+            });
+
+            // Change event
             $(document).on('change', '.is_negotiate_total_price', function () {
 
                 let $section = $(this).closest('.flat-details-wrapper');
