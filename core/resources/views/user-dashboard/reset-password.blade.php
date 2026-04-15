@@ -14,9 +14,9 @@
         <label>Client</label>
         <select name="customer_id_select" id="customer_id_select" class="custom-select form-control" required>
             <option value="">Select Client</option>
-            @foreach($customers as $customer)
-                <option value="{{ $customer->id }}">
-                    {{ $customer->first_name }} {{ $customer->last_name }}
+            @foreach($all_booking_details->pluck('client')->unique('id') as $client)
+                <option value="{{ $client->id }}" {{ $filter_customer_id == $client->id ? 'selected' : '' }}>
+                    {{ $client->first_name }} {{ $client->last_name }}
                 </option>
             @endforeach
         </select>

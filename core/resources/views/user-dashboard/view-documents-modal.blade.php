@@ -3,9 +3,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="documentsModalLabel{{ $price->id }}">
-                    {{ $price->customer->first_name ?? 'N/A' }} {{ $price->customer->last_name ?? '' }} - 
-                    Documents for Flat: {{ $price->flat->title ?? 'N/A' }} 
-                    (Project: {{ $price->project->title_en ?? 'N/A' }})
+                    {{ $customer->first_name ?? 'N/A' }} {{ $customer->last_name ?? '' }} - 
+                    Documents for Flat: {{ $flat->flats->flat_name ?? 'N/A' }} 
+                    (Project: {{ $flat->projects->title_en ?? 'N/A' }})
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
