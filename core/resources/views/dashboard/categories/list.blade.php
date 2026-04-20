@@ -123,7 +123,7 @@ if ($WebmasterSection->$title_var != "") {
                                                 @endif
                                                 {{ $title }}
                                             </a>
-                                        @elsez
+                                        @else
                                             @if($Section->icon !="")
                                                 <i class="fa {!! $Section->icon !!} "></i>
                                             @endif

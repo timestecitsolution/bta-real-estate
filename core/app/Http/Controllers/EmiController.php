@@ -37,125 +37,6 @@ class EmiController extends Controller
 
         return $path;
     }
-    // public function storeEmi(Request $request)
-    // {
-    //     $request->validate([
-    //         'price_id' => 'required|exists:price,id',
-    //         'emi_paying_date' => 'required|date',
-    //         'payment_method' => 'required|in:cash,check,bank_transfer',
-    //     ]);
-
-    //     if (in_array($request->payment_method, ['check', 'bank_transfer'])) {
-    //     $request->validate([
-    //         'transaction_no' => 'nullable|string|max:255',
-    //         'check_ds_image' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-    //     ]);
-    //     } else {
-    //         $request->validate([
-    //             'transaction_no' => 'nullable|string|max:255',
-    //             'check_ds_image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
-    //         ]);
-    //     }
-
-    //     $lastEmi = EmiPayment::where('price_id', $request->price_id)
-    //         ->orderBy('id', 'desc')
-    //         ->first();
-    //     if($request->extras_amount_check == 1){
-    //         $request->validate([
-    //             'extras_amount' => 'required|numeric|min:1',
-    //         ]);
-    //         $payment_category = 'extras';
-    //         $extras_amount = $request->extras_amount;
-    //         $emi_amount = null;
-    //     }else{
-    //         $request->validate([
-    //             'current_installment_amount' => 'required|numeric|min:1',
-    //         ]);
-    //         $payment_category = 'emi';
-    //         $extras_amount = null;
-    //         $emi_amount = $request->current_installment_amount;
-    //     }
-    //     $number_format_current_installment_amount = number_format((float)$request->current_installment_amount, 2, '.', '');
-    //     $next_emi_date = Carbon::parse($request->emi_due_date)->addMonth()->format('Y-m-d');
-
-    //     // Handle file upload
-    //     $documentPath = null;
-    //     if ($request->hasFile('check_ds_image')) {
-    //         $path = $this->getUploadPath('emi_payment_document');
-    //         $file = $request->file('check_ds_image');
-    //         $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-    //         $file->move($path, $fileName);
-    //         Helper::imageResize($path . $fileName);
-    //         Helper::imageOptimize($path . $fileName);
-    //         $documentPath = 'emi_payment_document/' . $fileName;
-    //     }
-
-    //     $user = Auth::guard('user')->user();
-    //     if($user->status == 1){
-    //         $status = 'approved';
-    //     }else{
-    //         $status = 'pending';
-    //     }
-    //     $emi = EmiPayment::create([
-    //         'price_id' => $request->price_id,
-    //         'emi_amount' => $emi_amount,
-    //         'extras_amount' => $extras_amount,
-    //         'payment_category' => $payment_category,
-    //         'emi_due_date' => $request->emi_due_date,
-    //         'emi_paid_date' => $request->emi_paying_date,
-    //         'status' => $status,
-    //         'payment_method' => $request->payment_method,
-    //         'trx_no' => $request->transaction_no,
-    //         'document_path' => $documentPath,
-    //         'voucher_no' => $request->voucher_no,
-    //         'note' => $request->note,
-    //         'created_by' => Auth::guard('user')->user()->id,
-    //         'updated_by' => Auth::guard('user')->user()->id,
-    //     ]);
-
-    //     if ($emi) {
-    //         // =====================
-    //         // Generate Invoice No
-    //         // =====================
-    //         $lastInvoice = Invoices::orderBy('id', 'desc')->first();
-    //         $nextInvoiceNo = $lastInvoice ? $lastInvoice->id + 1 : 1;
-    //         $invoiceNo = 'INV-' . str_pad($nextInvoiceNo, 5, '0', STR_PAD_LEFT);
-    //         if($emi_amount){
-    //             $total_price_invoice = $emi_amount;
-    //         }else{
-    //             $total_price_invoice = $extras_amount;
-    //         }
-    //         // Insert into invoices table
-    //         Invoices::create([
-    //             'invoice_no'  => $invoiceNo,
-    //             'payment_type'=> 'emi',
-    //             'emi_id'    => $emi->id,
-    //             'client_id'   => $request->customer_id_select,
-    //             'total_price' => $total_price_invoice,
-    //             'created_by'  => Auth::guard('user')->user()->id,
-    //         ]);
-
-    //         // Send SMS to customer
-    //         $contacts = Contact::find($request->customer_id);
-    //         $customerPhone = '88'.$contacts->phone; 
-    //         $prices = PriceModel::find($request->price_id);
-    //         $project = $prices->project;
-
-    //         $message = "Dear {$contacts->first_name},\n"
-    //                 . "Your flat EMI has been paid for the project: {$project->title_en}, Flat No: {$prices->flat->title}.\n"
-    //                 . "EMI Amount: {$number_format_current_installment_amount} BDT,\n"
-    //                 . "Paid Date: {$request->emi_paying_date},\n"
-    //                 // . "Your Remaining Due Amount: {$number_format_remaining_due} BDT,\n"
-    //                 // . "Remaining EMI Count: {$remaining_emi_count},\n"
-    //                 . "Next EMI Date: {$next_emi_date}.\n"
-    //                 . "Thank you for choosing us.\n"
-    //                 . "- Building Technology & Architecture.";
-    //         SMSService::send($customerPhone, $message);
-    //         return redirect()->back()->with('success', 'EMI saved successfully!');
-    //     }else {
-    //         return redirect()->back()->with('error', 'Failed to add price. Please try again.');
-    //     }
-    // }
 
     public function storeEmi(Request $request)
     {
@@ -333,43 +214,54 @@ class EmiController extends Controller
             // SMS
             // =======================
             $contact = Contact::find($request->client_id_select);
+            $invoice = Invoices::where('emi_payment_id', $emiPaymentId)->first();
+            $flatLines = '';
+            foreach ($flatIds as $index => $flatId) {
+                $flatInfo = DB::table('booked_flat_info')
+                    ->where('booking_id', $request->booking_id)
+                    ->where('flat_id', $flatId)
+                    ->first();
 
-            $flats = FlatBookingModel::with(['flatBookingDetails.projects', 'flatBookingDetails.flats'])
-                ->where('id', $request->booking_id)
-                ->get()
-                ->flatMap(function($booking) {
-                    return $booking->flatBookingDetails->map(function($detail) {
-                        return [
-                            'flat_title' => optional($detail->flats)->flat_name,
-                            'project_title' => optional($detail->projects)->title_en
-                        ];
-                    });
-                });
+                if (!$flatInfo) continue;
 
-            // collect flat names
-            $flatNames = $flats->pluck('flat_title')->filter()->unique()->values()->toArray();
+                $flatName    = DB::table('flat_details')->where('id', $flatId)->value('flat_name');
+                $projectName = DB::table('topics')->where('id', $flatInfo->project_id)->value('title_en');
 
-            // collect project names
-            $projectNames = $flats->pluck('project_title')->filter()->unique()->values()->toArray();
+                $flatNo = $index + 1;
+                $flatLines .= "-- Flat {$flatNo} --\n"
+                    . "Project : {$projectName}\n"
+                    . "Flat    : {$flatName}\n";
+            }
 
-            // format flat string
-            $flatText = implode(', ', $flatNames);
+            // Next EMI date
+            $next_emi_date = Carbon::parse($request->emi_due_date)->addMonth()->format('d-m-Y');
 
-            // format project string
-            $projectText = implode(', ', $projectNames);
-
-            // next emi date
-            $next_emi_date = Carbon::parse($request->emi_due_date)->addMonth()->format('Y-m-d');
-
-            // final message
-            $message = "Dear {$contact->first_name},\n"
-                . "Your payment received for Flat: {$flatText} ({$projectText})\n"
-                . "Amount: {$amount} BDT\n"
-                . "Date: {$request->emi_paying_date}\n"
-                . "Next EMI Date: {$next_emi_date}\n"
-                . "Thank you.";
+            if ($user->status == 1) {
+                $message = "Dear {$contact->first_name} {$contact->last_name},\n"
+                    . "Your payment has been received!\n\n"
+                    . $flatLines
+                    . "\n-- Payment Summary --\n"
+                    . "Invoice No   : " . ($invoice->invoice_no ?? 'N/A') . "\n"
+                    . "Paid Amount  : " . number_format($amount) . " BDT\n"
+                    . "Payment Date : " . date('d-m-Y', strtotime($request->emi_paying_date)) . "\n"
+                    . "Next EMI Date: {$next_emi_date}\n"
+                    . "\nThank you for choosing us!";
+            } else {
+                $message = "Dear {$contact->first_name} {$contact->last_name},\n"
+                    . "Your payment entry has been received and is pending approval.\n\n"
+                    . $flatLines
+                    . "\n-- Payment Summary --\n"
+                    . "Invoice No   : " . ($invoice->invoice_no ?? 'N/A') . "\n"
+                    . "Amount       : " . number_format($amount) . " BDT\n"
+                    . "Payment Date : " . date('d-m-Y', strtotime($request->emi_paying_date)) . "\n"
+                    . "Next EMI Date: {$next_emi_date}\n"
+                    . "\nWe will notify you once the payment is approved.\n"
+                    . "Thank you for choosing us!";
+            }
 
             SMSService::send('88' . $contact->phone, $message);
+            SMSService::send('88' . '01812005333', $message);
+            SMSService::send('88' . '01814783810', $message);
 
             return back()->with('success', 'Payment saved successfully!');
 
@@ -379,110 +271,6 @@ class EmiController extends Controller
         }
     }
 
-    // public function getFlatDetails(Request $request)
-    // {
-    //     $flatId = $request->flat_id;
-
-    //     $flat_booking = FlatBookingModel::with(['client', 'flatBookingDetails.projects', 'flatBookingDetails.flats'])
-    //     ->whereHas('flatBookingDetails', function($query) use ($flatId) {
-    //         $query->where('flat_id', $flatId);
-    //     })->first();
-
-    //     $flat_booking_detail = $flat_booking->flatBookingDetails->first();
-
-    //     if (!$flat_booking) {
-    //         return response()->json(['error' => 'No data found'], 404);
-    //     }
-
-    //     // Base variables
-    //     $total_price = floatval($flat_booking->total_price ?? 0);
-    //     $emi_count = intval($flat_booking->emi_count ?? 0);
-    //     $monthly_emi = floatval($flat_booking->total_emi_amount ?? 0);
-    //     $due_amount = floatval($flat_booking->due_amount_total ?? 0);
-    //     $extras_amount_total = floatval($flat_booking->extras_total ?? 0);
-
-    //     // Fetch EMI Payments
-    //     $emis = EmiPayment::where('booking_id', $flat_booking->id)
-    //         ->where('status', 'Paid')
-    //         ->orderBy('id', 'asc')
-    //         ->get();
-
-    //     // Default initialization
-    //     $total_paid = 0;
-    //     $total_paid_with_extras = 0;
-    //     $actual_emi_paid_count = 0;
-
-    //     // Dynamic calculation (same as dashboard)
-    //     foreach ($emis as $emi) {
-    //         $emi_amount = floatval($emi->total_amount ?? 0);
-    //         $extras_amount = floatval($emi->total_extras ?? 0);
-
-    //         if ($emi_amount > 0) {
-    //             $total_paid += $emi_amount;
-    //             $actual_emi_paid_count++;
-    //         }
-
-    //         $total_paid_with_extras += ($emi_amount + $extras_amount);
-    //     }
-
-    //     // Derived values (dynamic)
-    //     $remaining_due = max($total_price - $total_paid, 0);
-    //     $remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
-    //     $remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
-
-    //     // Extras calculation
-    //     $total_extras_paid = $emis->sum('total_extras');
-    //     $remaining_extras = max($extras_amount_total - $total_extras_paid, 0);
-
-    //     // Next EMI date calculation
-    //     $lastEmi = $emis->sortByDesc('emi_due_date')->first();
-    //     if ($lastEmi) {
-    //         $nextEmiDueDate = \Carbon\Carbon::parse($lastEmi->emi_due_date)->addMonth();
-    //     } else {
-    //         $nextEmiDueDate = \Carbon\Carbon::parse($flat_booking->emi_start_date);
-    //     }
-    //     $latestStatus = EmiPayment::where('booking_id', $flat_booking->id)
-    //                     ->orderByDesc('id')
-    //                     ->first()
-    //                     ->status ?? null;
-
-    //     $currentDueAmount = $monthly_emi;
-
-    //     // Grand totals
-    //     $totalPaidAmount = ($flat_booking->booking_amount ?? 0) + ($flat_booking->downpayment_amount ?? 0) + $total_paid;
-    //     $totalPaidAmountWithExtras = $totalPaidAmount + $total_extras_paid;
-    //     $dueAmountWithExtras = $due_amount + $remaining_extras;
-
-    //     return response()->json([
-    //         'booking_id' => $flat_booking->id,
-    //         'project_id' => $flat_booking_detail->project_id,
-    //         'flat_id' => $flat_booking_detail->flat_id,
-    //         'flat_size' => $flat_booking_detail->flat_size,
-    //         'client_id' => $flat_booking->client_id,
-    //         'price_per_sqft' => $flat_booking_detail->price_per_sqft,
-    //         'total_price' => $flat_booking->total_price,
-    //         'emi' => $monthly_emi,
-    //         'booking_amount' => $flat_booking->booking_amount,
-    //         'downpayment_amount' => $flat_booking->downpayment_amount,
-    //         'due_amount' => $due_amount,
-    //         'remaining_due_amount' => $remaining_due,
-    //         'extras_amount' => $remaining_extras,
-    //         'emi_count' => $emi_count,
-    //         'remaining_emi_count' => $remaining_emi_count,
-    //         'total_paid_amount' => $total_paid,
-    //         'total_extras_paid' => $total_extras_paid,
-    //         'latest_status' => $latestStatus,
-    //         'total_paid_amount_with_extras' => $total_paid_with_extras,
-    //         'remaining_due_amount_with_extras' => $remaining_due_amount_with_extras,
-    //         'total_paid_amount_final' => $totalPaidAmount,
-    //         'total_paid_amount_with_extras_final' => $totalPaidAmountWithExtras,
-    //         'due_amount_with_extras' => $dueAmountWithExtras,
-    //         'current_installment_amount' => $currentDueAmount,
-    //         'emi_start_date' => $flat_booking->emi_start_date,
-    //         'emi_due_date' => $nextEmiDueDate->format('Y-m-d'),
-    //         'is_cancelled' => $flat_booking->is_cancelled,
-    //     ]);
-    // }
     public function getFlatDetails(Request $request)
     {
         $flatIds = $request->flat_id;
@@ -671,6 +459,38 @@ class EmiController extends Controller
             Invoices::where('emi_payment_id', $emi->id)
                 ->update(['updated_at' => now()]);
         });
+        // SMS
+        $emi     = EmiPayment::findOrFail($id);
+        $booking = FlatBookingModel::find($emi->booking_id);
+        $contact = Contact::find($booking->client_id);
+        $invoice = Invoices::where('emi_payment_id', $emi->id)->first();
+
+        // Flat lines from emi payment items
+        $emiItems = EmiPaymentItems::where('emi_payment_id', $emi->id)->get();
+        $flatLines = '';
+        foreach ($emiItems as $index => $item) {
+            $flatInfo    = DB::table('booked_flat_info')->where('id', $item->flat_info_id)->first();
+            $flatName    = DB::table('flat_details')->where('id', $flatInfo->flat_id)->value('flat_name');
+            $projectName = DB::table('topics')->where('id', $flatInfo->project_id)->value('title_en');
+
+            $flatNo = $index + 1;
+            $flatLines .= "-- Flat {$flatNo} --\n"
+                . "Project : {$projectName}\n"
+                . "Flat    : {$flatName}\n";
+        }
+
+        $message = "Dear {$contact->first_name} {$contact->last_name},\n"
+            . "Your EMI payment has been approved!\n\n"
+            . $flatLines
+            . "\n-- Payment Summary --\n"
+            . "Invoice No   : " . ($invoice->invoice_no ?? 'N/A') . "\n"
+            . "Paid Amount  : " . number_format($emi->total_amount) . " BDT\n"
+            . "Payment Date : " . date('d-m-Y', strtotime($emi->emi_paid_date)) . "\n"
+            . "\nThank you for choosing us!";
+
+        SMSService::send('88' . $contact->phone, $message);
+        SMSService::send('88' . '01812005333', $message);
+        SMSService::send('88' . '01814783810', $message);
 
         return back()->with('success', 'EMI approved successfully.');
     }
@@ -698,6 +518,38 @@ class EmiController extends Controller
             Invoices::where('emi_payment_id', $emi->id)
                 ->update(['updated_at' => now()]);
         });
+        // SMS
+        $emi     = EmiPayment::findOrFail($id);
+        $booking = FlatBookingModel::find($emi->booking_id);
+        $contact = Contact::find($booking->client_id);
+        $invoice = Invoices::where('emi_payment_id', $emi->id)->first();
+
+        $emiItems = EmiPaymentItems::where('emi_payment_id', $emi->id)->get();
+        $flatLines = '';
+        foreach ($emiItems as $index => $item) {
+            $flatInfo    = DB::table('booked_flat_info')->where('id', $item->flat_info_id)->first();
+            $flatName    = DB::table('flat_details')->where('id', $flatInfo->flat_id)->value('flat_name');
+            $projectName = DB::table('topics')->where('id', $flatInfo->project_id)->value('title_en');
+
+            $flatNo = $index + 1;
+            $flatLines .= "-- Flat {$flatNo} --\n"
+                . "Project : {$projectName}\n"
+                . "Flat    : {$flatName}\n";
+        }
+
+        $message = "Dear {$contact->first_name} {$contact->last_name},\n"
+            . "Your EMI payment has been rejected.\n\n"
+            . $flatLines
+            . "\n-- Payment Summary --\n"
+            . "Invoice No   : {$invoice->invoice_no}\n"
+            . "Amount       : " . number_format($emi->total_amount) . " BDT\n"
+            . "Payment Date : " . date('d-m-Y', strtotime($emi->emi_paid_date)) . "\n"
+            . "\nPlease contact us for further information.\n"
+            . "Thank you.";
+
+        SMSService::send('88' . $contact->phone, $message);
+        SMSService::send('88' . '01812005333', $message);
+        SMSService::send('88' . '01814783810', $message);
 
         return back()->with('success', 'EMI rejected successfully.');
     }
@@ -813,7 +665,6 @@ class EmiController extends Controller
 
             $flatCount = count($flatInfos);
             $perFlatAmount = round($amount / $flatCount, 2);
-            // dd($perFlatAmount);
             foreach ($flatInfos as $flatInfoId => $flatInfo) {
 
 
@@ -844,6 +695,55 @@ class EmiController extends Controller
             ]);
             DB::commit();
 
+            // =======================
+            // SMS
+            // =======================
+            $booking = FlatBookingModel::find($emi->booking_id);
+            $contact = Contact::find($booking->client_id);
+            $invoice = Invoices::where('emi_payment_id', $emi->id)->first();
+
+            $emiItems = EmiPaymentItems::where('emi_payment_id', $emi->id)->get();
+            $flatLines = '';
+            foreach ($emiItems as $index => $item) {
+                $flatInfo    = DB::table('booked_flat_info')->where('id', $item->flat_info_id)->first();
+                $flatName    = DB::table('flat_details')->where('id', $flatInfo->flat_id)->value('flat_name');
+                $projectName = DB::table('topics')->where('id', $flatInfo->project_id)->value('title_en');
+
+                $flatNo = $index + 1;
+                $flatLines .= "-- Flat {$flatNo} --\n"
+                    . "Project : {$projectName}\n"
+                    . "Flat    : {$flatName}\n";
+            }
+
+            $next_emi_date = Carbon::parse($request->emi_due_date)->addMonth()->format('d-m-Y');
+
+            if ($user->status == 1) {
+                $message = "Dear {$contact->first_name} {$contact->last_name},\n"
+                    . "Your EMI payment has been updated!\n\n"
+                    . $flatLines
+                    . "\n-- Payment Summary --\n"
+                    . "Invoice No   : " . ($invoice->invoice_no ?? 'N/A') . "\n"
+                    . "Paid Amount  : " . number_format($amount) . " BDT\n"
+                    . "Payment Date : " . date('d-m-Y', strtotime($request->paying_date)) . "\n"
+                    . "Next EMI Date: {$next_emi_date}\n"
+                    . "\nThank you for choosing us!";
+            } else {
+                $message = "Dear {$contact->first_name} {$contact->last_name},\n"
+                    . "Your EMI payment update is pending approval.\n\n"
+                    . $flatLines
+                    . "\n-- Payment Summary --\n"
+                    . "Invoice No   : " . ($invoice->invoice_no ?? 'N/A') . "\n"
+                    . "Amount       : " . number_format($amount) . " BDT\n"
+                    . "Payment Date : " . date('d-m-Y', strtotime($request->paying_date)) . "\n"
+                    . "Next EMI Date: {$next_emi_date}\n"
+                    . "\nWe will notify you once the payment is approved.\n"
+                    . "Thank you for choosing us!";
+            }
+
+            SMSService::send('88' . $contact->phone, $message);
+            SMSService::send('88' . '01812005333', $message);
+            SMSService::send('88' . '01814783810', $message);
+
             return response()->json([
                     'success' => true,
                     'message' => 'Payment updated successfully!'
@@ -857,6 +757,24 @@ class EmiController extends Controller
 
     public function destroy($id)
     {
+        // data for sms
+        $emi     = EmiPayment::findOrFail($id);
+        $booking = FlatBookingModel::find($emi->booking_id);
+        $contact = Contact::find($booking->client_id);
+        $invoice = Invoices::where('emi_payment_id', $emi->id)->first();
+
+        $emiItems = EmiPaymentItems::where('emi_payment_id', $emi->id)->get();
+        $flatLines = '';
+        foreach ($emiItems as $index => $item) {
+            $flatInfo    = DB::table('booked_flat_info')->where('id', $item->flat_info_id)->first();
+            $flatName    = DB::table('flat_details')->where('id', $flatInfo->flat_id)->value('flat_name');
+            $projectName = DB::table('topics')->where('id', $flatInfo->project_id)->value('title_en');
+
+            $flatNo = $index + 1;
+            $flatLines .= "-- Flat {$flatNo} --\n"
+                . "Project : {$projectName}\n"
+                . "Flat    : {$flatName}\n";
+        }
         DB::transaction(function () use ($id) {
 
             // 1️⃣ Get EMI Payment
@@ -900,7 +818,22 @@ class EmiController extends Controller
             }
 
         });
+        // =======================
+        // SMS
+        // =======================
+        $message = "Dear {$contact->first_name} {$contact->last_name},\n"
+            . "Your EMI payment entry has been deleted by admin.\n\n"
+            . $flatLines
+            . "\n-- Payment Info --\n"
+            . "Invoice No   : " . ($invoice->invoice_no ?? 'N/A') . "\n"
+            . "Amount       : " . number_format($emi->total_amount) . " BDT\n"
+            . "Payment Date : " . date('d-m-Y', strtotime($emi->emi_paid_date)) . "\n"
+            . "\nPlease re-submit the corrected payment entry or contact to the admin.\n"
+            . "Thank you.";
 
+        SMSService::send('88' . $contact->phone, $message);
+        SMSService::send('88' . '01812005333', $message);
+        SMSService::send('88' . '01814783810', $message);
         return redirect()->back()->with('success', 'EMI deleted successfully.');
     }
     public function showDocument($id)
