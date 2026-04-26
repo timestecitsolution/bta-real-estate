@@ -63,8 +63,8 @@
 <?php
 $Topics_on_going = Helper::Topics(8,30,4);
 $Topics_upcoming = Helper::Topics(8,31,4);
-$social_activities = Helper::Topics(15,35,4);
-$services = Helper::Topics(16,37,4);
+$social_activities = Helper::Topics(15,36,4);
+$services = Helper::Topics(16,33,4);
 ?>
   <section class="upcoming-project ongoing-project">
     <div class="container">
