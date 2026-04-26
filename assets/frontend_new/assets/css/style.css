@@ -44,6 +44,268 @@
         display: none !important;
     }
 }
+/* Social activity styles start */
+/* ── Page Layout ── */
+    /* ── Page Layout ── */
+    .social-activity-page {
+        padding: 60px 0 80px;
+        background: #f8f7f4;
+        min-height: 60vh;
+    }
+ 
+    /* ── Banner / Title Section ── */
+    .social-activity-title-section {
+        position: relative;
+        width: 100%;
+        min-height: 420px;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+        background: #1a1814;
+    }
+ 
+    .social-activity-banner-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+    }
+ 
+    .social-activity-banner-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            rgba(10, 9, 7, 0.15) 0%,
+            rgba(10, 9, 7, 0.75) 100%
+        );
+    }
+ 
+    .social-activity-banner-content {
+        position: relative;
+        z-index: 2;
+        padding: 48px 0 44px;
+        width: 100%;
+    }
+ 
+    .social-activity-title-section h1 {
+        font-size: clamp(1.75rem, 4vw, 2.75rem);
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin: 0;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+ 
+    .social-activity-label {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #fdf3e4;
+        background: rgba(176, 125, 69, 0.85);
+        border: 1px solid rgba(240, 217, 181, 0.4);
+        border-radius: 4px;
+        padding: 4px 10px;
+        margin-bottom: 16px;
+    }
+ 
+    @media (max-width: 768px) {
+        .social-activity-title-section {
+            min-height: 280px;
+        }
+    }
+ 
+    /* ── Details Section ── */
+    .social-activity-details-section {
+        padding: 52px 0;
+        background: #ffffff;
+    }
+ 
+    .section-heading {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #b07d45;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f0d9b5;
+    }
+ 
+    .social-activity-details-text {
+        font-size: 16px;
+        line-height: 1.85;
+        color: #3d3a33;
+        margin-bottom: 0;
+    }
+ 
+    /* ── Video Embed ── */
+    .video-embed-wrapper {
+        margin: 36px 0 0;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #000;
+        position: relative;
+        aspect-ratio: 16 / 9;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+ 
+    .video-embed-wrapper iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+ 
+    /* ── Divider ── */
+    .section-divider {
+        border: none;
+        border-top: 1px solid #e8e5df;
+        margin: 0;
+    }
+ 
+    /* ── Gallery Section ── */
+    .social-activity-gallery-section {
+        padding: 52px 0 60px;
+        background: #f8f7f4;
+    }
+ 
+    .gallery-heading-row {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+ 
+    .gallery-heading-row h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1814;
+        letter-spacing: -0.01em;
+        margin: 0;
+    }
+ 
+    .gallery-count {
+        font-size: 13px;
+        color: #9a9389;
+    }
+ 
+    /* ── Gallery Grid ── */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
+    }
+ 
+    .gallery-item {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #e8e5df;
+        cursor: pointer;
+    }
+ 
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+    }
+ 
+    .gallery-item:hover img {
+        transform: scale(1.05);
+    }
+ 
+    .gallery-item::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(26, 24, 20, 0);
+        transition: background 0.3s ease;
+    }
+ 
+    .gallery-item:hover::after {
+        background: rgba(26, 24, 20, 0.15);
+    }
+ 
+    /* ── Lightbox ── */
+    .lightbox-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 9, 7, 0.92);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+ 
+    .lightbox-overlay.active {
+        display: flex;
+    }
+ 
+    .lightbox-img {
+        max-width: 90vw;
+        max-height: 90vh;
+        border-radius: 6px;
+        object-fit: contain;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+ 
+    .lightbox-close {
+        position: fixed;
+        top: 20px;
+        right: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffffff;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+ 
+    .lightbox-close:hover {
+        background: rgba(255,255,255,0.2);
+    }
+ 
+    /* ── Empty State ── */
+    .gallery-empty {
+        text-align: center;
+        padding: 48px 24px;
+        color: #9a9389;
+        font-size: 14px;
+        border: 1px dashed #d5d0c8;
+        border-radius: 8px;
+        background: #ffffff;
+    }
+ 
+    @media (max-width: 768px) {
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 8px;
+        }
+        .social-activity-details-section {
+            padding: 32px 0;
+        }
+    }
+/* Social activity styles end */
 .btn-primary {
   border-radius: 16px;
   background: var(--primary-color);

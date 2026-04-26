@@ -56,6 +56,8 @@ Route::post('/submit-land-query', [LandQueryController::class, 'submit'])->name(
 // Route::get('/land-query', [LandQueryController::class, 'index']);
 Route::get('/projects', [HomeController::class, 'projects'])->name('projects');
 Route::get('/details/{project_id?}', [HomeController::class, 'details'])->name('details');
+Route::get('/social-activity-details/{activity_id?}', [HomeController::class, 'social_activity_details'])->name('social.activity.details');
+Route::get('/service-details/{service_id?}', [HomeController::class, 'service_details'])->name('service.details');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 Route::post('/login-new', [BookingController::class, 'loginbookinguser'])->name('booking.loginbookinguser');
 Route::get('/change-password', [ChangePassword::class, 'index'])->name('change-password')->middleware('user');
@@ -106,6 +108,7 @@ Route::middleware(['force.password.change'])->group(function() {
 
     Route::get('/emi/document/{id}', [EmiController::class, 'showDocument'])->name('emi.document.show');
     Route::get('/emi/document/{id}/download', [EmiController::class, 'downloadDocument'])->name('emi.document.download');
+    Route::get('/emi/scheduled', [EmiController::class, 'scheduledEmiMessage'])->name('emi.scheduled');
     Route::post('/material/change/{id}', [MaterialDetailsController::class, 'MaterialChangeApplication'])->name('material.change');
     Route::post('/material/action/{id}', [MaterialDetailsController::class, 'MaterialChangeApproval'])->name('material.action');
     Route::post('/send-sms', [BulkSmsController::class, 'bulksms'])->name('bulk.sms');

@@ -130,6 +130,38 @@
     <div class="shape2 d-none d-lg-block">
       <img src="{{ URL::asset('assets/frontend_new/assets/images/shape/1.svg') }}" alt="">
     </div>
+  @elseif($slug == 'social-activity-details')
+  <!-- Hero Section -->
+  <section class="hero-banner">
+    <div class="container">
+      <div class="innerheader ps-0 ps-lg-5">
+        <h1>Social Activity</h1>
+      </div>
+    </div>
+
+    <div class="shape1 d-none d-lg-block">
+      <img src="{{ URL::asset('assets/frontend_new/assets/images/shape/2.svg') }}" alt="">
+    </div>
+  </section>
+  <div class="shape2 d-none d-lg-block">
+    <img src="{{ URL::asset('assets/frontend_new/assets/images/shape/1.svg') }}" alt="">
+  </div>
+  @elseif($slug == 'service-details')
+  <!-- Hero Section -->
+  <section class="hero-banner">
+    <div class="container">
+      <div class="innerheader ps-0 ps-lg-5">
+        <h1>Service Details</h1>
+      </div>
+    </div>
+
+    <div class="shape1 d-none d-lg-block">
+      <img src="{{ URL::asset('assets/frontend_new/assets/images/shape/2.svg') }}" alt="">
+    </div>
+  </section>
+  <div class="shape2 d-none d-lg-block">
+    <img src="{{ URL::asset('assets/frontend_new/assets/images/shape/1.svg') }}" alt="">
+  </div>
   @elseif($slug == 'dashboard-new')
     <!-- Hero Section -->
     <section class="hero-banner">

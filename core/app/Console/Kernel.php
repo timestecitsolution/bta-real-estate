@@ -12,9 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('inspire')->hourly();
         $schedule->call(function () {
-            app(\App\Services\EmiNotificationService::class)->run();
+            app(\App\Http\Controllers\EmiController::class)->scheduledEmiMessage();
         })->everyMinute();
     }
 

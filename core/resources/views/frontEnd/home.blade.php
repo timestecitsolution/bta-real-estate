@@ -63,7 +63,8 @@
 <?php
 $Topics_on_going = Helper::Topics(8,30,4);
 $Topics_upcoming = Helper::Topics(8,31,4);
-
+$social_activities = Helper::Topics(15,35,4);
+$services = Helper::Topics(16,37,4);
 ?>
   <section class="upcoming-project ongoing-project">
     <div class="container">
@@ -79,7 +80,7 @@ $Topics_upcoming = Helper::Topics(8,31,4);
             <img src="{{ URL::to('uploads/topics/'.$project->photo_file) }}" alt="">
             <div class="bottom-content">
               <h3>{{$project->title_en}}</h3>
-              <a href="{{ route('details', $project->id) }}">View projects <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{{ route('details', $project->id) }}">View details <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>
@@ -95,8 +96,6 @@ $Topics_upcoming = Helper::Topics(8,31,4);
         <h1>Upcoming Project</h1>
       </div>
       <div class="row">
-
-
         @foreach($Topics_upcoming as $key_u => $project_u)
         <div class="col-lg-3">
           <div class="project-single">
@@ -109,11 +108,55 @@ $Topics_upcoming = Helper::Topics(8,31,4);
           </div>
         </div>
         @endforeach
+      </div>
+    </div>
+  </section>
+  <!-- Social Activities -->
+  <section class="upcoming-project">
+    <div class="container">
+      <div class="title-two mb-5">
+        <h1>Social Activities</h1>
+      </div>
+      <div class="row">
+        @foreach($social_activities as $key_s => $activities)
+        <div class="col-lg-3">
+          <div class="project-single">
+
+            <img src="{{ URL::to('uploads/topics/'.$activities->photo_file) }}" alt="">
+            <div class="bottom-content">
+              <h3>{{$activities->title_en}}</h3>
+              <a href="{{ route('social.activity.details', $activities->id) }}">View details <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        @endforeach
         
       </div>
     </div>
   </section>
+  <!-- Service section -->
+  <section class="upcoming-project">
+    <div class="container">
+      <div class="title-two mb-5">
+        <h1>Services</h1>
+      </div>
+      <div class="row">
+        @foreach($services as $key_s => $service)
+        <div class="col-lg-3">
+          <div class="project-single">
 
+            <img src="{{ URL::to('uploads/topics/'.$service->photo_file) }}" alt="">
+            <div class="bottom-content">
+              <h3>{{$service->title_en}}</h3>
+              <a href="{{ route('service.details', $service->id) }}">View details <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        @endforeach
+        
+      </div>
+    </div>
+  </section>
   <section class="home-about why-choose">
     <div class="container">
       <div class="home-about-content ps-5">

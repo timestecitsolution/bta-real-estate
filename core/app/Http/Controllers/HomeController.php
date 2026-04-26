@@ -1212,5 +1212,15 @@ class HomeController extends Controller
         $details = Topic::with('categories','fields','photos','relatedTopics')->where('id', $id)->first();
         return view("frontEnd.project_details", ["page_data" => $details]);
     }
+    public function social_activity_details($id)
+    {
+        $details = Topic::with('categories','fields','photos','relatedTopics')->where('id', $id)->first();
+        return view("frontEnd.social_activity_details", ["page_data" => $details, "PageTitle" => $details->title_en ?? '']);
+    }
+    public function service_details($id)
+    {
+        $details = Topic::with('categories','fields','photos','relatedTopics')->where('id', $id)->first();
+        return view("frontEnd.service_details", ["page_data" => $details, "PageTitle" => $details->title_en ?? '']);
+    }
 
 }

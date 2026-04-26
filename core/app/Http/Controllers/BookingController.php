@@ -313,20 +313,12 @@ class BookingController extends Controller
                                 continue; 
                             }
 
-                            // $extras_amount = floatval($emiItems->extras_amount ?? 0);
-                            // $total_paid_with_extras += ($emiItems->amount + $extras_amount);
-                            // $emi->total_paid_amount_with_extras = $total_paid_with_extras;
-                            // $emi->remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
-
                             $amount = floatval($emiItems->amount ?? 0);
                             $extras_amount = floatval($emiItems->extras_amount ?? 0);
 
                             $current_total_with_extras += ($amount + $extras_amount);
                         }
 
-                        // $emi->voucher_no = $emi->transactions->voucher_no;
-                        // $emi->document_path = $emi->transactions->document_path;
-                        // $emi->remaining_emi_count = max($emi_count - $actual_emi_paid_count, 0);
                         $total_paid_with_extras = $current_total_with_extras;
                         $emi->total_paid_amount_with_extras = $total_paid_with_extras;
                         $emi->remaining_due_amount_with_extras = max($total_price - $total_paid_with_extras, 0);
@@ -362,7 +354,7 @@ class BookingController extends Controller
         $allDocumentTypes = DocumentType::all();
         $applicationSubjects = ClientApplicationSubject::where('type', 'application')->get();
 
-        $bulksmsdata = BulkSmsData::all();
+        $bulksmsdata = BulkSmsData::orderBy('id', 'desc')->get();
         $applicationdata = CentralApplication::with(['subject', 'creator', 'feedbacks.feedbackCreator', 'attachments', 'project', 'flat'])
             ->where('applied_by', $user->id)
             ->get();
