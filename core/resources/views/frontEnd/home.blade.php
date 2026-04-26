@@ -112,6 +112,7 @@ $services = Helper::Topics(16,37,4);
     </div>
   </section>
   <!-- Social Activities -->
+   @if($social_activities->count() > 0 )
   <section class="upcoming-project">
     <div class="container">
       <div class="title-two mb-5">
@@ -134,7 +135,9 @@ $services = Helper::Topics(16,37,4);
       </div>
     </div>
   </section>
+  @endif
   <!-- Service section -->
+   @if($services->count() > 0 )
   <section class="upcoming-project">
     <div class="container">
       <div class="title-two mb-5">
@@ -157,6 +160,7 @@ $services = Helper::Topics(16,37,4);
       </div>
     </div>
   </section>
+  @endif
   <section class="home-about why-choose">
     <div class="container">
       <div class="home-about-content ps-5">
