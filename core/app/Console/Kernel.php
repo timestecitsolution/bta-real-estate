@@ -12,9 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->call(function () {
-            app(\App\Http\Controllers\EmiController::class)->scheduledEmiMessage();
-        })->everyMinute();
+        $schedule->command('emi:send-reminder')->everyMinute();
     }
 
     /**

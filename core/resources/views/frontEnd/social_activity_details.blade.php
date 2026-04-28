@@ -26,7 +26,7 @@
 {{-- ══════════════════════════════════
      SECTION 1 — BANNER + TITLE
 ══════════════════════════════════ --}}
-<div class="social-activity-title-section">
+<div class="social-activity-title-section"> 
     @if($page_data->photo)
         <img
             class="social-activity-banner-img"

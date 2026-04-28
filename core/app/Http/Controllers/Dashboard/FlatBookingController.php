@@ -341,7 +341,7 @@ class FlatBookingController extends Controller
                 $message .= "\n-- EMI Details --\n"
                     . "Total EMI : {$request->emi_count} installments\n"
                     . "Per Month : " . number_format($request->emi_amount) . " BDT\n"
-                    . "1st EMI   : " . date('d-m-Y', strtotime($request->emi_start_date)) . "\n";
+                    . "1st EMI   : " . date('d-m-Y', strtotime($request->emi_start_date ?? $request->emi_start_date_flat)) . "\n";
             }
 
             $message .= "\nThank you for choosing us!";
