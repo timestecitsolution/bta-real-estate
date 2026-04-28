@@ -318,12 +318,23 @@ class FlatBookingController extends Controller
                 $flatTotal    = $request->total_price_flat[$index] ?? 0;
                 $flatNo       = $index + 1;
 
+                // প্রতিটা flat এর নিজস্ব EMI start date
+                $emiStartDate = $request->emi_start_date 
+                ?? ($request->emi_start_date_flat[$index] ?? null);
+
                 $flatLines .= "-- Flat {$flatNo} --\n"
                     . "Project : {$project->title_en}\n"
                     . "Flat    : {$flat->flat_name}\n"
                     . "Size    : {$flatSize} sq ft\n"
                     . "Rate    : " . number_format($pricePerSqft) . " BDT/sqft\n"
                     . "Price   : " . number_format($flatTotal) . " BDT\n";
+
+                // EMI details প্রতিটা flat এর সাথে
+                if (!empty($request->emi_count) && $emiStartDate) {
+                    $emiAmountFlat = $request->emi_amount_flat[$index] ?? $request->emi_amount;
+                    $flatLines .= "EMI/Month: " . number_format($emiAmountFlat) . " BDT\n"
+                        . "1st EMI  : " . date('d-m-Y', strtotime($emiStartDate)) . "\n";
+                }
             }
 
             // Build payment summary
@@ -340,13 +351,14 @@ class FlatBookingController extends Controller
             if (!empty($request->emi_count)) {
                 $message .= "\n-- EMI Details --\n"
                     . "Total EMI : {$request->emi_count} installments\n"
-                    . "Per Month : " . number_format($request->emi_amount) . " BDT\n"
-                    . "1st EMI   : " . date('d-m-Y', strtotime($request->emi_start_date ?? $request->emi_start_date_flat)) . "\n";
+                    . "Per Month : " . number_format($request->emi_amount) . " BDT\n";
             }
 
             $message .= "\nThank you for choosing us!";
             // Send the SMS
-            SMSService::send($customerPhone, $message);
+            // SMSService::send($customerPhone, $message);
+            SMSService::send('88' . '01600000127', $message);
+
         });
         return redirect()
             ->route('flat-booking')
