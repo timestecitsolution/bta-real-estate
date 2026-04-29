@@ -48,8 +48,13 @@ class CentralApplication extends Model
         return $this->belongsTo(Topic::class, 'project_id');
     }
 
+    // public function flat()
+    // {
+    //     return $this->belongsTo(Tags::class, 'flat_id');
+    // }
+    
     public function flat()
     {
-        return $this->belongsTo(Tags::class, 'flat_id');
+        return $this->belongsTo(FlatDetailsModel::class, 'flat_id');
     }
 }

@@ -47,7 +47,7 @@
             <div class="mb-4">
                 <strong>Flat:</strong>
                 <span style="margin-left:10px;">
-                    {{ $applications->flat->title ?? 'N/A' }}
+                    {{ $applications->flat->flat_name ?? 'N/A' }}
                 </span>
             </div>
 
@@ -171,7 +171,7 @@
                         <button type="submit" class="btn btn-success">
                             <i class="material-icons">&#xe876;</i> Submit
                         </button>
-                        <a href="{{ route('price') }}" class="btn btn-default">
+                        <a href="{{ route('application-list') }}" class="btn btn-default">
                             Back
                         </a>
                     </div>

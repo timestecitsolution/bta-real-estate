@@ -242,22 +242,16 @@
         // Base64 decode the body
         const encodedBody = $(this).attr('data-body');
         let decodedBody = '';
-
-        // try {
-        //     decodedBody = atob(encodedBody);
-        // } catch(e) {
-        //     decodedBody = $(this).attr('data-body'); // fallback
-        // }
         try {
             decodedBody = decodeURIComponent(
                 atob(encodedBody)
                     .split('')
                     .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
                     .join('')
-                    
+
             );
         } catch(e) {
-            decodedBody = encodedBody; // fallback
+            decodedBody = encodedBody; 
         }
 
         // Set main fields
