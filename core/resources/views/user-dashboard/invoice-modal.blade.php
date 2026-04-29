@@ -129,9 +129,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                @if($emi->status == 'approved' )
                     <button class="btn btn-success" onclick="printInvoice({{ $emi->id }})">Print</button>
-                @endif
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
