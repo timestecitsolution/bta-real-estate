@@ -356,8 +356,7 @@ class FlatBookingController extends Controller
 
             $message .= "\nThank you for choosing us!";
             // Send the SMS
-            // SMSService::send($customerPhone, $message);
-            SMSService::send('88' . '01600000127', $message);
+            SMSService::send($customerPhone, $message);
 
         });
         return redirect()

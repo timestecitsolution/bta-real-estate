@@ -37,14 +37,12 @@ class SendEmiReminder extends Command
             EmiPayment::select('booking_id', DB::raw('MAX(emi_due_date) as latest_due_date'))
                     ->whereIn('booking_id', function($query) {
                         $query->select('booking_id')
-                            ->from('emi_payments')
-                            ->where('status', 'Unpaid');
+                            ->from('emi_payments');
                     })
                     ->groupBy('booking_id')
                     ->orderBy('booking_id')
                     ->chunk(100, function ($groups) use ($today) {
                     foreach ($groups as $group) {
-
                         $booking = FlatBookingModel::find($group->booking_id);
                         if (!$booking) continue;
 
@@ -95,10 +93,9 @@ class SendEmiReminder extends Command
                         }
 
                         if ($message) {
-                            // SMSService::send('88' . $contact->phone, $message);
-                            // SMSService::send('88' . '01812005333', $message);
-                            // SMSService::send('88' . '01814783810', $message);
-                            SMSService::send('88' . '01600000127', $message);
+                            SMSService::send('88' . $contact->phone, $message);
+                            SMSService::send('88' . '01812005333', $message);
+                            SMSService::send('88' . '01814783810', $message);
                         }
                     }
                 });
