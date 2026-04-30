@@ -82,7 +82,7 @@ class LandQueryController extends Controller
         ]);
         $mail_to = Helper::GeneralSiteSettings("land_query_mail");
 
-        Mail::to($query->email)->send(new LandQueryMail($query));
+        // Mail::to($query->email)->send(new LandQueryMail($query));
 
         return back()->with('success', 'Query submitted successfully.');
     }

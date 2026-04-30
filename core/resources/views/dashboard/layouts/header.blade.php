@@ -1,3 +1,4 @@
+
 <div class="app-header white box-shadow navbar-md">
     <div class="navbar">
         <!-- Open side - Naviation on mobile -->
@@ -21,7 +22,7 @@
             $alerts = count($webmailsAlerts) + count($eventsAlerts);
             ?>
             @if($alerts >0)
-                <li class="nav-item dropdown pos-stc-xs">
+                <!-- <li class="nav-item dropdown pos-stc-xs">
                     <a class="nav-link" data-toggle="dropdown">
                         <i class="material-icons">&#xe7f5;</i>
                         @if($alerts >0)
@@ -64,8 +65,29 @@
                             </div>
                         </div>
                     </div>
-                </li>
+                </li> -->
             @endif
+            <!-- Navbar Dropdown -->
+            <li class="nav-item dropdown pos-stc-xs">
+                <a class="nav-link" data-toggle="dropdown">
+                    <i class="material-icons">&#xe7f5;</i>
+                    <span class="label label-sm up warn" style="display:none">0</span>
+                </a>
+                <div class="dropdown-menu pull-right w-xl animated fadeInUp no-bg no-border no-shadow">
+                    <div class="box dark">
+                        <div class="box-header p-a clearfix">
+                            <strong>Notifications</strong>
+                            <button onclick="NM.seenAll()"
+                                    class="btn btn-xs btn-default pull-right">
+                                Clear All
+                            </button>
+                        </div>
+                        <div class="box p-a scrollable maxHeight320">
+                            <ul class="list-group list-group-gap m-a-0" id="notif-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link clear" data-toggle="dropdown">
                   <span class="avatar w-32">
@@ -225,3 +247,128 @@
         </div>
     </div>
 </div>
+<script>
+window._userId    = {{ auth()->id() }};
+window._csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+const actionBg = { created: '#e8f5e9', updated: '#fff8e1', deleted: '#ffebee' };
+
+class NotificationManager {
+    constructor() {
+        this.count = 0;
+        this.list  = document.getElementById('notif-list');
+        this.badge = document.querySelector('.label.warn');
+        this.init();
+    }
+
+    async init() {
+        await this.load();
+        this.connect();
+    }
+
+    async load() {
+        const data = await fetch('/notifications').then(r => r.json());
+        this.count = data.count;
+        this.updateBadge();
+        if (data.notifications.length === 0) {
+            this.showEmpty();
+        } else {
+            data.notifications.forEach(n => this.addItem(n, false));
+        }
+    }
+
+    connect() {
+        const pusher = new Pusher('{{ config("broadcasting.connections.pusher.key") }}', {
+            cluster: '{{ config("broadcasting.connections.pusher.options.cluster") }}',
+            forceTLS:     true,
+            authEndpoint: '/broadcasting/auth',
+            auth: { headers: { 'X-CSRF-TOKEN': window._csrfToken } }
+        });
+
+        window.Echo = new Echo({ broadcaster: 'pusher', client: pusher });
+
+        window.Echo.private(`notifications.${window._userId}`)
+            .listen('NotificationCreated', ({ notification }) => {
+                this.removeEmpty();
+                this.count++;
+                this.updateBadge();
+                this.addItem(notification, true);
+            })
+            .listen('NotificationSeen', ({ notificationId }) => {
+                notificationId === 'all' ? this.removeAll() : this.removeOne(notificationId);
+            });
+    }
+
+    addItem(n, animate) {
+        const li      = document.createElement('li');
+        li.className  = 'list-group-item lt box-shadow-z0 b';
+        li.dataset.id = n.id;
+        li.innerHTML  = `
+            <span class="clear block">
+                <i class="material-icons" style="font-size:15px;vertical-align:middle">${n.icon || 'notifications'}</i>
+                <strong> ${n.title}</strong><br>
+                <small>${n.message}</small><br>
+                <small class="text-muted">${n.time || 'এইমাত্র'}</small>
+                ${n.url ? `<a href="${n.url}" onclick="NM.seen(${n.id})"
+                    class="btn btn-xs btn-default pull-right m-t-xs">দেখুন</a>` : ''}
+            </span>`;
+
+        if (animate) {
+            li.style.background = actionBg[n.action] || '#fffde7';
+            setTimeout(() => li.style.transition = 'background 1.5s', 50);
+            setTimeout(() => li.style.background = '', 2500);
+        }
+
+        this.list.prepend(li);
+    }
+
+    async seen(id) {
+        this.removeOne(id);
+        await fetch(`/notifications/${id}/seen`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': window._csrfToken }
+        });
+    }
+
+    async seenAll() {
+        this.removeAll();
+        await fetch('/notifications/seen-all', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': window._csrfToken }
+        });
+    }
+
+    removeOne(id) {
+        document.querySelector(`#notif-list [data-id="${id}"]`)?.remove();
+        this.count = Math.max(0, this.count - 1);
+        this.updateBadge();
+        if (!this.list.querySelector('[data-id]')) this.showEmpty();
+    }
+
+    removeAll() {
+        this.list.querySelectorAll('[data-id]').forEach(el => el.remove());
+        this.count = 0;
+        this.updateBadge();
+        this.showEmpty();
+    }
+
+    updateBadge() {
+        if (!this.badge) return;
+        this.badge.textContent   = this.count;
+        this.badge.style.display = this.count > 0 ? 'inline' : 'none';
+    }
+
+    showEmpty() {
+        if (!this.list.querySelector('.notif-empty')) {
+            this.list.innerHTML =
+                '<li class="list-group-item text-muted text-center notif-empty">কোনো notification নেই</li>';
+        }
+    }
+
+    removeEmpty() {
+        this.list.querySelector('.notif-empty')?.remove();
+    }
+}
+
+window.NM = new NotificationManager();
+</script>

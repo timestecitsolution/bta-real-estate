@@ -108,7 +108,7 @@ class BookingController extends Controller
 
         $mail_to = Helper::GeneralSiteSettings("land_query_mail");
         // Send Email
-        Mail::to($query->email)->send(new BookingQueryMail($query));
+        // Mail::to($query->email)->send(new BookingQueryMail($query));
         
         return redirect()->back()->with('success', 'Your visit booking request is submitted successfully!');
     }

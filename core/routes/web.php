@@ -13,6 +13,7 @@ use App\Http\Controllers\BulkSmsController;
 use App\Http\Controllers\centralApplicationController;
 use App\Http\Controllers\Dashboard\ClientApplicationSubjectController;
 use App\Services\EmiNotificationService;
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -117,6 +118,13 @@ Route::middleware(['force.password.change'])->group(function() {
     Route::get('/application-subject/{id}/body', [ClientApplicationSubjectController::class, 'getBody']);
     Route::post('/application/feedback/store', [ClientApplicationSubjectController::class, 'feedbackreplystore'])
     ->name('application.feedback.store');
+});
+
+// routes/web.php
+Route::middleware('auth')->prefix('notifications')->group(function () {
+    Route::get('/',           [NotificationController::class, 'index']);
+    Route::post('/{id}/seen', [NotificationController::class, 'markSeen']);
+    Route::post('/seen-all',  [NotificationController::class, 'markAllSeen']);
 });
 
 Route::get('/login-new', [BookingController::class, 'UserLogin'])->name('login-new');

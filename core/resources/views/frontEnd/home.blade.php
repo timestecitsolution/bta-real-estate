@@ -414,15 +414,15 @@ $('#fileInput').on('change', function () {
                     success: function (response) {
                         let options = '<option selected disabled>Select Flat *</option>';
 
-                        if (response.tags.length > 0) {
-                            response.tags.forEach(function (tag) {
-                                options += `<option value="${tag.title}">${tag.title}</option>`;
+                        if (response.flats.length > 0) {
+                            response.flats.forEach(function (flats) {
+                                options += `<option value="${flats.id}">${flats.flat_name}</option>`;
                             });
 
                             $('#flat_id').html(options);
                             // $('#flat_section').show();
                         } else {
-                            $('#flat_id').html('<option>No tags found</option>');
+                            $('#flat_id').html('<option>No flats found</option>');
                             // $('#flat_section').hide();
                         }
                     }

@@ -130,7 +130,7 @@
             </div>
             <div class="modal-footer">
                     <button class="btn btn-success" onclick="printInvoice({{ $emi->id }})">Print</button>
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

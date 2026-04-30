@@ -33,4 +33,8 @@ class EmiPayment extends Model
     {
         return $this->hasOne(Transactions::class, 'id' , 'transaction_id');
     }  
+    public function booking()
+    {
+        return $this->belongsTo(FlatBookingModel::class, 'booking_id');
+    }
 }
